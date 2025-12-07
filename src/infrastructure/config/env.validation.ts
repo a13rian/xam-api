@@ -1,0 +1,54 @@
+import { z } from 'zod';
+
+const booleanString = z
+  .string()
+  .optional()
+  .default('false')
+  .transform((val) => val === 'true');
+
+const envSchema = z.object({
+  // App
+  NODE_ENV: z
+    .enum(['development', 'production', 'test'])
+    .default('development'),
+  PORT: z.coerce.number().int().positive().default(3000),
+  APP_NAME: z.string().optional().default('XAM API'),
+  API_PREFIX: z.string().optional().default('api'),
+  CORS_ORIGINS: z
+    .string()
+    .optional()
+    .default('http://localhost:3000')
+    .transform((val) => val.split(',').map((s) => s.trim())),
+
+  // Database
+  DB_HOST: z.string().optional().default('localhost'),
+  DB_PORT: z.coerce.number().int().positive().default(5432),
+  DB_USERNAME: z.string().optional().default('postgres'),
+  DB_PASSWORD: z.string().optional().default('password'),
+  DB_NAME: z.string().optional().default('xam_api'),
+  DB_SYNCHRONIZE: booleanString,
+  DB_LOGGING: booleanString,
+  DB_SSL: booleanString,
+
+  // JWT
+  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
+  JWT_EXPIRES_IN: z.string().optional().default('15m'),
+  JWT_REFRESH_SECRET: z.string().optional(),
+  JWT_REFRESH_EXPIRES_IN: z.string().optional().default('7d'),
+});
+
+export type EnvConfig = z.infer<typeof envSchema>;
+
+export function validateEnv(config: Record<string, unknown>): EnvConfig {
+  const result = envSchema.safeParse(config);
+
+  if (!result.success) {
+    const errors = result.error.issues
+      .map((issue) => `  - ${issue.path.join('.')}: ${issue.message}`)
+      .join('\n');
+
+    throw new Error(`Environment validation failed:\n${errors}`);
+  }
+
+  return result.data;
+}

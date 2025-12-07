@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD, APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { CqrsModule } from '@nestjs/cqrs';
+import { LoggerModule } from 'nestjs-pino';
 import { PersistenceModule } from './infrastructure/persistence/persistence.module';
 import { AuthModule } from './presentation/modules/auth.module';
 import { UserModule } from './presentation/modules/user.module';
@@ -14,6 +15,7 @@ import { ValidationPipe } from './shared/pipes/validation.pipe';
 import appConfig from './infrastructure/config/app.config';
 import databaseConfig from './infrastructure/config/database.config';
 import jwtConfig from './infrastructure/config/jwt.config';
+import { validateEnv } from './infrastructure/config/env.validation';
 
 @Module({
   imports: [
@@ -24,6 +26,31 @@ import jwtConfig from './infrastructure/config/jwt.config';
         process.env.NODE_ENV === 'test'
           ? ['.env.test']
           : ['.env.local', '.env'],
+      validate: validateEnv,
+    }),
+    LoggerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const isProduction = configService.get('NODE_ENV') === 'production';
+        return {
+          pinoHttp: {
+            level: isProduction ? 'info' : 'debug',
+            transport: isProduction
+              ? undefined
+              : {
+                  target: 'pino-pretty',
+                  options: {
+                    colorize: true,
+                    singleLine: true,
+                    translateTime: 'SYS:standard',
+                  },
+                },
+            autoLogging: false,
+            quietReqLogger: true,
+          },
+        };
+      },
     }),
     CqrsModule.forRoot(),
     PersistenceModule,

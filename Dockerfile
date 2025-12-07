@@ -1,13 +1,13 @@
 # ===========================================
 # Base stage - Common dependencies
 # ===========================================
-FROM node:22-alpine AS base
+FROM oven/bun:1-alpine AS base
 
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Install dependencies
-COPY package.json yarn.lock ./
+COPY package.json bun.lock ./
 
 # ===========================================
 # Development stage
@@ -16,32 +16,32 @@ FROM base AS development
 
 ENV NODE_ENV=development
 
-RUN yarn install --frozen-lockfile
+RUN bun install --frozen-lockfile
 
 COPY . .
 
 EXPOSE 3000
 
-CMD ["yarn", "dev"]
+CMD ["bun", "run", "dev"]
 
 # ===========================================
 # Builder stage - Build the application
 # ===========================================
 FROM base AS builder
 
-RUN yarn install --frozen-lockfile
+RUN bun install --frozen-lockfile
 
 COPY . .
 
-RUN yarn build
+RUN bun run build
 
 # Remove dev dependencies
-RUN yarn install --production --frozen-lockfile && yarn cache clean
+RUN bun install --production --frozen-lockfile
 
 # ===========================================
 # Production stage - Minimal runtime image
 # ===========================================
-FROM node:22-alpine AS production
+FROM oven/bun:1-alpine AS production
 
 ENV NODE_ENV=production
 
@@ -60,4 +60,4 @@ USER nestjs
 
 EXPOSE 3000
 
-CMD ["node", "dist/main.js"]
+CMD ["bun", "run", "dist/main.js"]
