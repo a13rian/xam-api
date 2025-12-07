@@ -59,37 +59,6 @@ services:
     profiles:
       - dev
 
-  # ===========================================
-  # API - Production
-  # ===========================================
-  api-prod:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: production
-    container_name: xam-api-prod
-    restart: unless-stopped
-    ports:
-      - "${APP_PORT:-3000}:3000"
-    environment:
-      NODE_ENV: production
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USERNAME: ${DB_USERNAME:-postgres}
-      DB_PASSWORD: ${DB_PASSWORD:-postgres}
-      DB_DATABASE: ${DB_DATABASE:-xam_api}
-      DB_LOGGING: ${DB_LOGGING:-false}
-      DB_MIGRATIONS_RUN: ${DB_MIGRATIONS_RUN:-true}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - xam-network
-    profiles:
-      - prod
-
 volumes:
   postgres_data:
     driver: local

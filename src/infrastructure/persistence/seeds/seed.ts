@@ -9,6 +9,7 @@ import { PasswordResetTokenOrmEntity } from '../typeorm/entities/password-reset-
 import { EmailVerificationTokenOrmEntity } from '../typeorm/entities/email-verification-token.orm-entity';
 import { seedPermissions } from './permissions.seed';
 import { seedRoles } from './roles.seed';
+import { seedUsers } from './users.seed';
 
 config({ path: '.env.local' });
 config({ path: '.env' });
@@ -38,7 +39,8 @@ async function runSeeds() {
     console.log('Data source initialized');
 
     const permissions = await seedPermissions(dataSource);
-    await seedRoles(dataSource, permissions);
+    const roles = await seedRoles(dataSource, permissions);
+    await seedUsers(dataSource, roles);
 
     console.log('All seeds completed successfully');
   } catch (error) {

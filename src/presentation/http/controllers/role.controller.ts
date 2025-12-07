@@ -1,36 +1,36 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Delete,
   Body,
-  Param,
-  Query,
-  ParseUUIDPipe,
+  Controller,
+  Delete,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { Roles } from '../../../shared/decorators/roles.decorator';
-import {
-  CreateRoleDto,
-  UpdateRoleDto,
-  RoleResponseDto,
-  RoleListResponseDto,
-  PermissionListResponseDto,
-} from '../dto/role';
 import {
   CreateRoleCommand,
-  UpdateRoleCommand,
   DeleteRoleCommand,
+  UpdateRoleCommand,
 } from '../../../core/application/role/commands';
 import { CreateRoleResult } from '../../../core/application/role/commands/create-role/create-role.handler';
 import {
   GetRoleQuery,
-  ListRolesQuery,
   ListPermissionsQuery,
+  ListRolesQuery,
 } from '../../../core/application/role/queries';
+import { Roles } from '../../../shared/decorators/roles.decorator';
+import {
+  CreateRoleDto,
+  PermissionListResponseDto,
+  RoleListResponseDto,
+  RoleResponseDto,
+  UpdateRoleDto,
+} from '../dto/role';
 
 @Controller('roles')
 export class RoleController {
@@ -42,7 +42,10 @@ export class RoleController {
   @Post()
   @Roles('super_admin', 'admin')
   async create(@Body() dto: CreateRoleDto): Promise<RoleResponseDto> {
-    const result = await this.commandBus.execute(
+    const result = await this.commandBus.execute<
+      CreateRoleCommand,
+      CreateRoleResult
+    >(
       new CreateRoleCommand(
         dto.name,
         dto.description,
