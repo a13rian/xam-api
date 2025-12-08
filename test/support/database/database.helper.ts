@@ -50,6 +50,47 @@ export class DatabaseHelper {
     }
   }
 
+  async cleanAllData(): Promise<void> {
+    // Clean all data including booking platform tables, keep permissions and roles
+    const tableOrder = [
+      // Booking related
+      'booking_services',
+      'bookings',
+      // Schedule related
+      'time_slots',
+      'operating_hours',
+      // Staff related
+      'staff_services',
+      'partner_staff',
+      // Service related
+      'services',
+      'service_categories',
+      // Location related
+      'partner_locations',
+      // Partner related
+      'partner_documents',
+      'partners',
+      // Wallet related
+      'wallet_transactions',
+      'wallets',
+      // Auth/User related
+      'refresh_tokens',
+      'password_reset_tokens',
+      'email_verification_tokens',
+      'user_roles',
+      'users',
+      'organizations',
+    ];
+
+    for (const tableName of tableOrder) {
+      try {
+        await this.dataSource.query(`TRUNCATE TABLE "${tableName}" CASCADE`);
+      } catch {
+        // Table might not exist, ignore
+      }
+    }
+  }
+
   getRepository<T extends object>(entity: new () => T): Repository<T> {
     return this.dataSource.getRepository(entity);
   }

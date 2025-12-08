@@ -1,56 +1,61 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_GUARD, APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { ConfigModule } from '@nestjs/config';
+import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { CqrsModule } from '@nestjs/cqrs';
 import { LoggerModule } from 'nestjs-pino';
+import type { IAppConfig } from './core/application/ports/config/app.config.port';
+import type { ILoggerConfig } from './core/application/ports/config/logger.config.port';
+import { AppConfigModule, validateEnv } from './infrastructure/config';
+import { APP_CONFIG, LOGGER_CONFIG } from './shared/constants/injection-tokens';
 import { PersistenceModule } from './infrastructure/persistence/persistence.module';
 import { AuthModule } from './presentation/modules/auth.module';
-import { UserModule } from './presentation/modules/user.module';
+import { BookingModule } from './presentation/modules/booking.module';
+import { CategoryModule } from './presentation/modules/category.module';
+import { LocationModule } from './presentation/modules/location.module';
 import { OrganizationModule } from './presentation/modules/organization.module';
+import { PartnerStaffModule } from './presentation/modules/partner-staff.module';
+import { PartnerModule } from './presentation/modules/partner.module';
 import { RoleModule } from './presentation/modules/role.module';
+import { ScheduleModule } from './presentation/modules/schedule.module';
+import { ServiceModule } from './presentation/modules/service.module';
+import { UserModule } from './presentation/modules/user.module';
+import { WalletModule } from './presentation/modules/wallet.module';
+import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
 import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
-import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
 import { ValidationPipe } from './shared/pipes/validation.pipe';
-import appConfig from './infrastructure/config/app.config';
-import databaseConfig from './infrastructure/config/database.config';
-import jwtConfig from './infrastructure/config/jwt.config';
-import { validateEnv } from './infrastructure/config/env.validation';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, jwtConfig],
       envFilePath:
         process.env.NODE_ENV === 'test'
           ? ['.env.test']
           : ['.env.local', '.env'],
       validate: validateEnv,
     }),
+    AppConfigModule,
     LoggerModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        const isProduction = configService.get('NODE_ENV') === 'production';
-        return {
-          pinoHttp: {
-            level: isProduction ? 'info' : 'debug',
-            transport: isProduction
-              ? undefined
-              : {
-                  target: 'pino-pretty',
-                  options: {
-                    colorize: true,
-                    singleLine: true,
-                    translateTime: 'SYS:standard',
-                  },
+      imports: [AppConfigModule],
+      inject: [APP_CONFIG, LOGGER_CONFIG],
+      useFactory: (appConfig: IAppConfig, loggerConfig: ILoggerConfig) => ({
+        pinoHttp: {
+          level: loggerConfig.level,
+          transport: appConfig.isProduction
+            ? undefined
+            : {
+                target: 'pino-pretty',
+                options: {
+                  colorize: true,
+                  singleLine: true,
+                  translateTime: 'SYS:standard',
                 },
-            autoLogging: false,
-            quietReqLogger: true,
-          },
-        };
-      },
+              },
+          autoLogging: false,
+          quietReqLogger: true,
+        },
+      }),
     }),
     CqrsModule.forRoot(),
     PersistenceModule,
@@ -58,6 +63,14 @@ import { validateEnv } from './infrastructure/config/env.validation';
     UserModule,
     OrganizationModule,
     RoleModule,
+    WalletModule,
+    PartnerModule,
+    CategoryModule,
+    ServiceModule,
+    LocationModule,
+    ScheduleModule,
+    BookingModule,
+    PartnerStaffModule,
   ],
   providers: [
     {

@@ -5,3 +5,7 @@ export * from './permission.orm-entity';
 export * from './refresh-token.orm-entity';
 export * from './password-reset-token.orm-entity';
 export * from './email-verification-token.orm-entity';
+export * from './wallet.orm-entity';
+export * from './wallet-transaction.orm-entity';
+export * from './partner.orm-entity';
+export * from './partner-document.orm-entity';

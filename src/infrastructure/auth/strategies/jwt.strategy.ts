@@ -1,8 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { ConfigService } from '@nestjs/config';
-import { AuthenticatedUser } from '../../../shared/interfaces/authenticated-user.interface';
+import { JwtConfigService } from '../../config/jwt.config.js';
+import { AuthenticatedUser } from '../../../shared/interfaces/authenticated-user.interface.js';
 
 interface JwtPayload {
   sub: string;
@@ -14,15 +14,11 @@ interface JwtPayload {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly configService: ConfigService) {
-    const secret = configService.get<string>('JWT_SECRET');
-    if (!secret) {
-      throw new Error('JWT_SECRET environment variable is not set');
-    }
+  constructor(private readonly jwtConfig: JwtConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: secret,
+      secretOrKey: jwtConfig.secret,
     });
   }
 

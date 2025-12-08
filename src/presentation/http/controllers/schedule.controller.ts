@@ -1,0 +1,117 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Query,
+  ParseUUIDPipe,
+  NotFoundException,
+} from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { Public } from '../../../shared/decorators/public.decorator';
+import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
+import { AuthenticatedUser } from '../../../shared/interfaces/authenticated-user.interface';
+import {
+  GenerateSlotsDto,
+  GetSlotsQueryDto,
+  GetSlotsByRangeQueryDto,
+  TimeSlotResponseDto,
+} from '../dto/schedule';
+import {
+  GenerateSlotsCommand,
+  BlockSlotCommand,
+  UnblockSlotCommand,
+} from '../../../core/application/schedule/commands';
+import {
+  GetAvailableSlotsQuery,
+  GetSlotsByDateRangeQuery,
+} from '../../../core/application/schedule/queries';
+import { GetMyPartnerQuery } from '../../../core/application/partner/queries';
+
+@Controller('locations/:locationId/slots')
+export class ScheduleController {
+  constructor(private readonly queryBus: QueryBus) {}
+
+  @Get('available')
+  @Public()
+  async getAvailable(
+    @Param('locationId', ParseUUIDPipe) locationId: string,
+    @Query() query: GetSlotsQueryDto,
+  ): Promise<{ items: TimeSlotResponseDto[] }> {
+    return await this.queryBus.execute(
+      new GetAvailableSlotsQuery(locationId, new Date(query.date)),
+    );
+  }
+}
+
+@Controller('partners/me/locations/:locationId/slots')
+export class PartnerScheduleController {
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
+
+  private async getPartnerId(userId: string): Promise<string> {
+    const partner = await this.queryBus.execute(new GetMyPartnerQuery(userId));
+    if (!partner) {
+      throw new NotFoundException('Partner profile not found');
+    }
+    return partner.id;
+  }
+
+  @Get()
+  async getSlots(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('locationId', ParseUUIDPipe) locationId: string,
+    @Query() query: GetSlotsByRangeQueryDto,
+  ): Promise<{ items: TimeSlotResponseDto[] }> {
+    await this.getPartnerId(user.id); // Verify partner
+
+    return await this.queryBus.execute(
+      new GetSlotsByDateRangeQuery(
+        locationId,
+        new Date(query.startDate),
+        new Date(query.endDate),
+      ),
+    );
+  }
+
+  @Post('generate')
+  async generateSlots(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('locationId', ParseUUIDPipe) locationId: string,
+    @Body() dto: GenerateSlotsDto,
+  ): Promise<{ count: number }> {
+    const partnerId = await this.getPartnerId(user.id);
+
+    return await this.commandBus.execute(
+      new GenerateSlotsCommand(
+        locationId,
+        partnerId,
+        new Date(dto.startDate),
+        new Date(dto.endDate),
+        dto.slotDurationMinutes,
+        dto.staffId,
+      ),
+    );
+  }
+
+  @Post(':slotId/block')
+  async blockSlot(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('slotId', ParseUUIDPipe) slotId: string,
+  ): Promise<void> {
+    const partnerId = await this.getPartnerId(user.id);
+    await this.commandBus.execute(new BlockSlotCommand(slotId, partnerId));
+  }
+
+  @Post(':slotId/unblock')
+  async unblockSlot(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('slotId', ParseUUIDPipe) slotId: string,
+  ): Promise<void> {
+    const partnerId = await this.getPartnerId(user.id);
+    await this.commandBus.execute(new UnblockSlotCommand(slotId, partnerId));
+  }
+}

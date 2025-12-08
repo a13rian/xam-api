@@ -1,7 +1,8 @@
 import { NestFactory } from '@nestjs/core';
-import { ConfigService } from '@nestjs/config';
 import { Logger } from 'nestjs-pino';
-import { AppModule } from './app.module';
+import { AppModule } from './app.module.js';
+import { IAppConfig } from './core/application/ports/config/app.config.port.js';
+import { APP_CONFIG } from './shared/constants/injection-tokens.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
@@ -9,21 +10,19 @@ async function bootstrap() {
   const logger = app.get(Logger);
   app.useLogger(logger);
 
-  const configService = app.get(ConfigService);
-  const port = configService.get<number>('PORT', 3000);
-  const nodeEnv = configService.get<string>('NODE_ENV', 'development');
+  const appConfig = app.get<IAppConfig>(APP_CONFIG);
 
   app.enableCors({
-    origin: configService.get<string>('CORS_ORIGIN', '*'),
+    origin: appConfig.corsOrigins,
     credentials: true,
   });
 
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix(appConfig.apiPrefix);
 
-  await app.listen(port);
+  await app.listen(appConfig.port);
 
-  logger.log(`Application running on: http://localhost:${port}`);
-  logger.log(`Environment: ${nodeEnv}`);
+  logger.log(`Application running on: http://localhost:${appConfig.port}`);
+  logger.log(`Environment: ${appConfig.nodeEnv}`);
 }
 
 void bootstrap();

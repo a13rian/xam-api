@@ -1,12 +1,40 @@
-import { registerAs } from '@nestjs/config';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import type { IDatabaseConfig } from '@core/application/ports/config/database.config.port';
 
-export default registerAs('database', () => ({
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432', 10),
-  username: process.env.DB_USERNAME || 'postgres',
-  password: process.env.DB_PASSWORD || 'password',
-  name: process.env.DB_NAME || 'xam_api',
-  synchronize: process.env.DB_SYNCHRONIZE === 'true',
-  logging: process.env.DB_LOGGING === 'true',
-  ssl: process.env.DB_SSL === 'true',
-}));
+@Injectable()
+export class DatabaseConfigService implements IDatabaseConfig {
+  constructor(private readonly configService: ConfigService) {}
+
+  get host(): string {
+    return this.configService.get<string>('DB_HOST') ?? 'localhost';
+  }
+
+  get port(): number {
+    return this.configService.get<number>('DB_PORT') ?? 5432;
+  }
+
+  get username(): string {
+    return this.configService.get<string>('DB_USERNAME') ?? 'postgres';
+  }
+
+  get password(): string {
+    return this.configService.get<string>('DB_PASSWORD') ?? 'password';
+  }
+
+  get name(): string {
+    return this.configService.get<string>('DB_NAME') ?? 'xam_api';
+  }
+
+  get synchronize(): boolean {
+    return this.configService.get<string>('DB_SYNCHRONIZE') === 'true';
+  }
+
+  get logging(): boolean {
+    return this.configService.get<string>('DB_LOGGING') === 'true';
+  }
+
+  get ssl(): boolean {
+    return this.configService.get<string>('DB_SSL') === 'true';
+  }
+}

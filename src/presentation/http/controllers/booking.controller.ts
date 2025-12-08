@@ -1,0 +1,250 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Query,
+  ParseUUIDPipe,
+  NotFoundException,
+  HttpCode,
+} from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
+import { AuthenticatedUser } from '../../../shared/interfaces/authenticated-user.interface';
+import {
+  CreateBookingDto,
+  ListCustomerBookingsQueryDto,
+  ListPartnerBookingsQueryDto,
+  CancelBookingDto,
+  BookingResponseDto,
+  BookingsListResponseDto,
+  RescheduleBookingDto,
+} from '../dto/booking';
+import {
+  CreateBookingCommand,
+  ConfirmBookingCommand,
+  CancelBookingCommand,
+  StartBookingCommand,
+  CompleteBookingCommand,
+  RescheduleBookingCommand,
+} from '../../../core/application/booking/commands';
+import {
+  GetBookingQuery,
+  ListCustomerBookingsQuery,
+  ListPartnerBookingsQuery,
+} from '../../../core/application/booking/queries';
+import { GetMyPartnerQuery } from '../../../core/application/partner/queries';
+
+@Controller('bookings')
+export class CustomerBookingController {
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
+
+  @Post()
+  async createBooking(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: CreateBookingDto,
+  ): Promise<BookingResponseDto> {
+    return await this.commandBus.execute(
+      new CreateBookingCommand(
+        user.id,
+        dto.partnerId,
+        dto.locationId,
+        new Date(dto.scheduledDate),
+        dto.startTime,
+        dto.services.map((s) => ({ serviceId: s.serviceId })),
+        dto.customerPhone,
+        dto.customerName,
+        dto.staffId,
+        dto.isHomeService ?? false,
+        dto.customerAddress,
+        dto.notes,
+      ),
+    );
+  }
+
+  @Get('me')
+  async listMyBookings(
+    @CurrentUser() user: AuthenticatedUser,
+    @Query() query: ListCustomerBookingsQueryDto,
+  ): Promise<BookingsListResponseDto> {
+    return await this.queryBus.execute(
+      new ListCustomerBookingsQuery(
+        user.id,
+        query.status,
+        query.page,
+        query.limit,
+      ),
+    );
+  }
+
+  @Get(':id')
+  async getBooking(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<BookingResponseDto> {
+    const booking = await this.queryBus.execute(new GetBookingQuery(id));
+    if (!booking) {
+      throw new NotFoundException('Booking not found');
+    }
+    // Ensure customer can only see their own bookings
+    if (booking.customerId !== user.id) {
+      throw new NotFoundException('Booking not found');
+    }
+    return booking;
+  }
+
+  @Post(':id/cancel')
+  @HttpCode(200)
+  async cancelBooking(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: CancelBookingDto,
+  ): Promise<BookingResponseDto> {
+    return await this.commandBus.execute(
+      new CancelBookingCommand(id, user.id, dto.reason, false),
+    );
+  }
+
+  @Post(':id/reschedule')
+  @HttpCode(200)
+  async rescheduleBooking(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: RescheduleBookingDto,
+  ): Promise<void> {
+    await this.commandBus.execute(
+      new RescheduleBookingCommand(
+        id,
+        user.id,
+        false,
+        new Date(dto.newDate),
+        dto.newStartTime,
+      ),
+    );
+  }
+}
+
+@Controller('partners/me/bookings')
+export class PartnerBookingController {
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
+
+  private async getPartnerId(userId: string): Promise<string> {
+    const partner = await this.queryBus.execute(new GetMyPartnerQuery(userId));
+    if (!partner) {
+      throw new NotFoundException('Partner profile not found');
+    }
+    return partner.id;
+  }
+
+  @Get()
+  async listBookings(
+    @CurrentUser() user: AuthenticatedUser,
+    @Query() query: ListPartnerBookingsQueryDto,
+  ): Promise<BookingsListResponseDto> {
+    const partnerId = await this.getPartnerId(user.id);
+
+    return await this.queryBus.execute(
+      new ListPartnerBookingsQuery(
+        partnerId,
+        query.status,
+        query.startDate ? new Date(query.startDate) : undefined,
+        query.endDate ? new Date(query.endDate) : undefined,
+        query.page,
+        query.limit,
+      ),
+    );
+  }
+
+  @Get(':id')
+  async getBooking(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<BookingResponseDto> {
+    const partnerId = await this.getPartnerId(user.id);
+
+    const booking = await this.queryBus.execute(new GetBookingQuery(id));
+    if (!booking) {
+      throw new NotFoundException('Booking not found');
+    }
+    // Ensure partner can only see their own bookings
+    if (booking.partnerId !== partnerId) {
+      throw new NotFoundException('Booking not found');
+    }
+    return booking;
+  }
+
+  @Post(':id/confirm')
+  @HttpCode(200)
+  async confirmBooking(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<BookingResponseDto> {
+    const partnerId = await this.getPartnerId(user.id);
+    return await this.commandBus.execute(
+      new ConfirmBookingCommand(id, partnerId),
+    );
+  }
+
+  @Post(':id/start')
+  @HttpCode(200)
+  async startBooking(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<BookingResponseDto> {
+    const partnerId = await this.getPartnerId(user.id);
+    return await this.commandBus.execute(
+      new StartBookingCommand(id, partnerId),
+    );
+  }
+
+  @Post(':id/complete')
+  @HttpCode(200)
+  async completeBooking(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<BookingResponseDto> {
+    const partnerId = await this.getPartnerId(user.id);
+    return await this.commandBus.execute(
+      new CompleteBookingCommand(id, partnerId),
+    );
+  }
+
+  @Post(':id/cancel')
+  @HttpCode(200)
+  async cancelBooking(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: CancelBookingDto,
+  ): Promise<BookingResponseDto> {
+    const partnerId = await this.getPartnerId(user.id);
+    return await this.commandBus.execute(
+      new CancelBookingCommand(id, partnerId, dto.reason, true),
+    );
+  }
+
+  @Post(':id/reschedule')
+  @HttpCode(200)
+  async rescheduleBooking(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: RescheduleBookingDto,
+  ): Promise<void> {
+    const partnerId = await this.getPartnerId(user.id);
+    await this.commandBus.execute(
+      new RescheduleBookingCommand(
+        id,
+        partnerId,
+        true,
+        new Date(dto.newDate),
+        dto.newStartTime,
+      ),
+    );
+  }
+}
