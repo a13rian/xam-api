@@ -28,6 +28,6 @@
   "globalSetup": "<rootDir>/setup/global-setup.ts",
   "globalTeardown": "<rootDir>/setup/global-teardown.ts",
   "testTimeout": 30000,
-  "maxWorkers": 1,
+  "maxWorkers": 10,
   "verbose": true
 }
