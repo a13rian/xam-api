@@ -12,10 +12,16 @@
     ]
   },
   "moduleNameMapper": {
+    "^(\\.{1,2}/.*)\\.js$": "$1",
+    "^@/(.*)\\.js$": "<rootDir>/../src/$1",
     "^@/(.*)$": "<rootDir>/../src/$1",
+    "^@core/(.*)\\.js$": "<rootDir>/../src/core/$1",
     "^@core/(.*)$": "<rootDir>/../src/core/$1",
+    "^@infrastructure/(.*)\\.js$": "<rootDir>/../src/infrastructure/$1",
     "^@infrastructure/(.*)$": "<rootDir>/../src/infrastructure/$1",
+    "^@presentation/(.*)\\.js$": "<rootDir>/../src/presentation/$1",
     "^@presentation/(.*)$": "<rootDir>/../src/presentation/$1",
+    "^@shared/(.*)\\.js$": "<rootDir>/../src/shared/$1",
     "^@shared/(.*)$": "<rootDir>/../src/shared/$1"
   },
   "setupFilesAfterEnv": ["<rootDir>/setup/test-env.ts"],

@@ -2,15 +2,14 @@ import { Module, forwardRef } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthController } from '../http/controllers/auth.controller';
-import { JwtStrategy } from '../../infrastructure/auth/strategies/jwt.strategy';
-import { TokenService } from '../../infrastructure/auth/services/token.service';
-import { TOKEN_SERVICE } from '../../core/domain/auth/services/token.service.interface';
-import { RefreshTokenOrmEntity } from '../../infrastructure/persistence/typeorm/entities/refresh-token.orm-entity';
-import { PasswordResetTokenOrmEntity } from '../../infrastructure/persistence/typeorm/entities/password-reset-token.orm-entity';
-import { EmailVerificationTokenOrmEntity } from '../../infrastructure/persistence/typeorm/entities/email-verification-token.orm-entity';
+import { AuthController } from '../http/controllers/auth.controller.js';
+import { JwtStrategy } from '../../infrastructure/auth/strategies/jwt.strategy.js';
+import { TokenService } from '../../infrastructure/auth/services/token.service.js';
+import { TOKEN_SERVICE } from '../../core/domain/auth/services/token.service.interface.js';
+import { RefreshTokenOrmEntity } from '../../infrastructure/persistence/typeorm/entities/refresh-token.orm-entity.js';
+import { PasswordResetTokenOrmEntity } from '../../infrastructure/persistence/typeorm/entities/password-reset-token.orm-entity.js';
+import { EmailVerificationTokenOrmEntity } from '../../infrastructure/persistence/typeorm/entities/email-verification-token.orm-entity.js';
 import {
   RegisterHandler,
   LoginHandler,
@@ -19,11 +18,15 @@ import {
   ResetPasswordHandler,
   VerifyEmailHandler,
   LogoutHandler,
-} from '../../core/application/auth/commands';
-import { GetMeHandler } from '../../core/application/auth/queries';
-import { UserModule } from './user.module';
-import { RoleModule } from './role.module';
-import { OrganizationModule } from './organization.module';
+} from '../../core/application/auth/commands/index.js';
+import { GetMeHandler } from '../../core/application/auth/queries/index.js';
+import { UserModule } from './user.module.js';
+import { RoleModule } from './role.module.js';
+import { OrganizationModule } from './organization.module.js';
+import {
+  AppConfigModule,
+  JwtConfigService,
+} from '../../infrastructure/config/index.js';
 
 const CommandHandlers = [
   RegisterHandler,
@@ -42,17 +45,14 @@ const QueryHandlers = [GetMeHandler];
     CqrsModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        const expiresIn = configService.get<string>('JWT_EXPIRES_IN') || '1h';
-        return {
-          secret: configService.get<string>('JWT_SECRET'),
-          signOptions: {
-            expiresIn: expiresIn as `${number}${'s' | 'm' | 'h' | 'd'}`,
-          },
-        };
-      },
+      imports: [AppConfigModule],
+      inject: [JwtConfigService],
+      useFactory: (jwtConfig: JwtConfigService) => ({
+        secret: jwtConfig.secret,
+        signOptions: {
+          expiresIn: jwtConfig.expiresIn as `${number}${'s' | 'm' | 'h' | 'd'}`,
+        },
+      }),
     }),
     TypeOrmModule.forFeature([
       RefreshTokenOrmEntity,
