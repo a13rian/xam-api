@@ -1,7 +1,6 @@
 import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
 import { UserOrmEntity } from '../typeorm/entities/user.orm-entity';
-import { OrganizationOrmEntity } from '../typeorm/entities/organization.orm-entity';
 import { RoleOrmEntity } from '../typeorm/entities/role.orm-entity';
 import { PermissionOrmEntity } from '../typeorm/entities/permission.orm-entity';
 import { RefreshTokenOrmEntity } from '../typeorm/entities/refresh-token.orm-entity';
@@ -23,7 +22,6 @@ const dataSource = new DataSource({
   database: process.env.DB_DATABASE || 'xam_api',
   entities: [
     UserOrmEntity,
-    OrganizationOrmEntity,
     RoleOrmEntity,
     PermissionOrmEntity,
     RefreshTokenOrmEntity,

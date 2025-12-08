@@ -1,5 +1,11 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Inject, NotFoundException, BadRequestException, ForbiddenException, ConflictException } from '@nestjs/common';
+import {
+  Inject,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+  ConflictException,
+} from '@nestjs/common';
 import { AcceptInvitationCommand } from './accept-invitation.command';
 import {
   PARTNER_STAFF_REPOSITORY,
@@ -21,7 +27,8 @@ export class AcceptInvitationHandler implements ICommandHandler<AcceptInvitation
 
   async execute(command: AcceptInvitationCommand): Promise<void> {
     // Validate token is a valid UUID format
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(command.token)) {
       throw new NotFoundException('Invitation not found');
     }
@@ -42,12 +49,16 @@ export class AcceptInvitationHandler implements ICommandHandler<AcceptInvitation
 
     // Verify email matches - return 403 if different user tries to accept
     if (user.email.value.toLowerCase() !== staff.email.toLowerCase()) {
-      throw new ForbiddenException('You are not authorized to accept this invitation');
+      throw new ForbiddenException(
+        'You are not authorized to accept this invitation',
+      );
     }
 
     // Check if invitation can be accepted
     if (!staff.invitationStatus.canBeAccepted()) {
-      throw new ConflictException('Invitation has already been accepted or is no longer valid');
+      throw new ConflictException(
+        'Invitation has already been accepted or is no longer valid',
+      );
     }
 
     // Check if user is already staff of this partner

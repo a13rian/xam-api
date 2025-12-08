@@ -1,14 +1,10 @@
 import { CommandHandler, ICommandHandler, EventPublisher } from '@nestjs/cqrs';
-import { Inject, ConflictException, NotFoundException } from '@nestjs/common';
+import { Inject, ConflictException } from '@nestjs/common';
 import { RegisterCommand } from './register.command';
 import {
   IUserRepository,
   USER_REPOSITORY,
 } from '../../../../domain/user/repositories/user.repository.interface';
-import {
-  IOrganizationRepository,
-  ORGANIZATION_REPOSITORY,
-} from '../../../../domain/organization/repositories/organization.repository.interface';
 import {
   ITokenService,
   TOKEN_SERVICE,
@@ -31,8 +27,6 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
   constructor(
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
-    @Inject(ORGANIZATION_REPOSITORY)
-    private readonly organizationRepository: IOrganizationRepository,
     @Inject(TOKEN_SERVICE)
     private readonly tokenService: ITokenService,
     private readonly eventPublisher: EventPublisher,
@@ -47,22 +41,12 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
       throw new ConflictException('User with this email already exists');
     }
 
-    if (command.organizationId) {
-      const organization = await this.organizationRepository.findById(
-        command.organizationId,
-      );
-      if (!organization) {
-        throw new NotFoundException('Organization not found');
-      }
-    }
-
     const user = this.eventPublisher.mergeObjectContext(
       User.create({
         email,
         password,
         firstName: command.firstName,
         lastName: command.lastName,
-        organizationId: command.organizationId ?? null,
         roleIds: [],
       }),
     );

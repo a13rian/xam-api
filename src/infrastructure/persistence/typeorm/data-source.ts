@@ -2,7 +2,6 @@ import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
 import { UserOrmEntity } from './entities/user.orm-entity';
-import { OrganizationOrmEntity } from './entities/organization.orm-entity';
 import { RoleOrmEntity } from './entities/role.orm-entity';
 import { PermissionOrmEntity } from './entities/permission.orm-entity';
 import { RefreshTokenOrmEntity } from './entities/refresh-token.orm-entity';
@@ -36,7 +35,6 @@ const dataSource = new DataSource({
   database: process.env.DB_DATABASE || 'xam_api',
   entities: [
     UserOrmEntity,
-    OrganizationOrmEntity,
     RoleOrmEntity,
     PermissionOrmEntity,
     RefreshTokenOrmEntity,

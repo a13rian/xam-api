@@ -7,7 +7,6 @@ import { AuthenticatedUser } from '../../../shared/interfaces/authenticated-user
 interface JwtPayload {
   sub: string;
   email: string;
-  organizationId: string | null;
   roleIds: string[];
   roleNames: string[];
 }
@@ -30,7 +29,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     return {
       id: payload.sub,
       email: payload.email,
-      organizationId: payload.organizationId,
       roleIds: payload.roleIds,
       roleNames: payload.roleNames || [],
     };

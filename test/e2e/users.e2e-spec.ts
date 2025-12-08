@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
 import request from 'supertest';
 import { TestContext, createTestApp, closeTestApp } from '../support/test-app';
 import { AuthHelper } from '../support/auth/auth.helper';
 import { UserFactory } from '../support/factories/user.factory';
 import { RoleFactory } from '../support/factories/role.factory';
-import { OrganizationFactory } from '../support/factories/organization.factory';
 import { UserOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/user.orm-entity';
 
 describe('Users E2E', () => {
@@ -12,14 +11,12 @@ describe('Users E2E', () => {
   let authHelper: AuthHelper;
   let userFactory: UserFactory;
   let roleFactory: RoleFactory;
-  let orgFactory: OrganizationFactory;
 
   beforeAll(async () => {
     ctx = await createTestApp();
     authHelper = new AuthHelper(ctx);
     userFactory = new UserFactory(ctx.db);
     roleFactory = new RoleFactory(ctx.db);
-    orgFactory = new OrganizationFactory(ctx.db);
   });
 
   afterAll(async () => {
@@ -212,27 +209,6 @@ describe('Users E2E', () => {
           page: 1,
           limit: 10,
         });
-      });
-
-      it('should filter users by organizationId', async () => {
-        const superAdmin = await authHelper.createSuperAdmin();
-        const org = await orgFactory.create({ ownerId: superAdmin.user.id });
-
-        await userFactory.create({ organizationId: org.id });
-        await userFactory.create({ organizationId: org.id });
-        await userFactory.create(); // No org
-
-        const response = await request(ctx.server)
-          .get('/api/users')
-          .set(authHelper.authHeader(superAdmin))
-          .query({ organizationId: org.id })
-          .expect(200);
-
-        expect(
-          response.body.items.every(
-            (u: { organizationId: string }) => u.organizationId === org.id,
-          ),
-        ).toBe(true);
       });
 
       it('should respect pagination limits', async () => {

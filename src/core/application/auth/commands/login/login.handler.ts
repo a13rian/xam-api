@@ -26,7 +26,6 @@ export interface LoginResult {
     email: string;
     firstName: string;
     lastName: string;
-    organizationId: string | null;
     roleIds: string[];
   };
 }
@@ -76,7 +75,6 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
     const payload = {
       sub: user.id,
       email: user.email.value,
-      organizationId: user.organizationId,
       roleIds: [...user.roleIds],
       roleNames: [...user.roleNames],
     };
@@ -104,7 +102,6 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
         email: user.email.value,
         firstName: user.firstName,
         lastName: user.lastName,
-        organizationId: user.organizationId,
         roleIds: [...user.roleIds],
       },
     };

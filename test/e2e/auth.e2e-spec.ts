@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { TestContext, createTestApp, closeTestApp } from '../support/test-app';
 import { AuthHelper } from '../support/auth/auth.helper';
 import { UserFactory } from '../support/factories/user.factory';
-import { OrganizationFactory } from '../support/factories/organization.factory';
 import { UserOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/user.orm-entity';
 import { EmailVerificationTokenOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/email-verification-token.orm-entity';
 import { PasswordResetTokenOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/password-reset-token.orm-entity';
@@ -13,13 +12,11 @@ describe('Auth E2E', () => {
   let ctx: TestContext;
   let authHelper: AuthHelper;
   let userFactory: UserFactory;
-  let orgFactory: OrganizationFactory;
 
   beforeAll(async () => {
     ctx = await createTestApp();
     authHelper = new AuthHelper(ctx);
     userFactory = new UserFactory(ctx.db);
-    orgFactory = new OrganizationFactory(ctx.db);
   });
 
   afterAll(async () => {
@@ -281,24 +278,6 @@ describe('Auth E2E', () => {
           lastName: 'Doe',
         });
       });
-
-      it('should register user with organization', async () => {
-        const admin = await userFactory.create({ roleNames: ['super_admin'] });
-        const org = await orgFactory.create({ ownerId: admin.id });
-
-        const response = await request(ctx.server)
-          .post('/api/auth/register')
-          .send({
-            email: 'orguser@test.com',
-            password: 'SecurePass123!',
-            firstName: 'Jane',
-            lastName: 'Doe',
-            organizationId: org.id,
-          })
-          .expect(201);
-
-        expect(response.body.id).toBeDefined();
-      });
     });
 
     describe('Validation Errors', () => {
@@ -362,19 +341,6 @@ describe('Auth E2E', () => {
           })
           .expect(400);
       });
-
-      it('should return 400 for invalid organizationId format', async () => {
-        await request(ctx.server)
-          .post('/api/auth/register')
-          .send({
-            email: 'user@test.com',
-            password: 'SecurePass123!',
-            firstName: 'John',
-            lastName: 'Doe',
-            organizationId: 'not-a-uuid',
-          })
-          .expect(400);
-      });
     });
 
     describe('Conflict Errors', () => {
@@ -396,18 +362,7 @@ describe('Auth E2E', () => {
     });
 
     describe('Not Found Errors', () => {
-      it('should return 404 for non-existent organizationId', async () => {
-        await request(ctx.server)
-          .post('/api/auth/register')
-          .send({
-            email: 'user@test.com',
-            password: 'SecurePass123!',
-            firstName: 'John',
-            lastName: 'Doe',
-            organizationId: '00000000-0000-0000-0000-000000000000',
-          })
-          .expect(404);
-      });
+      // No organization-related tests needed
     });
   });
 
@@ -617,7 +572,6 @@ describe('Auth E2E', () => {
         const expiredToken = authHelper.createExpiredToken({
           id: user.user.id,
           email: user.user.email,
-          organizationId: user.user.organizationId,
           roleIds: user.user.roleIds,
         });
 

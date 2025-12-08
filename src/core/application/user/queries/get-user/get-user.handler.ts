@@ -11,7 +11,6 @@ export interface GetUserResult {
   email: string;
   firstName: string;
   lastName: string;
-  organizationId: string | null;
   isActive: boolean;
   isEmailVerified: boolean;
   roleIds: string[];
@@ -37,7 +36,6 @@ export class GetUserHandler implements IQueryHandler<GetUserQuery> {
       email: user.email.value,
       firstName: user.firstName,
       lastName: user.lastName,
-      organizationId: user.organizationId,
       isActive: user.isActive,
       isEmailVerified: user.isEmailVerified,
       roleIds: [...user.roleIds],

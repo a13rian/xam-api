@@ -15,7 +15,6 @@ export class UserMapper {
       lastName: entity.lastName,
       isActive: entity.isActive,
       emailVerifiedAt: entity.emailVerifiedAt,
-      organizationId: entity.organizationId,
       roleIds: entity.roles?.map((r) => r.id) ?? [],
       roleNames: entity.roles?.map((r) => r.name) ?? [],
       failedLoginAttempts: entity.failedLoginAttempts,
@@ -34,7 +33,6 @@ export class UserMapper {
     entity.lastName = domain.lastName;
     entity.isActive = domain.isActive;
     entity.emailVerifiedAt = domain.emailVerifiedAt;
-    entity.organizationId = domain.organizationId;
     entity.failedLoginAttempts = domain.failedLoginAttempts;
     entity.lockedUntil = domain.lockedUntil;
     entity.createdAt = domain.createdAt;

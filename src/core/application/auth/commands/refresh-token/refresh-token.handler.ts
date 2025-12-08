@@ -60,7 +60,6 @@ export class RefreshTokenHandler implements ICommandHandler<RefreshTokenCommand>
     const payload = {
       sub: user.id,
       email: user.email.value,
-      organizationId: user.organizationId,
       roleIds: [...user.roleIds],
       roleNames: [...user.roleNames],
     };

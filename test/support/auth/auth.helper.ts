@@ -1,4 +1,5 @@
 import request from 'supertest';
+import { App } from 'supertest/types';
 import { JwtService } from '@nestjs/jwt';
 import { TestContext } from '../test-app';
 import { UserFactory, CreatedUser } from '../factories/user.factory';
@@ -13,7 +14,6 @@ export interface LoginResult {
     email: string;
     firstName: string;
     lastName: string;
-    organizationId: string | null;
     roleIds: string[];
   };
 }
@@ -37,7 +37,7 @@ export class AuthHelper {
   ): Promise<TestUser> {
     const userData = await this.userFactory.create(options);
 
-    const response = await request(this.ctx.server)
+    const response = await request(this.ctx.server as App)
       .post('/api/auth/login')
       .send({
         email: userData.email,
@@ -46,7 +46,7 @@ export class AuthHelper {
       .expect(200);
 
     return {
-      ...response.body,
+      ...(response.body as LoginResult),
       password: userData.password,
     };
   }
@@ -63,20 +63,18 @@ export class AuthHelper {
   /**
    * Create an admin user and return tokens
    */
-  async createAdmin(organizationId?: string): Promise<TestUser> {
+  async createAdmin(): Promise<TestUser> {
     return this.createAuthenticatedUser({
       roleNames: ['admin'],
-      organizationId,
     });
   }
 
   /**
    * Create a member user and return tokens
    */
-  async createMember(organizationId?: string): Promise<TestUser> {
+  async createMember(): Promise<TestUser> {
     return this.createAuthenticatedUser({
       roleNames: ['member'],
-      organizationId,
     });
   }
 
@@ -137,7 +135,6 @@ export class AuthHelper {
       {
         sub: user.id,
         email: user.email,
-        organizationId: user.organizationId,
         roleIds: user.roleIds,
       },
       { expiresIn: '-1h' }, // Expired 1 hour ago

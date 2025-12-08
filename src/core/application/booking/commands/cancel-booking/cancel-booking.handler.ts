@@ -1,9 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import {
-  Inject,
-  NotFoundException,
-  ConflictException,
-} from '@nestjs/common';
+import { Inject, NotFoundException, ConflictException } from '@nestjs/common';
 import { CancelBookingCommand } from './cancel-booking.command';
 import { Money } from '../../../../domain/shared/value-objects/money.vo';
 import {

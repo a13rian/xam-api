@@ -5,7 +5,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
-  OneToMany,
   JoinColumn,
   Index,
 } from 'typeorm';
@@ -40,6 +39,15 @@ export class PartnerLocationOrmEntity {
 
   @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
   longitude?: number;
+
+  @Index('IDX_partner_locations_location', { spatial: true })
+  @Column({
+    type: 'geography',
+    spatialFeatureType: 'Point',
+    srid: 4326,
+    nullable: true,
+  })
+  location?: string;
 
   @Column({ length: 20, nullable: true })
   phone?: string;

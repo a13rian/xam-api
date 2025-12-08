@@ -28,10 +28,6 @@ export class CreateUserDto {
   lastName: string;
 
   @IsOptional()
-  @IsUUID()
-  organizationId?: string;
-
-  @IsOptional()
   @IsArray()
   @IsUUID('4', { each: true })
   roleIds?: string[];

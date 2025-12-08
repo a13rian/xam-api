@@ -34,7 +34,6 @@ import {
   LogoutCommand,
 } from '../../../core/application/auth/commands';
 import { RegisterResult } from '../../../core/application/auth/commands/register/register.handler';
-import { ForgotPasswordResult } from '../../../core/application/auth/commands/forgot-password/forgot-password.handler';
 import { GetMeQuery } from '../../../core/application/auth/queries';
 import { GetMeResult } from '../../../core/application/auth/queries/get-me/get-me.handler';
 
@@ -48,14 +47,8 @@ export class AuthController {
   @Public()
   @Post('register')
   async register(@Body() dto: RegisterDto): Promise<RegisterResponseDto> {
-    const result = await this.commandBus.execute(
-      new RegisterCommand(
-        dto.email,
-        dto.password,
-        dto.firstName,
-        dto.lastName,
-        dto.organizationId,
-      ),
+    const result: RegisterResult = await this.commandBus.execute(
+      new RegisterCommand(dto.email, dto.password, dto.firstName, dto.lastName),
     );
 
     return {
@@ -103,7 +96,7 @@ export class AuthController {
   async forgotPassword(
     @Body() dto: ForgotPasswordDto,
   ): Promise<MessageResponseDto> {
-    const result = await this.commandBus.execute(
+    const result: { message: string } = await this.commandBus.execute(
       new ForgotPasswordCommand(dto.email),
     );
     return { message: result.message };

@@ -25,7 +25,6 @@ import {
   UpdateUserCommand,
   DeleteUserCommand,
 } from '../../../core/application/user/commands';
-import { CreateUserResult } from '../../../core/application/user/commands/create-user/create-user.handler';
 import {
   GetUserQuery,
   ListUsersQuery,
@@ -41,13 +40,12 @@ export class UserController {
   @Post()
   @Roles('super_admin', 'admin')
   async create(@Body() dto: CreateUserDto): Promise<UserResponseDto> {
-    const result = await this.commandBus.execute(
+    const result: { id: string } = await this.commandBus.execute(
       new CreateUserCommand(
         dto.email,
         dto.password,
         dto.firstName,
         dto.lastName,
-        dto.organizationId,
         dto.roleIds,
       ),
     );
@@ -61,7 +59,7 @@ export class UserController {
     @Query() query: ListUsersQueryDto,
   ): Promise<UserListResponseDto> {
     return await this.queryBus.execute(
-      new ListUsersQuery(query.organizationId, query.page, query.limit),
+      new ListUsersQuery(query.page, query.limit),
     );
   }
 

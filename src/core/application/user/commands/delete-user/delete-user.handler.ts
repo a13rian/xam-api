@@ -25,9 +25,7 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
 
     await this.userRepository.delete(command.id);
 
-    userWithContext.apply(
-      new UserDeletedEvent(user.id, user.email.value, user.organizationId),
-    );
+    userWithContext.apply(new UserDeletedEvent(user.id, user.email.value));
     userWithContext.commit();
   }
 }

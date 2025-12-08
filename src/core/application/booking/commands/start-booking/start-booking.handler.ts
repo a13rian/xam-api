@@ -1,9 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import {
-  Inject,
-  NotFoundException,
-  ConflictException,
-} from '@nestjs/common';
+import { Inject, NotFoundException, ConflictException } from '@nestjs/common';
 import { StartBookingCommand } from './start-booking.command';
 import {
   BOOKING_REPOSITORY,

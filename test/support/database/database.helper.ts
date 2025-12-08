@@ -16,7 +16,6 @@ export class DatabaseHelper {
       'email_verification_tokens',
       'user_roles',
       'users',
-      'organizations',
       'role_permissions',
       // Don't clear roles and permissions - they are seeded once
     ];
@@ -38,7 +37,6 @@ export class DatabaseHelper {
       'email_verification_tokens',
       'user_roles',
       'users',
-      'organizations',
     ];
 
     for (const tableName of tableOrder) {
@@ -79,7 +77,6 @@ export class DatabaseHelper {
       'email_verification_tokens',
       'user_roles',
       'users',
-      'organizations',
     ];
 
     for (const tableName of tableOrder) {

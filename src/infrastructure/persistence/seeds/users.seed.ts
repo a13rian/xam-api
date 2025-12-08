@@ -62,7 +62,6 @@ export async function seedUsers(
     entity.lastName = userConfig.lastName;
     entity.isActive = true;
     entity.emailVerifiedAt = new Date();
-    entity.organizationId = null;
     entity.failedLoginAttempts = 0;
     entity.lockedUntil = null;
     entity.roles = role ? [role] : [];

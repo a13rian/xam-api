@@ -8,6 +8,7 @@ import {
   Index,
 } from 'typeorm';
 import { PartnerOrmEntity } from './partner.orm-entity';
+import { UserOrmEntity } from './user.orm-entity';
 import {
   DocumentTypeEnum,
   DocumentStatusEnum,
@@ -48,6 +49,10 @@ export class PartnerDocumentOrmEntity {
 
   @Column({ type: 'uuid', nullable: true })
   reviewedBy: string | null;
+
+  @ManyToOne(() => UserOrmEntity, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'reviewedBy' })
+  reviewer: UserOrmEntity | null;
 
   @CreateDateColumn()
   createdAt: Date;

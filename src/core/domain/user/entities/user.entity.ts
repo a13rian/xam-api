@@ -13,7 +13,6 @@ export interface UserProps {
   lastName: string;
   isActive?: boolean;
   emailVerifiedAt?: Date | null;
-  organizationId?: string | null;
   roleIds?: string[];
   roleNames?: string[];
   failedLoginAttempts?: number;
@@ -27,7 +26,6 @@ export interface CreateUserProps {
   password: Password;
   firstName: string;
   lastName: string;
-  organizationId?: string | null;
   roleIds?: string[];
 }
 
@@ -39,7 +37,6 @@ export class User extends AggregateRoot {
   private _lastName: string;
   private _isActive: boolean;
   private _emailVerifiedAt: Date | null;
-  private _organizationId: string | null;
   private _roleIds: string[];
   private _roleNames: string[];
   private _failedLoginAttempts: number;
@@ -56,7 +53,6 @@ export class User extends AggregateRoot {
     this._lastName = props.lastName;
     this._isActive = props.isActive ?? true;
     this._emailVerifiedAt = props.emailVerifiedAt ?? null;
-    this._organizationId = props.organizationId ?? null;
     this._roleIds = props.roleIds ?? [];
     this._roleNames = props.roleNames ?? [];
     this._failedLoginAttempts = props.failedLoginAttempts ?? 0;
@@ -71,13 +67,10 @@ export class User extends AggregateRoot {
       password: props.password,
       firstName: props.firstName,
       lastName: props.lastName,
-      organizationId: props.organizationId,
       roleIds: props.roleIds,
     });
 
-    user.apply(
-      new UserCreatedEvent(user.id, user.email.value, user.organizationId),
-    );
+    user.apply(new UserCreatedEvent(user.id, user.email.value));
     return user;
   }
 
@@ -197,9 +190,6 @@ export class User extends AggregateRoot {
   }
   get isEmailVerified(): boolean {
     return this._emailVerifiedAt !== null;
-  }
-  get organizationId(): string | null {
-    return this._organizationId;
   }
   get roleIds(): readonly string[] {
     return [...this._roleIds];

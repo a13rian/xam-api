@@ -3,7 +3,6 @@ export class UserResponseDto {
   email: string;
   firstName: string;
   lastName: string;
-  organizationId: string | null;
   isActive: boolean;
   isEmailVerified: boolean;
   roleIds: string[];
@@ -16,7 +15,6 @@ export class UserListItemDto {
   email: string;
   firstName: string;
   lastName: string;
-  organizationId: string | null;
   isActive: boolean;
   isEmailVerified: boolean;
   createdAt: Date;

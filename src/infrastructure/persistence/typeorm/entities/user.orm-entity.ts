@@ -2,15 +2,12 @@ import {
   Entity,
   PrimaryColumn,
   Column,
-  ManyToOne,
   ManyToMany,
   JoinTable,
-  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
   Index,
 } from 'typeorm';
-import { OrganizationOrmEntity } from './organization.orm-entity';
 import { RoleOrmEntity } from './role.orm-entity';
 
 @Entity('users')
@@ -36,14 +33,6 @@ export class UserOrmEntity {
 
   @Column({ type: 'timestamp', nullable: true })
   emailVerifiedAt: Date | null;
-
-  @Column({ type: 'uuid', nullable: true })
-  @Index()
-  organizationId: string | null;
-
-  @ManyToOne(() => OrganizationOrmEntity, { nullable: true })
-  @JoinColumn({ name: 'organizationId' })
-  organization: OrganizationOrmEntity | null;
 
   @ManyToMany(() => RoleOrmEntity, { cascade: false })
   @JoinTable({

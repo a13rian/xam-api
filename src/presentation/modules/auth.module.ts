@@ -22,7 +22,6 @@ import {
 import { GetMeHandler } from '../../core/application/auth/queries/index.js';
 import { UserModule } from './user.module.js';
 import { RoleModule } from './role.module.js';
-import { OrganizationModule } from './organization.module.js';
 import {
   AppConfigModule,
   JwtConfigService,
@@ -61,7 +60,6 @@ const QueryHandlers = [GetMeHandler];
     ]),
     forwardRef(() => UserModule),
     forwardRef(() => RoleModule),
-    forwardRef(() => OrganizationModule),
   ],
   controllers: [AuthController],
   providers: [

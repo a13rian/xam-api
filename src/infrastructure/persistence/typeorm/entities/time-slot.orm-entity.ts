@@ -47,6 +47,10 @@ export class TimeSlotOrmEntity {
   @Column('uuid', { nullable: true })
   bookingId?: string;
 
+  @ManyToOne('BookingOrmEntity', { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'bookingId' })
+  booking?: any;
+
   @CreateDateColumn()
   createdAt: Date;
 

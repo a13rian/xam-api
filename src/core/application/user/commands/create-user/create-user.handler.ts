@@ -18,7 +18,6 @@ export interface CreateUserResult {
   email: string;
   firstName: string;
   lastName: string;
-  organizationId: string | null;
 }
 
 @CommandHandler(CreateUserCommand)
@@ -55,7 +54,6 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
         password,
         firstName: command.firstName,
         lastName: command.lastName,
-        organizationId: command.organizationId ?? null,
         roleIds,
       }),
     );
@@ -68,7 +66,6 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
       email: user.email.value,
       firstName: user.firstName,
       lastName: user.lastName,
-      organizationId: user.organizationId,
     };
   }
 }

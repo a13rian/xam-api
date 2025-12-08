@@ -9,7 +9,6 @@ export interface CreateUserOptions {
   password?: string;
   firstName?: string;
   lastName?: string;
-  organizationId?: string;
   roleNames?: string[];
   isActive?: boolean;
   emailVerifiedAt?: Date | null;
@@ -23,7 +22,6 @@ export interface CreatedUser {
   password: string; // Plain text for login
   firstName: string;
   lastName: string;
-  organizationId: string | null;
   roleIds: string[];
 }
 
@@ -57,7 +55,6 @@ export class UserFactory {
       passwordHash,
       firstName: options.firstName || `Test${userCounter}`,
       lastName: options.lastName || 'User',
-      organizationId: options.organizationId || null,
       isActive: options.isActive ?? true,
       emailVerifiedAt: options.emailVerifiedAt ?? new Date(),
       failedLoginAttempts: options.failedLoginAttempts ?? 0,
@@ -73,7 +70,6 @@ export class UserFactory {
       password,
       firstName: user.firstName,
       lastName: user.lastName,
-      organizationId: user.organizationId,
       roleIds: roles.map((r) => r.id),
     };
   }

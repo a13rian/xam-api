@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppConfigModule, DatabaseConfigService } from '../config';
 import { UserOrmEntity } from './typeorm/entities/user.orm-entity';
-import { OrganizationOrmEntity } from './typeorm/entities/organization.orm-entity';
 import { RoleOrmEntity } from './typeorm/entities/role.orm-entity';
 import { PermissionOrmEntity } from './typeorm/entities/permission.orm-entity';
 import { RefreshTokenOrmEntity } from './typeorm/entities/refresh-token.orm-entity';
@@ -26,7 +25,6 @@ import { StaffServiceOrmEntity } from './typeorm/entities/staff-service.orm-enti
 
 const entities = [
   UserOrmEntity,
-  OrganizationOrmEntity,
   RoleOrmEntity,
   PermissionOrmEntity,
   RefreshTokenOrmEntity,

@@ -35,24 +35,6 @@ export class UserRepository implements IUserRepository {
     return entity ? this.mapper.toDomain(entity) : null;
   }
 
-  async findByOrganization(
-    organizationId: string,
-    options?: PaginationOptions,
-  ): Promise<User[]> {
-    const entities = await this.ormRepository.find({
-      where: { organizationId },
-      relations: ['roles'],
-      take: options?.limit ?? 50,
-      skip: ((options?.page ?? 1) - 1) * (options?.limit ?? 50),
-      order: { createdAt: 'DESC' },
-    });
-    return entities.map((e) => this.mapper.toDomain(e));
-  }
-
-  async countByOrganization(organizationId: string): Promise<number> {
-    return this.ormRepository.count({ where: { organizationId } });
-  }
-
   async findAll(options?: PaginationOptions): Promise<User[]> {
     const entities = await this.ormRepository.find({
       relations: ['roles'],

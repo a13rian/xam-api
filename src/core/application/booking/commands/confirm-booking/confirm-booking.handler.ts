@@ -1,9 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import {
-  Inject,
-  NotFoundException,
-  ConflictException,
-} from '@nestjs/common';
+import { Inject, NotFoundException, ConflictException } from '@nestjs/common';
 import { ConfirmBookingCommand } from './confirm-booking.command';
 import { Money } from '../../../../domain/shared/value-objects/money.vo';
 import {
@@ -48,7 +44,11 @@ export class ConfirmBookingHandler implements ICommandHandler<ConfirmBookingComm
     if (wallet) {
       const paymentAmount = Money.create(booking.totalAmount, booking.currency);
       if (wallet.hasSufficientBalance(paymentAmount)) {
-        wallet.pay(paymentAmount, booking.id, `Payment for booking ${booking.id}`);
+        wallet.pay(
+          paymentAmount,
+          booking.id,
+          `Payment for booking ${booking.id}`,
+        );
         await this.walletRepository.save(wallet);
         booking.markPaymentReceived(booking.totalAmount);
       }

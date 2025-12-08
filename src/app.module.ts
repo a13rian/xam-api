@@ -12,7 +12,6 @@ import { AuthModule } from './presentation/modules/auth.module';
 import { BookingModule } from './presentation/modules/booking.module';
 import { CategoryModule } from './presentation/modules/category.module';
 import { LocationModule } from './presentation/modules/location.module';
-import { OrganizationModule } from './presentation/modules/organization.module';
 import { PartnerStaffModule } from './presentation/modules/partner-staff.module';
 import { PartnerModule } from './presentation/modules/partner.module';
 import { RoleModule } from './presentation/modules/role.module';
@@ -61,7 +60,6 @@ import { ValidationPipe } from './shared/pipes/validation.pipe';
     PersistenceModule,
     AuthModule,
     UserModule,
-    OrganizationModule,
     RoleModule,
     WalletModule,
     PartnerModule,
