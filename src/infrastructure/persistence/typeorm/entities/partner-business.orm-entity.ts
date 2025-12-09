@@ -7,14 +7,14 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { PartnerOrmEntity } from './partner.orm-entity';
+import type { PartnerOrmEntity } from './partner.orm-entity';
 
 @Entity('partner_businesses')
 export class PartnerBusinessOrmEntity {
   @PrimaryColumn('uuid')
   partnerId: string;
 
-  @OneToOne(() => PartnerOrmEntity, { onDelete: 'CASCADE' })
+  @OneToOne('PartnerOrmEntity', 'business', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'partnerId' })
   partner: PartnerOrmEntity;
 

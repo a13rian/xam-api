@@ -27,11 +27,14 @@ export class AppConfigService implements IAppConfig {
   }
 
   get corsOrigins(): string[] {
-    const origins = this.configService.get<string>('CORS_ORIGINS');
-    if (origins) {
-      return origins.split(',').map((origin) => origin.trim());
+    const origins = this.configService.get<string | string[]>('CORS_ORIGINS');
+    if (!origins) {
+      return ['http://localhost:3000'];
     }
-    return ['http://localhost:3000'];
+    if (Array.isArray(origins)) {
+      return origins;
+    }
+    return origins.split(',').map((origin) => origin.trim());
   }
 
   get isProduction(): boolean {

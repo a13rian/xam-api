@@ -11,7 +11,7 @@ import {
   Check,
 } from 'typeorm';
 import { UserOrmEntity } from './user.orm-entity';
-import { WalletTransactionOrmEntity } from './wallet-transaction.orm-entity';
+import type { WalletTransactionOrmEntity } from './wallet-transaction.orm-entity';
 
 @Entity('wallets')
 @Check('"balance" >= 0')
@@ -39,6 +39,6 @@ export class WalletOrmEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => WalletTransactionOrmEntity, (tx) => tx.wallet)
+  @OneToMany('WalletTransactionOrmEntity', 'wallet')
   transactions: WalletTransactionOrmEntity[];
 }

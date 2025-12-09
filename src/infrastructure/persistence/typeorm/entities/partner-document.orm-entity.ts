@@ -7,7 +7,7 @@ import {
   CreateDateColumn,
   Index,
 } from 'typeorm';
-import { PartnerOrmEntity } from './partner.orm-entity';
+import type { PartnerOrmEntity } from './partner.orm-entity';
 import { UserOrmEntity } from './user.orm-entity';
 import {
   DocumentTypeEnum,
@@ -23,7 +23,7 @@ export class PartnerDocumentOrmEntity {
   @Index()
   partnerId: string;
 
-  @ManyToOne(() => PartnerOrmEntity, (partner) => partner.documents)
+  @ManyToOne('PartnerOrmEntity', 'documents')
   @JoinColumn({ name: 'partnerId' })
   partner: PartnerOrmEntity;
 

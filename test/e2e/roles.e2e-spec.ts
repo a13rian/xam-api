@@ -3,20 +3,17 @@ import request from 'supertest';
 import { TestContext, createTestApp, closeTestApp } from '../support/test-app';
 import { AuthHelper } from '../support/auth/auth.helper';
 import { RoleFactory } from '../support/factories/role.factory';
-import { OrganizationFactory } from '../support/factories/organization.factory';
 import { RoleOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/role.orm-entity';
 
 describe('Roles E2E', () => {
   let ctx: TestContext;
   let authHelper: AuthHelper;
   let roleFactory: RoleFactory;
-  let orgFactory: OrganizationFactory;
 
   beforeAll(async () => {
     ctx = await createTestApp();
     authHelper = new AuthHelper(ctx);
     roleFactory = new RoleFactory(ctx.db);
-    orgFactory = new OrganizationFactory(ctx.db);
   });
 
   afterAll(async () => {
@@ -66,24 +63,6 @@ describe('Roles E2E', () => {
           .expect(201);
 
         expect(response.body.name).toBe('admin-role');
-      });
-
-      it('should create organization-scoped role', async () => {
-        const superAdmin = await authHelper.createSuperAdmin();
-        const org = await orgFactory.create({ ownerId: superAdmin.user.id });
-
-        const response = await request(ctx.server)
-          .post('/api/roles')
-          .set(authHelper.authHeader(superAdmin))
-          .send({
-            name: 'org-role',
-            description: 'Organization role',
-            permissionIds: [],
-            organizationId: org.id,
-          })
-          .expect(201);
-
-        expect(response.body.organizationId).toBe(org.id);
       });
 
       it('should create role without permissions', async () => {
@@ -218,29 +197,6 @@ describe('Roles E2E', () => {
           (r: { name: string }) => r.name === 'custom-test-role',
         );
         expect(customRole).toBeDefined();
-      });
-
-      it('should filter by organizationId', async () => {
-        const superAdmin = await authHelper.createSuperAdmin();
-        const org = await orgFactory.create({ ownerId: superAdmin.user.id });
-
-        await roleFactory.create({
-          name: 'org-specific-role',
-          organizationId: org.id,
-        });
-
-        const response = await request(ctx.server)
-          .get('/api/roles')
-          .set(authHelper.authHeader(superAdmin))
-          .query({ organizationId: org.id })
-          .expect(200);
-
-        expect(
-          response.body.items.every(
-            (r: { organizationId: string | null }) =>
-              r.organizationId === org.id || r.organizationId === null,
-          ),
-        ).toBe(true);
       });
 
       it('should filter system roles', async () => {

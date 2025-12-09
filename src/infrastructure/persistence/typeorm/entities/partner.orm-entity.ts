@@ -10,9 +10,9 @@ import {
   Index,
 } from 'typeorm';
 import { UserOrmEntity } from './user.orm-entity';
-import { PartnerDocumentOrmEntity } from './partner-document.orm-entity';
-import { PartnerBusinessOrmEntity } from './partner-business.orm-entity';
-import { PartnerIndividualOrmEntity } from './partner-individual.orm-entity';
+import type { PartnerDocumentOrmEntity } from './partner-document.orm-entity';
+import type { PartnerBusinessOrmEntity } from './partner-business.orm-entity';
+import type { PartnerIndividualOrmEntity } from './partner-individual.orm-entity';
 import { PartnerTypeEnum } from '../../../../core/domain/partner/value-objects/partner-type.vo';
 import { PartnerStatusEnum } from '../../../../core/domain/partner/value-objects/partner-status.vo';
 
@@ -67,15 +67,12 @@ export class PartnerOrmEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => PartnerDocumentOrmEntity, (doc) => doc.partner)
+  @OneToMany('PartnerDocumentOrmEntity', 'partner')
   documents: PartnerDocumentOrmEntity[];
 
-  @OneToOne(() => PartnerBusinessOrmEntity, (business) => business.partner)
+  @OneToOne('PartnerBusinessOrmEntity', 'partner')
   business: PartnerBusinessOrmEntity;
 
-  @OneToOne(
-    () => PartnerIndividualOrmEntity,
-    (individual) => individual.partner,
-  )
+  @OneToOne('PartnerIndividualOrmEntity', 'partner')
   individual: PartnerIndividualOrmEntity;
 }

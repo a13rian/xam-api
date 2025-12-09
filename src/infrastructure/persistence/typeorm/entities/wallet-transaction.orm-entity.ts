@@ -7,7 +7,7 @@ import {
   CreateDateColumn,
   Index,
 } from 'typeorm';
-import { WalletOrmEntity } from './wallet.orm-entity';
+import type { WalletOrmEntity } from './wallet.orm-entity';
 import { TransactionTypeEnum } from '../../../../core/domain/wallet/value-objects/transaction-type.vo';
 
 @Entity('wallet_transactions')
@@ -20,7 +20,7 @@ export class WalletTransactionOrmEntity {
   @Index()
   walletId: string;
 
-  @ManyToOne(() => WalletOrmEntity, (wallet) => wallet.transactions)
+  @ManyToOne('WalletOrmEntity', 'transactions')
   @JoinColumn({ name: 'walletId' })
   wallet: WalletOrmEntity;
 

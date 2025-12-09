@@ -55,12 +55,7 @@ const roles: RoleSeedConfig[] = [
     name: 'member',
     description: 'Regular organization member with limited access',
     isSystem: true,
-    permissionCodes: [
-      'user:read',
-      'organization:read',
-      'role:read',
-      'role:list',
-    ],
+    permissionCodes: ['organization:read', 'role:read', 'role:list'],
   },
 ];
 
