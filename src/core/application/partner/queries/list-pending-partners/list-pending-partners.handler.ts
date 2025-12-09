@@ -12,7 +12,6 @@ export interface PartnerListItemDto {
   userId: string;
   type: string;
   status: string;
-  businessName: string;
   createdAt: Date;
 }
 
@@ -48,7 +47,6 @@ export class ListPendingPartnersHandler implements IQueryHandler<ListPendingPart
         userId: p.userId,
         type: p.typeValue,
         status: p.statusValue,
-        businessName: p.businessName,
         createdAt: p.createdAt,
       })),
       total,

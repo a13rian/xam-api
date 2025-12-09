@@ -1,4 +1,5 @@
 export * from './user.orm-entity';
+export * from './user-profile.orm-entity';
 export * from './role.orm-entity';
 export * from './permission.orm-entity';
 export * from './refresh-token.orm-entity';
@@ -8,3 +9,5 @@ export * from './wallet.orm-entity';
 export * from './wallet-transaction.orm-entity';
 export * from './partner.orm-entity';
 export * from './partner-document.orm-entity';
+export * from './partner-business.orm-entity';
+export * from './partner-individual.orm-entity';

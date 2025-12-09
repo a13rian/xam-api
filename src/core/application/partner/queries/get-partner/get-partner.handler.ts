@@ -11,7 +11,6 @@ export interface GetPartnerResult {
   userId: string;
   type: string;
   status: string;
-  businessName: string;
   description: string | null;
   rating: number;
   reviewCount: number;
@@ -41,7 +40,6 @@ export class GetPartnerHandler implements IQueryHandler<GetPartnerQuery> {
       userId: partner.userId,
       type: partner.typeValue,
       status: partner.statusValue,
-      businessName: partner.businessName,
       description: partner.description,
       rating: partner.rating,
       reviewCount: partner.reviewCount,

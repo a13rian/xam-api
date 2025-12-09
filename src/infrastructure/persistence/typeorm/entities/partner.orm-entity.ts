@@ -11,6 +11,8 @@ import {
 } from 'typeorm';
 import { UserOrmEntity } from './user.orm-entity';
 import { PartnerDocumentOrmEntity } from './partner-document.orm-entity';
+import { PartnerBusinessOrmEntity } from './partner-business.orm-entity';
+import { PartnerIndividualOrmEntity } from './partner-individual.orm-entity';
 import { PartnerTypeEnum } from '../../../../core/domain/partner/value-objects/partner-type.vo';
 import { PartnerStatusEnum } from '../../../../core/domain/partner/value-objects/partner-status.vo';
 
@@ -34,9 +36,6 @@ export class PartnerOrmEntity {
   @Column({ type: 'enum', enum: PartnerStatusEnum })
   @Index()
   status: PartnerStatusEnum;
-
-  @Column()
-  businessName: string;
 
   @Column({ type: 'text', nullable: true })
   description: string | null;
@@ -70,4 +69,13 @@ export class PartnerOrmEntity {
 
   @OneToMany(() => PartnerDocumentOrmEntity, (doc) => doc.partner)
   documents: PartnerDocumentOrmEntity[];
+
+  @OneToOne(() => PartnerBusinessOrmEntity, (business) => business.partner)
+  business: PartnerBusinessOrmEntity;
+
+  @OneToOne(
+    () => PartnerIndividualOrmEntity,
+    (individual) => individual.partner,
+  )
+  individual: PartnerIndividualOrmEntity;
 }

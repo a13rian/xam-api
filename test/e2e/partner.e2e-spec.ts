@@ -27,9 +27,12 @@ describe('Partner E2E', () => {
 
   describe('GET /api/partners/me', () => {
     describe('Happy Path', () => {
-      it('should return partner profile for authenticated user', async () => {
+      it('should return partner profile for authenticated user (individual)', async () => {
         const user = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.create({ userId: user.user.id });
+        const partner = await partnerFactory.createIndividual({
+          userId: user.user.id,
+          displayName: 'Test Individual',
+        });
 
         const response = await request(ctx.server)
           .get('/api/partners/me')
@@ -39,9 +42,28 @@ describe('Partner E2E', () => {
         expect(response.body).toMatchObject({
           id: partner.id,
           userId: user.user.id,
-          type: partner.type,
+          type: PartnerTypeEnum.INDIVIDUAL,
           status: partner.status,
-          businessName: partner.businessName,
+        });
+      });
+
+      it('should return partner profile for authenticated user (business)', async () => {
+        const user = await authHelper.createAuthenticatedUser();
+        const partner = await partnerFactory.createBusiness({
+          userId: user.user.id,
+          businessName: 'Test Business',
+        });
+
+        const response = await request(ctx.server)
+          .get('/api/partners/me')
+          .set(authHelper.authHeader(user))
+          .expect(200);
+
+        expect(response.body).toMatchObject({
+          id: partner.id,
+          userId: user.user.id,
+          type: PartnerTypeEnum.BUSINESS,
+          status: partner.status,
         });
       });
 
@@ -80,43 +102,46 @@ describe('Partner E2E', () => {
 
   describe('POST /api/partners/register', () => {
     describe('Happy Path', () => {
-      it('should register as freelance partner', async () => {
+      it('should register as individual partner', async () => {
         const user = await authHelper.createAuthenticatedUser();
 
         const response = await request(ctx.server)
           .post('/api/partners/register')
           .set(authHelper.authHeader(user))
           .send({
-            type: PartnerTypeEnum.FREELANCE,
-            businessName: 'Test Freelance Business',
-            description: 'A test freelance business',
+            type: PartnerTypeEnum.INDIVIDUAL,
+            displayName: 'Test Individual',
+            description: 'A test individual partner',
+            specialization: 'Hair Styling',
+            yearsExperience: 5,
           })
           .expect(201);
 
         expect(response.body).toMatchObject({
           id: expect.any(String),
           userId: user.user.id,
-          type: PartnerTypeEnum.FREELANCE,
+          type: PartnerTypeEnum.INDIVIDUAL,
           status: 'pending',
-          businessName: 'Test Freelance Business',
         });
       });
 
-      it('should register as organization partner', async () => {
+      it('should register as business partner', async () => {
         const user = await authHelper.createAuthenticatedUser();
 
         const response = await request(ctx.server)
           .post('/api/partners/register')
           .set(authHelper.authHeader(user))
           .send({
-            type: PartnerTypeEnum.ORGANIZATION,
-            businessName: 'Test Organization',
-            description: 'A test organization',
+            type: PartnerTypeEnum.BUSINESS,
+            businessName: 'Test Business',
+            description: 'A test business',
+            taxId: '123456789',
+            companySize: 'small',
           })
           .expect(201);
 
         expect(response.body).toMatchObject({
-          type: PartnerTypeEnum.ORGANIZATION,
+          type: PartnerTypeEnum.BUSINESS,
           status: 'pending',
         });
       });
@@ -128,8 +153,8 @@ describe('Partner E2E', () => {
           .post('/api/partners/register')
           .set(authHelper.authHeader(user))
           .send({
-            type: PartnerTypeEnum.FREELANCE,
-            businessName: 'Minimal Business',
+            type: PartnerTypeEnum.INDIVIDUAL,
+            displayName: 'Minimal Individual',
           })
           .expect(201);
 
@@ -145,19 +170,31 @@ describe('Partner E2E', () => {
           .post('/api/partners/register')
           .set(authHelper.authHeader(user))
           .send({
-            businessName: 'Test Business',
+            displayName: 'Test Individual',
           })
           .expect(400);
       });
 
-      it('should return 400 for missing businessName', async () => {
+      it('should return 400 for missing displayName (individual)', async () => {
         const user = await authHelper.createAuthenticatedUser();
 
         await request(ctx.server)
           .post('/api/partners/register')
           .set(authHelper.authHeader(user))
           .send({
-            type: PartnerTypeEnum.FREELANCE,
+            type: PartnerTypeEnum.INDIVIDUAL,
+          })
+          .expect(400);
+      });
+
+      it('should return 400 for missing businessName (business)', async () => {
+        const user = await authHelper.createAuthenticatedUser();
+
+        await request(ctx.server)
+          .post('/api/partners/register')
+          .set(authHelper.authHeader(user))
+          .send({
+            type: PartnerTypeEnum.BUSINESS,
           })
           .expect(400);
       });
@@ -170,7 +207,7 @@ describe('Partner E2E', () => {
           .set(authHelper.authHeader(user))
           .send({
             type: 'invalid_type',
-            businessName: 'Test Business',
+            displayName: 'Test Individual',
           })
           .expect(400);
       });
@@ -185,8 +222,8 @@ describe('Partner E2E', () => {
           .post('/api/partners/register')
           .set(authHelper.authHeader(user))
           .send({
-            type: PartnerTypeEnum.FREELANCE,
-            businessName: 'First Business',
+            type: PartnerTypeEnum.INDIVIDUAL,
+            displayName: 'First Individual',
           })
           .expect(201);
 
@@ -195,7 +232,7 @@ describe('Partner E2E', () => {
           .post('/api/partners/register')
           .set(authHelper.authHeader(user))
           .send({
-            type: PartnerTypeEnum.ORGANIZATION,
+            type: PartnerTypeEnum.BUSINESS,
             businessName: 'Second Business',
           })
           .expect(409);
@@ -207,8 +244,8 @@ describe('Partner E2E', () => {
         await request(ctx.server)
           .post('/api/partners/register')
           .send({
-            type: PartnerTypeEnum.FREELANCE,
-            businessName: 'Test Business',
+            type: PartnerTypeEnum.INDIVIDUAL,
+            displayName: 'Test Individual',
           })
           .expect(401);
       });

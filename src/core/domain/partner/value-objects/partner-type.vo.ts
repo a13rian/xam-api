@@ -1,8 +1,8 @@
 import { ValidationException } from '../../../../shared/exceptions/domain.exception';
 
 export enum PartnerTypeEnum {
-  FREELANCE = 'freelance',
-  ORGANIZATION = 'organization',
+  INDIVIDUAL = 'individual',
+  BUSINESS = 'business',
 }
 
 export class PartnerType {
@@ -12,28 +12,28 @@ export class PartnerType {
     this._value = value;
   }
 
-  public static freelance(): PartnerType {
-    return new PartnerType(PartnerTypeEnum.FREELANCE);
+  public static individual(): PartnerType {
+    return new PartnerType(PartnerTypeEnum.INDIVIDUAL);
   }
 
-  public static organization(): PartnerType {
-    return new PartnerType(PartnerTypeEnum.ORGANIZATION);
+  public static business(): PartnerType {
+    return new PartnerType(PartnerTypeEnum.BUSINESS);
   }
 
   public static fromString(value: string): PartnerType {
-    const enumValue = Object.values(PartnerTypeEnum).find((v) => v === value);
-    if (!enumValue) {
+    const validValues = Object.values(PartnerTypeEnum) as string[];
+    if (!validValues.includes(value)) {
       throw new ValidationException(`Invalid partner type: ${value}`);
     }
-    return new PartnerType(enumValue);
+    return new PartnerType(value as PartnerTypeEnum);
   }
 
-  public isFreelance(): boolean {
-    return this._value === PartnerTypeEnum.FREELANCE;
+  public isIndividual(): boolean {
+    return this._value === PartnerTypeEnum.INDIVIDUAL;
   }
 
-  public isOrganization(): boolean {
-    return this._value === PartnerTypeEnum.ORGANIZATION;
+  public isBusiness(): boolean {
+    return this._value === PartnerTypeEnum.BUSINESS;
   }
 
   get value(): PartnerTypeEnum {

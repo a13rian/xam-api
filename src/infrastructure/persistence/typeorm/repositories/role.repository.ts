@@ -94,4 +94,17 @@ export class RoleRepository implements IRoleRepository {
     });
     return count > 0;
   }
+
+  async getPermissionCodesByRoleIds(roleIds: string[]): Promise<string[]> {
+    if (roleIds.length === 0) return [];
+
+    const result = await this.ormRepository
+      .createQueryBuilder('role')
+      .innerJoin('role.permissions', 'permission')
+      .where('role.id IN (:...roleIds)', { roleIds })
+      .select('DISTINCT permission.code', 'code')
+      .getRawMany<{ code: string }>();
+
+    return result.map((r) => r.code);
+  }
 }

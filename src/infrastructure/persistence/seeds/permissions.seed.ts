@@ -120,6 +120,110 @@ const permissions = [
     resource: 'role',
     action: 'assign',
   },
+
+  // Partner permissions
+  {
+    code: 'partner:create',
+    name: 'Create Partner',
+    description: 'Create new partners',
+    resource: 'partner',
+    action: 'create',
+  },
+  {
+    code: 'partner:read',
+    name: 'Read Partner',
+    description: 'View partner details',
+    resource: 'partner',
+    action: 'read',
+  },
+  {
+    code: 'partner:update',
+    name: 'Update Partner',
+    description: 'Update partner information',
+    resource: 'partner',
+    action: 'update',
+  },
+  {
+    code: 'partner:delete',
+    name: 'Delete Partner',
+    description: 'Delete partners',
+    resource: 'partner',
+    action: 'delete',
+  },
+  {
+    code: 'partner:list',
+    name: 'List Partners',
+    description: 'View list of partners',
+    resource: 'partner',
+    action: 'list',
+  },
+  {
+    code: 'partner:approve',
+    name: 'Approve Partner',
+    description: 'Approve partner applications',
+    resource: 'partner',
+    action: 'approve',
+  },
+  {
+    code: 'partner:reject',
+    name: 'Reject Partner',
+    description: 'Reject partner applications',
+    resource: 'partner',
+    action: 'reject',
+  },
+
+  // Partner Document permissions
+  {
+    code: 'partner_document:approve',
+    name: 'Approve Partner Document',
+    description: 'Approve partner documents',
+    resource: 'partner_document',
+    action: 'approve',
+  },
+  {
+    code: 'partner_document:reject',
+    name: 'Reject Partner Document',
+    description: 'Reject partner documents',
+    resource: 'partner_document',
+    action: 'reject',
+  },
+
+  // Category permissions
+  {
+    code: 'category:create',
+    name: 'Create Category',
+    description: 'Create new categories',
+    resource: 'category',
+    action: 'create',
+  },
+  {
+    code: 'category:read',
+    name: 'Read Category',
+    description: 'View category details',
+    resource: 'category',
+    action: 'read',
+  },
+  {
+    code: 'category:update',
+    name: 'Update Category',
+    description: 'Update category information',
+    resource: 'category',
+    action: 'update',
+  },
+  {
+    code: 'category:delete',
+    name: 'Delete Category',
+    description: 'Delete categories',
+    resource: 'category',
+    action: 'delete',
+  },
+  {
+    code: 'category:list',
+    name: 'List Categories',
+    description: 'View list of categories',
+    resource: 'category',
+    action: 'list',
+  },
 ];
 
 export async function seedPermissions(

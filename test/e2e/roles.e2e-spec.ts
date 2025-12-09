@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
 import request from 'supertest';
 import { TestContext, createTestApp, closeTestApp } from '../support/test-app';
 import { AuthHelper } from '../support/auth/auth.helper';

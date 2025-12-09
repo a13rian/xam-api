@@ -31,6 +31,7 @@ import {
   GetStaffByUserIdQuery,
 } from '../../../core/application/partner-staff/queries';
 import { GetMyPartnerQuery } from '../../../core/application/partner/queries';
+import { PartnerResponseDto } from '../dto/partner';
 
 @Controller('partners/me/staff')
 export class PartnerStaffController {
@@ -39,25 +40,21 @@ export class PartnerStaffController {
     private readonly queryBus: QueryBus,
   ) {}
 
-  private async getPartnerId(userId: string): Promise<string> {
-    const partner = await this.queryBus.execute(new GetMyPartnerQuery(userId));
-    if (!partner) {
-      throw new NotFoundException('Partner profile not found');
-    }
-    return partner.id;
-  }
-
   private async getPartnerIdForStaff(userId: string): Promise<string> {
     // First try to get partner if user is an owner
-    const partner = await this.queryBus.execute(new GetMyPartnerQuery(userId));
+    const partner = await this.queryBus.execute<
+      GetMyPartnerQuery,
+      PartnerResponseDto | null
+    >(new GetMyPartnerQuery(userId));
     if (partner) {
       return partner.id;
     }
 
     // Otherwise, check if user is a staff member
-    const memberships = await this.queryBus.execute(
-      new GetStaffByUserIdQuery(userId),
-    );
+    const memberships = await this.queryBus.execute<
+      GetStaffByUserIdQuery,
+      { items: StaffResponseDto[] }
+    >(new GetStaffByUserIdQuery(userId));
     if (memberships.items.length > 0) {
       return memberships.items[0].partnerId;
     }

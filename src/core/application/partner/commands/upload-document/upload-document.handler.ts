@@ -38,10 +38,10 @@ export class UploadDocumentHandler implements ICommandHandler<UploadDocumentComm
       throw new ForbiddenException('You do not own this partner profile');
     }
 
-    // Only organization partners need documents
-    if (partner.type.value !== PartnerTypeEnum.ORGANIZATION) {
+    // Only business partners need documents
+    if (partner.type.value !== PartnerTypeEnum.BUSINESS) {
       throw new BadRequestException(
-        'Only organization partners need to upload documents',
+        'Only business partners need to upload documents',
       );
     }
 

@@ -25,7 +25,6 @@ export class GetMyPartnerHandler implements IQueryHandler<GetMyPartnerQuery> {
       userId: partner.userId,
       type: partner.typeValue,
       status: partner.statusValue,
-      businessName: partner.businessName,
       description: partner.description,
       rating: partner.rating,
       reviewCount: partner.reviewCount,

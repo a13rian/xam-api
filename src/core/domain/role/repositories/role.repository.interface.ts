@@ -14,4 +14,5 @@ export interface IRoleRepository {
   save(role: Role): Promise<void>;
   delete(id: string): Promise<void>;
   exists(name: string, organizationId?: string | null): Promise<boolean>;
+  getPermissionCodesByRoleIds(roleIds: string[]): Promise<string[]>;
 }

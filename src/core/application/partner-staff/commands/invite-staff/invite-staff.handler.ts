@@ -43,11 +43,9 @@ export class InviteStaffHandler implements ICommandHandler<InviteStaffCommand> {
       throw new NotFoundException('Partner not found');
     }
 
-    // Only organization partners can have staff
-    if (partner.type.value !== PartnerTypeEnum.ORGANIZATION) {
-      throw new BadRequestException(
-        'Only organization partners can invite staff',
-      );
+    // Only business partners can have staff
+    if (partner.type.value !== PartnerTypeEnum.BUSINESS) {
+      throw new BadRequestException('Only business partners can invite staff');
     }
 
     // Verify inviter has permission

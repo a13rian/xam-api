@@ -11,7 +11,8 @@ import {
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
-import { Roles } from '../../../shared/decorators/roles.decorator';
+import { RequirePermissions } from '../../../shared/decorators/permissions.decorator';
+import { PERMISSIONS } from '../../../shared/constants/permissions';
 import { AuthenticatedUser } from '../../../shared/interfaces/authenticated-user.interface';
 import {
   RegisterPartnerDto,
@@ -30,6 +31,7 @@ import {
   ApproveDocumentCommand,
   RejectDocumentCommand,
 } from '../../../core/application/partner/commands';
+import { RegisterPartnerResult } from '../../../core/application/partner/commands/register-partner/register-partner.handler';
 import {
   GetPartnerQuery,
   GetMyPartnerQuery,
@@ -49,23 +51,46 @@ export class PartnerController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: RegisterPartnerDto,
   ): Promise<PartnerResponseDto> {
-    const result = await this.commandBus.execute(
+    const result = await this.commandBus.execute<
+      RegisterPartnerCommand,
+      RegisterPartnerResult
+    >(
       new RegisterPartnerCommand(
         user.id,
         dto.type,
-        dto.businessName,
         dto.description,
+        // Business-specific fields
+        dto.businessName,
+        dto.taxId,
+        dto.businessLicense,
+        dto.companySize,
+        dto.website,
+        dto.socialMedia,
+        dto.establishedDate ? new Date(dto.establishedDate) : undefined,
+        // Individual-specific fields
+        dto.displayName,
+        dto.idCardNumber,
+        dto.specialization,
+        dto.yearsExperience,
+        dto.certifications,
+        dto.portfolio,
+        dto.personalBio,
       ),
     );
 
-    return await this.queryBus.execute(new GetPartnerQuery(result.id));
+    return await this.queryBus.execute<GetPartnerQuery, PartnerResponseDto>(
+      new GetPartnerQuery(result.id),
+    );
   }
 
   @Get('me')
   async getMyPartner(
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<PartnerResponseDto> {
-    const partner = await this.queryBus.execute(new GetMyPartnerQuery(user.id));
+    const partner = await this.queryBus.execute<
+      GetMyPartnerQuery,
+      PartnerResponseDto | null
+    >(new GetMyPartnerQuery(user.id));
     if (!partner) {
       throw new NotFoundException('Partner profile not found');
     }
@@ -76,20 +101,26 @@ export class PartnerController {
   async getPartner(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<PartnerResponseDto> {
-    return await this.queryBus.execute(new GetPartnerQuery(id));
+    return await this.queryBus.execute<GetPartnerQuery, PartnerResponseDto>(
+      new GetPartnerQuery(id),
+    );
   }
 
   @Get('me/documents')
   async listMyDocuments(
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<{ items: DocumentResponseDto[] }> {
-    const partner = await this.queryBus.execute(new GetMyPartnerQuery(user.id));
+    const partner = await this.queryBus.execute<
+      GetMyPartnerQuery,
+      PartnerResponseDto | null
+    >(new GetMyPartnerQuery(user.id));
     if (!partner) {
       throw new NotFoundException('Partner profile not found');
     }
-    return await this.queryBus.execute(
-      new ListPartnerDocumentsQuery(partner.id, user.id),
-    );
+    return await this.queryBus.execute<
+      ListPartnerDocumentsQuery,
+      { items: DocumentResponseDto[] }
+    >(new ListPartnerDocumentsQuery(partner.id, user.id));
   }
 
   @Post('me/documents')
@@ -97,11 +128,14 @@ export class PartnerController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: UploadDocumentDto,
   ): Promise<{ id: string }> {
-    const partner = await this.queryBus.execute(new GetMyPartnerQuery(user.id));
+    const partner = await this.queryBus.execute<
+      GetMyPartnerQuery,
+      PartnerResponseDto | null
+    >(new GetMyPartnerQuery(user.id));
     if (!partner) {
       throw new NotFoundException('Partner profile not found');
     }
-    return await this.commandBus.execute(
+    return await this.commandBus.execute<UploadDocumentCommand, { id: string }>(
       new UploadDocumentCommand(partner.id, user.id, dto.type, dto.url),
     );
   }
@@ -115,7 +149,7 @@ export class AdminPartnerController {
   ) {}
 
   @Get('pending')
-  @Roles('super_admin', 'admin')
+  @RequirePermissions(PERMISSIONS.PARTNER.LIST)
   async listPending(
     @Query() query: ListPartnersQueryDto,
   ): Promise<PendingPartnersResponseDto> {
@@ -125,7 +159,7 @@ export class AdminPartnerController {
   }
 
   @Get(':id')
-  @Roles('super_admin', 'admin')
+  @RequirePermissions(PERMISSIONS.PARTNER.READ)
   async getPartner(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<PartnerResponseDto> {
@@ -134,7 +168,7 @@ export class AdminPartnerController {
 
   @Post(':id/approve')
   @HttpCode(200)
-  @Roles('super_admin', 'admin')
+  @RequirePermissions(PERMISSIONS.PARTNER.APPROVE)
   async approve(
     @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() user: AuthenticatedUser,
@@ -145,7 +179,7 @@ export class AdminPartnerController {
 
   @Post(':id/reject')
   @HttpCode(200)
-  @Roles('super_admin', 'admin')
+  @RequirePermissions(PERMISSIONS.PARTNER.REJECT)
   async reject(
     @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() user: AuthenticatedUser,
@@ -159,7 +193,7 @@ export class AdminPartnerController {
 
   @Post('documents/:documentId/approve')
   @HttpCode(200)
-  @Roles('super_admin', 'admin')
+  @RequirePermissions(PERMISSIONS.PARTNER_DOCUMENT.APPROVE)
   async approveDocument(
     @Param('documentId', ParseUUIDPipe) documentId: string,
     @CurrentUser() user: AuthenticatedUser,
@@ -171,7 +205,7 @@ export class AdminPartnerController {
 
   @Post('documents/:documentId/reject')
   @HttpCode(200)
-  @Roles('super_admin', 'admin')
+  @RequirePermissions(PERMISSIONS.PARTNER_DOCUMENT.REJECT)
   async rejectDocument(
     @Param('documentId', ParseUUIDPipe) documentId: string,
     @CurrentUser() user: AuthenticatedUser,

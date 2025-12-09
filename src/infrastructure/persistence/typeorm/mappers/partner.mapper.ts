@@ -12,7 +12,6 @@ export class PartnerMapper {
       userId: entity.userId,
       type: PartnerType.fromString(entity.type),
       status: PartnerStatus.fromString(entity.status),
-      businessName: entity.businessName,
       description: entity.description,
       rating: Number(entity.rating),
       reviewCount: entity.reviewCount,
@@ -34,7 +33,6 @@ export class PartnerMapper {
     entity.userId = domain.userId;
     entity.type = domain.typeValue;
     entity.status = domain.statusValue;
-    entity.businessName = domain.businessName;
     entity.description = domain.description;
     entity.rating = domain.rating;
     entity.reviewCount = domain.reviewCount;

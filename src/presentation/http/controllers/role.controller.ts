@@ -23,7 +23,8 @@ import {
   ListPermissionsQuery,
   ListRolesQuery,
 } from '../../../core/application/role/queries';
-import { Roles } from '../../../shared/decorators/roles.decorator';
+import { RequirePermissions } from '../../../shared/decorators/permissions.decorator';
+import { PERMISSIONS } from '../../../shared/constants/permissions';
 import {
   CreateRoleDto,
   PermissionListResponseDto,
@@ -40,7 +41,7 @@ export class RoleController {
   ) {}
 
   @Post()
-  @Roles('super_admin', 'admin')
+  @RequirePermissions(PERMISSIONS.ROLE.CREATE)
   async create(@Body() dto: CreateRoleDto): Promise<RoleResponseDto> {
     const result = await this.commandBus.execute<
       CreateRoleCommand,
@@ -86,7 +87,7 @@ export class RoleController {
   }
 
   @Patch(':id')
-  @Roles('super_admin', 'admin')
+  @RequirePermissions(PERMISSIONS.ROLE.UPDATE)
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateRoleDto,
@@ -99,7 +100,7 @@ export class RoleController {
   }
 
   @Delete(':id')
-  @Roles('super_admin', 'admin')
+  @RequirePermissions(PERMISSIONS.ROLE.DELETE)
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     await this.commandBus.execute(new DeleteRoleCommand(id));

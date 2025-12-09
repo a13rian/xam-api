@@ -1,5 +1,10 @@
 import { CommandHandler, ICommandHandler, EventPublisher } from '@nestjs/cqrs';
-import { Inject, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  ConflictException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { RegisterPartnerCommand } from './register-partner.command';
 import {
   IPartnerRepository,
@@ -10,10 +15,20 @@ import {
   PARTNER_STAFF_REPOSITORY,
 } from '../../../../domain/partner/repositories/partner-staff.repository.interface';
 import {
+  IPartnerBusinessRepository,
+  PARTNER_BUSINESS_REPOSITORY,
+} from '../../../../domain/partner/repositories/partner-business.repository.interface';
+import {
+  IPartnerIndividualRepository,
+  PARTNER_INDIVIDUAL_REPOSITORY,
+} from '../../../../domain/partner/repositories/partner-individual.repository.interface';
+import {
   IUserRepository,
   USER_REPOSITORY,
 } from '../../../../domain/user/repositories/user.repository.interface';
 import { Partner } from '../../../../domain/partner/entities/partner.entity';
+import { PartnerBusiness } from '../../../../domain/partner/entities/partner-business.entity';
+import { PartnerIndividual } from '../../../../domain/partner/entities/partner-individual.entity';
 import { PartnerStaff } from '../../../../domain/partner/entities/partner-staff.entity';
 import { PartnerTypeEnum } from '../../../../domain/partner/value-objects/partner-type.vo';
 
@@ -22,8 +37,9 @@ export interface RegisterPartnerResult {
   userId: string;
   type: string;
   status: string;
-  businessName: string;
   description: string | null;
+  businessName?: string;
+  displayName?: string;
 }
 
 @CommandHandler(RegisterPartnerCommand)
@@ -33,6 +49,10 @@ export class RegisterPartnerHandler implements ICommandHandler<RegisterPartnerCo
     private readonly partnerRepository: IPartnerRepository,
     @Inject(PARTNER_STAFF_REPOSITORY)
     private readonly staffRepository: IPartnerStaffRepository,
+    @Inject(PARTNER_BUSINESS_REPOSITORY)
+    private readonly businessRepository: IPartnerBusinessRepository,
+    @Inject(PARTNER_INDIVIDUAL_REPOSITORY)
+    private readonly individualRepository: IPartnerIndividualRepository,
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
     private readonly eventPublisher: EventPublisher,
@@ -52,25 +72,66 @@ export class RegisterPartnerHandler implements ICommandHandler<RegisterPartnerCo
       throw new NotFoundException('User not found');
     }
 
+    // Validate required fields based on type
+    if (command.type === PartnerTypeEnum.BUSINESS && !command.businessName) {
+      throw new BadRequestException(
+        'businessName is required for business partners',
+      );
+    }
+    if (command.type === PartnerTypeEnum.INDIVIDUAL && !command.displayName) {
+      throw new BadRequestException(
+        'displayName is required for individual partners',
+      );
+    }
+
     const partner = this.eventPublisher.mergeObjectContext(
       Partner.create({
         userId: command.userId,
         type: command.type,
-        businessName: command.businessName,
         description: command.description,
       }),
     );
 
     await this.partnerRepository.save(partner);
 
-    // Auto-create owner staff for organization partners
-    if (command.type === PartnerTypeEnum.ORGANIZATION) {
+    let resultBusinessName: string | undefined;
+    let resultDisplayName: string | undefined;
+
+    // Create type-specific child entity
+    if (command.type === PartnerTypeEnum.BUSINESS) {
+      const business = PartnerBusiness.create({
+        partnerId: partner.id,
+        businessName: command.businessName!,
+        taxId: command.taxId,
+        businessLicense: command.businessLicense,
+        companySize: command.companySize,
+        website: command.website,
+        socialMedia: command.socialMedia,
+        establishedDate: command.establishedDate,
+      });
+      await this.businessRepository.save(business);
+      resultBusinessName = business.businessName;
+
+      // Auto-create owner staff for business partners
       const ownerStaff = PartnerStaff.createOwner({
         partnerId: partner.id,
         userId: command.userId,
         email: user.email.value,
       });
       await this.staffRepository.save(ownerStaff);
+    } else {
+      const individual = PartnerIndividual.create({
+        partnerId: partner.id,
+        displayName: command.displayName!,
+        idCardNumber: command.idCardNumber,
+        specialization: command.specialization,
+        yearsExperience: command.yearsExperience,
+        certifications: command.certifications,
+        portfolio: command.portfolio,
+        personalBio: command.personalBio,
+      });
+      await this.individualRepository.save(individual);
+      resultDisplayName = individual.displayName;
     }
 
     partner.commit();
@@ -80,8 +141,9 @@ export class RegisterPartnerHandler implements ICommandHandler<RegisterPartnerCo
       userId: partner.userId,
       type: partner.typeValue,
       status: partner.statusValue,
-      businessName: partner.businessName,
       description: partner.description,
+      businessName: resultBusinessName,
+      displayName: resultDisplayName,
     };
   }
 }

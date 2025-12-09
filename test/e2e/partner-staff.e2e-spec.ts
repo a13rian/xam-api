@@ -31,7 +31,7 @@ describe('Partner Staff E2E', () => {
     describe('Happy Path', () => {
       it('should accept invitation with valid token', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -58,7 +58,7 @@ describe('Partner Staff E2E', () => {
 
       it('should link user to staff record after acceptance', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -145,7 +145,7 @@ describe('Partner Staff E2E', () => {
     describe('Conflict', () => {
       it('should return 409 when invitation already accepted', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -184,7 +184,7 @@ describe('Partner Staff E2E', () => {
     describe('Forbidden', () => {
       it('should return 403 when different user tries to accept', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -231,7 +231,7 @@ describe('Partner Staff E2E', () => {
 
         // Create first partner and add user as staff
         const owner1 = await authHelper.createAuthenticatedUser();
-        const partner1 = await partnerFactory.createActiveOrganization({
+        const partner1 = await partnerFactory.createActiveBusiness({
           userId: owner1.user.id,
           businessName: 'Partner 1',
         });
@@ -249,7 +249,7 @@ describe('Partner Staff E2E', () => {
 
         // Create second partner and add user as manager
         const owner2 = await authHelper.createAuthenticatedUser();
-        const partner2 = await partnerFactory.createActiveOrganization({
+        const partner2 = await partnerFactory.createActiveBusiness({
           userId: owner2.user.id,
           businessName: 'Partner 2',
         });
@@ -286,7 +286,7 @@ describe('Partner Staff E2E', () => {
 
       it('should include user own partner as owner', async () => {
         const user = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: user.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -306,7 +306,7 @@ describe('Partner Staff E2E', () => {
 
       it('should return membership with partner details', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
           businessName: 'Test Business',
         });
@@ -340,7 +340,7 @@ describe('Partner Staff E2E', () => {
         const user = await authHelper.createAuthenticatedUser();
 
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -386,7 +386,7 @@ describe('Partner Staff E2E', () => {
     describe('Happy Path', () => {
       it('should invite staff member as owner', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -414,7 +414,7 @@ describe('Partner Staff E2E', () => {
 
       it('should invite manager', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -437,7 +437,7 @@ describe('Partner Staff E2E', () => {
 
       it('should return invitation token', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -463,7 +463,7 @@ describe('Partner Staff E2E', () => {
     describe('Validation Errors', () => {
       it('should return 400 for missing email', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -483,7 +483,7 @@ describe('Partner Staff E2E', () => {
 
       it('should return 400 for invalid email', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -504,7 +504,7 @@ describe('Partner Staff E2E', () => {
 
       it('should return 400 for missing role', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -524,7 +524,7 @@ describe('Partner Staff E2E', () => {
 
       it('should return 400 for invalid role', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -545,7 +545,7 @@ describe('Partner Staff E2E', () => {
 
       it('should return 400 when trying to invite as owner role', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -568,7 +568,7 @@ describe('Partner Staff E2E', () => {
     describe('Conflict', () => {
       it('should return 409 when email already invited', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -595,7 +595,7 @@ describe('Partner Staff E2E', () => {
 
       it('should return 409 when inviting existing staff member', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -626,7 +626,7 @@ describe('Partner Staff E2E', () => {
     describe('Forbidden', () => {
       it('should return 403 when non-owner/manager tries to invite', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -686,7 +686,7 @@ describe('Partner Staff E2E', () => {
     describe('Happy Path', () => {
       it('should list all staff members', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -722,7 +722,7 @@ describe('Partner Staff E2E', () => {
 
       it('should return only owner when no other staff', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -742,7 +742,7 @@ describe('Partner Staff E2E', () => {
 
       it('should include pending invitations', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -767,7 +767,7 @@ describe('Partner Staff E2E', () => {
 
       it('should allow staff member to view staff list', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -822,7 +822,7 @@ describe('Partner Staff E2E', () => {
     describe('Happy Path', () => {
       it('should remove staff member as owner', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -855,7 +855,7 @@ describe('Partner Staff E2E', () => {
 
       it('should remove pending invitation', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -885,7 +885,7 @@ describe('Partner Staff E2E', () => {
 
       it('should allow manager to remove staff', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -920,7 +920,7 @@ describe('Partner Staff E2E', () => {
     describe('Validation Errors', () => {
       it('should return 400 for invalid UUID', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -939,7 +939,7 @@ describe('Partner Staff E2E', () => {
     describe('Forbidden', () => {
       it('should return 403 when trying to remove owner', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         const ownerStaff = await partnerStaffFactory.createOwner(
@@ -964,7 +964,7 @@ describe('Partner Staff E2E', () => {
 
       it('should return 403 when staff tries to remove another staff', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -997,7 +997,7 @@ describe('Partner Staff E2E', () => {
 
       it('should return 403 when manager tries to remove another manager', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(
@@ -1041,7 +1041,7 @@ describe('Partner Staff E2E', () => {
 
       it('should return 404 if staff does not exist', async () => {
         const owner = await authHelper.createAuthenticatedUser();
-        const partner = await partnerFactory.createActiveOrganization({
+        const partner = await partnerFactory.createActiveBusiness({
           userId: owner.user.id,
         });
         await partnerStaffFactory.createOwner(

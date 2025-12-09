@@ -5,3 +5,5 @@ export * from './wallet.repository';
 export * from './wallet-transaction.repository';
 export * from './partner.repository';
 export * from './partner-document.repository';
+export * from './partner-business.repository';
+export * from './partner-individual.repository';

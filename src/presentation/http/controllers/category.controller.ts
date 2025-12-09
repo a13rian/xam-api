@@ -11,7 +11,8 @@ import {
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Public } from '../../../shared/decorators/public.decorator';
-import { Roles } from '../../../shared/decorators/roles.decorator';
+import { RequirePermissions } from '../../../shared/decorators/permissions.decorator';
+import { PERMISSIONS } from '../../../shared/constants/permissions';
 import {
   CreateCategoryDto,
   UpdateCategoryDto,
@@ -66,7 +67,7 @@ export class AdminCategoryController {
   ) {}
 
   @Get()
-  @Roles('super_admin', 'admin')
+  @RequirePermissions(PERMISSIONS.CATEGORY.LIST)
   async list(
     @Query() query: ListCategoriesQueryDto,
   ): Promise<CategoriesListResponseDto> {
@@ -77,7 +78,7 @@ export class AdminCategoryController {
   }
 
   @Get(':id')
-  @Roles('super_admin', 'admin')
+  @RequirePermissions(PERMISSIONS.CATEGORY.READ)
   async getById(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<CategoryResponseDto> {
@@ -85,9 +86,12 @@ export class AdminCategoryController {
   }
 
   @Post()
-  @Roles('super_admin', 'admin')
+  @RequirePermissions(PERMISSIONS.CATEGORY.CREATE)
   async create(@Body() dto: CreateCategoryDto): Promise<CategoryResponseDto> {
-    const result = await this.commandBus.execute(
+    const result = await this.commandBus.execute<
+      CreateCategoryCommand,
+      { id: string }
+    >(
       new CreateCategoryCommand(
         dto.name,
         dto.slug,
@@ -97,11 +101,13 @@ export class AdminCategoryController {
         dto.sortOrder,
       ),
     );
-    return await this.queryBus.execute(new GetCategoryQuery(result.id));
+    return await this.queryBus.execute<GetCategoryQuery, CategoryResponseDto>(
+      new GetCategoryQuery(result.id),
+    );
   }
 
   @Put(':id')
-  @Roles('super_admin', 'admin')
+  @RequirePermissions(PERMISSIONS.CATEGORY.UPDATE)
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateCategoryDto,
@@ -120,7 +126,7 @@ export class AdminCategoryController {
   }
 
   @Delete(':id')
-  @Roles('super_admin', 'admin')
+  @RequirePermissions(PERMISSIONS.CATEGORY.DELETE)
   async delete(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     await this.commandBus.execute(new DeleteCategoryCommand(id));
   }

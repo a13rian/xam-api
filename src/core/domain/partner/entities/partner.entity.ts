@@ -16,7 +16,6 @@ export interface PartnerProps {
   userId: string;
   type: PartnerType;
   status: PartnerStatus;
-  businessName: string;
   description?: string | null;
   rating?: number;
   reviewCount?: number;
@@ -32,7 +31,6 @@ export interface PartnerProps {
 export interface CreatePartnerProps {
   userId: string;
   type: PartnerTypeEnum;
-  businessName: string;
   description?: string;
 }
 
@@ -41,7 +39,6 @@ export class Partner extends AggregateRoot {
   private readonly _userId: string;
   private readonly _type: PartnerType;
   private _status: PartnerStatus;
-  private _businessName: string;
   private _description: string | null;
   private _rating: number;
   private _reviewCount: number;
@@ -59,7 +56,6 @@ export class Partner extends AggregateRoot {
     this._userId = props.userId;
     this._type = props.type;
     this._status = props.status;
-    this._businessName = props.businessName;
     this._description = props.description ?? null;
     this._rating = props.rating ?? 0;
     this._reviewCount = props.reviewCount ?? 0;
@@ -79,7 +75,6 @@ export class Partner extends AggregateRoot {
       userId: props.userId,
       type,
       status: PartnerStatus.pending(),
-      businessName: props.businessName,
       description: props.description,
     });
 
@@ -88,7 +83,6 @@ export class Partner extends AggregateRoot {
         partner.id,
         partner.userId,
         partner.type.value,
-        partner.businessName,
       ),
     );
 
@@ -155,13 +149,7 @@ export class Partner extends AggregateRoot {
     this._updatedAt = new Date();
   }
 
-  public updateProfile(props: {
-    businessName?: string;
-    description?: string;
-  }): void {
-    if (props.businessName !== undefined) {
-      this._businessName = props.businessName;
-    }
+  public updateProfile(props: { description?: string }): void {
     if (props.description !== undefined) {
       this._description = props.description;
     }
@@ -192,7 +180,7 @@ export class Partner extends AggregateRoot {
   }
 
   public canAddStaff(): boolean {
-    return this._type.isOrganization() && this._status.canOperate();
+    return this._type.isBusiness() && this._status.canOperate();
   }
 
   public canAcceptBookings(): boolean {
@@ -228,10 +216,6 @@ export class Partner extends AggregateRoot {
 
   get statusValue(): PartnerStatusEnum {
     return this._status.value;
-  }
-
-  get businessName(): string {
-    return this._businessName;
   }
 
   get description(): string | null {

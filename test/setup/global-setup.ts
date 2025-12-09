@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
 import { UserOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/user.orm-entity';
-import { OrganizationOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/organization.orm-entity';
+import { UserProfileOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/user-profile.orm-entity';
 import { RoleOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/role.orm-entity';
 import { PermissionOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/permission.orm-entity';
 import { RefreshTokenOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/refresh-token.orm-entity';
@@ -10,6 +10,8 @@ import { EmailVerificationTokenOrmEntity } from '../../src/infrastructure/persis
 import { WalletOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/wallet.orm-entity';
 import { WalletTransactionOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/wallet-transaction.orm-entity';
 import { PartnerOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/partner.orm-entity';
+import { PartnerBusinessOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/partner-business.orm-entity';
+import { PartnerIndividualOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/partner-individual.orm-entity';
 import { PartnerDocumentOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/partner-document.orm-entity';
 import { ServiceCategoryOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/service-category.orm-entity';
 import { ServiceOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/service.orm-entity';
@@ -40,7 +42,7 @@ export default async function globalSetup(): Promise<void> {
     database: process.env.DB_DATABASE || 'xam_api_test',
     entities: [
       UserOrmEntity,
-      OrganizationOrmEntity,
+      UserProfileOrmEntity,
       RoleOrmEntity,
       PermissionOrmEntity,
       RefreshTokenOrmEntity,
@@ -49,6 +51,8 @@ export default async function globalSetup(): Promise<void> {
       WalletOrmEntity,
       WalletTransactionOrmEntity,
       PartnerOrmEntity,
+      PartnerBusinessOrmEntity,
+      PartnerIndividualOrmEntity,
       PartnerDocumentOrmEntity,
       ServiceCategoryOrmEntity,
       ServiceOrmEntity,

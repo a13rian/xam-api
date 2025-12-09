@@ -21,7 +21,7 @@ import { UserModule } from './presentation/modules/user.module';
 import { WalletModule } from './presentation/modules/wallet.module';
 import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
 import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
-import { RolesGuard } from './shared/guards/roles.guard';
+import { PermissionGuard } from './shared/guards/permission.guard';
 import { ValidationPipe } from './shared/pipes/validation.pipe';
 
 @Module({
@@ -77,7 +77,7 @@ import { ValidationPipe } from './shared/pipes/validation.pipe';
     },
     {
       provide: APP_GUARD,
-      useClass: RolesGuard,
+      useClass: PermissionGuard,
     },
     {
       provide: APP_FILTER,

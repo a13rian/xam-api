@@ -12,7 +12,8 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { Roles } from '../../../shared/decorators/roles.decorator';
+import { RequirePermissions } from '../../../shared/decorators/permissions.decorator';
+import { PERMISSIONS } from '../../../shared/constants/permissions';
 import {
   CreateUserDto,
   UpdateUserDto,
@@ -38,7 +39,7 @@ export class UserController {
   ) {}
 
   @Post()
-  @Roles('super_admin', 'admin')
+  @RequirePermissions(PERMISSIONS.USER.CREATE)
   async create(@Body() dto: CreateUserDto): Promise<UserResponseDto> {
     const result: { id: string } = await this.commandBus.execute(
       new CreateUserCommand(
@@ -54,7 +55,7 @@ export class UserController {
   }
 
   @Get()
-  @Roles('super_admin', 'admin')
+  @RequirePermissions(PERMISSIONS.USER.LIST)
   async findAll(
     @Query() query: ListUsersQueryDto,
   ): Promise<UserListResponseDto> {
@@ -64,7 +65,7 @@ export class UserController {
   }
 
   @Get(':id')
-  @Roles('super_admin', 'admin')
+  @RequirePermissions(PERMISSIONS.USER.READ)
   async findOne(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<UserResponseDto> {
@@ -72,7 +73,7 @@ export class UserController {
   }
 
   @Patch(':id')
-  @Roles('super_admin', 'admin')
+  @RequirePermissions(PERMISSIONS.USER.UPDATE)
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateUserDto,
@@ -91,7 +92,7 @@ export class UserController {
   }
 
   @Delete(':id')
-  @Roles('super_admin', 'admin')
+  @RequirePermissions(PERMISSIONS.USER.DELETE)
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     await this.commandBus.execute(new DeleteUserCommand(id));

@@ -65,12 +65,16 @@ export class DatabaseHelper {
       'service_categories',
       // Location related
       'partner_locations',
-      // Partner related
+      // Partner related (CTI child tables first)
+      'partner_businesses',
+      'partner_individuals',
       'partner_documents',
       'partners',
       // Wallet related
       'wallet_transactions',
       'wallets',
+      // User related
+      'user_profiles',
       // Auth/User related
       'refresh_tokens',
       'password_reset_tokens',
