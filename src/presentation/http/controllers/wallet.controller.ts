@@ -23,6 +23,13 @@ import {
   ListTransactionsQuery,
 } from '../../../core/application/wallet/queries';
 
+interface CreateWalletResult {
+  id: string;
+  userId: string;
+  balance: number;
+  currency: string;
+}
+
 @Controller('wallet')
 export class WalletController {
   constructor(
@@ -34,9 +41,10 @@ export class WalletController {
   async createMyWallet(
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<WalletResponseDto> {
-    const result = await this.commandBus.execute(
-      new CreateWalletCommand(user.id),
-    );
+    const result = await this.commandBus.execute<
+      CreateWalletCommand,
+      CreateWalletResult
+    >(new CreateWalletCommand(user.id));
     return {
       id: result.id,
       userId: result.userId,
@@ -51,14 +59,18 @@ export class WalletController {
   async getMyWallet(
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<WalletResponseDto> {
-    return await this.queryBus.execute(new GetWalletQuery(user.id));
+    return await this.queryBus.execute<GetWalletQuery, WalletResponseDto>(
+      new GetWalletQuery(user.id),
+    );
   }
 
   @Get('me/balance')
   async getMyBalance(
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<BalanceResponseDto> {
-    return await this.queryBus.execute(new GetBalanceQuery(user.id));
+    return await this.queryBus.execute<GetBalanceQuery, BalanceResponseDto>(
+      new GetBalanceQuery(user.id),
+    );
   }
 
   @Get('me/transactions')
@@ -66,9 +78,10 @@ export class WalletController {
     @CurrentUser() user: AuthenticatedUser,
     @Query() query: ListTransactionsQueryDto,
   ): Promise<TransactionListResponseDto> {
-    return await this.queryBus.execute(
-      new ListTransactionsQuery(user.id, query.page, query.limit),
-    );
+    return await this.queryBus.execute<
+      ListTransactionsQuery,
+      TransactionListResponseDto
+    >(new ListTransactionsQuery(user.id, query.page, query.limit));
   }
 
   @Post('me/deposit')
@@ -77,7 +90,7 @@ export class WalletController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: DepositDto,
   ): Promise<DepositResponseDto> {
-    return await this.commandBus.execute(
+    return await this.commandBus.execute<DepositCommand, DepositResponseDto>(
       new DepositCommand(user.id, dto.amount, dto.description || 'Deposit'),
     );
   }
@@ -88,7 +101,7 @@ export class WalletController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: WithdrawDto,
   ): Promise<WithdrawResponseDto> {
-    return await this.commandBus.execute(
+    return await this.commandBus.execute<WithdrawCommand, WithdrawResponseDto>(
       new WithdrawCommand(user.id, dto.amount, dto.description || 'Withdrawal'),
     );
   }

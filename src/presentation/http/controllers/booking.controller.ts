@@ -35,6 +35,7 @@ import {
   ListPartnerBookingsQuery,
 } from '../../../core/application/booking/queries';
 import { GetMyPartnerQuery } from '../../../core/application/partner/queries';
+import { PartnerResponseDto } from '../dto/partner';
 
 @Controller('bookings')
 export class CustomerBookingController {
@@ -48,7 +49,10 @@ export class CustomerBookingController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: CreateBookingDto,
   ): Promise<BookingResponseDto> {
-    return await this.commandBus.execute(
+    return await this.commandBus.execute<
+      CreateBookingCommand,
+      BookingResponseDto
+    >(
       new CreateBookingCommand(
         user.id,
         dto.partnerId,
@@ -71,7 +75,10 @@ export class CustomerBookingController {
     @CurrentUser() user: AuthenticatedUser,
     @Query() query: ListCustomerBookingsQueryDto,
   ): Promise<BookingsListResponseDto> {
-    return await this.queryBus.execute(
+    return await this.queryBus.execute<
+      ListCustomerBookingsQuery,
+      BookingsListResponseDto
+    >(
       new ListCustomerBookingsQuery(
         user.id,
         query.status,
@@ -86,7 +93,10 @@ export class CustomerBookingController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<BookingResponseDto> {
-    const booking = await this.queryBus.execute(new GetBookingQuery(id));
+    const booking = await this.queryBus.execute<
+      GetBookingQuery,
+      BookingResponseDto | null
+    >(new GetBookingQuery(id));
     if (!booking) {
       throw new NotFoundException('Booking not found');
     }
@@ -136,7 +146,10 @@ export class PartnerBookingController {
   ) {}
 
   private async getPartnerId(userId: string): Promise<string> {
-    const partner = await this.queryBus.execute(new GetMyPartnerQuery(userId));
+    const partner = await this.queryBus.execute<
+      GetMyPartnerQuery,
+      PartnerResponseDto | null
+    >(new GetMyPartnerQuery(userId));
     if (!partner) {
       throw new NotFoundException('Partner profile not found');
     }
@@ -150,7 +163,10 @@ export class PartnerBookingController {
   ): Promise<BookingsListResponseDto> {
     const partnerId = await this.getPartnerId(user.id);
 
-    return await this.queryBus.execute(
+    return await this.queryBus.execute<
+      ListPartnerBookingsQuery,
+      BookingsListResponseDto
+    >(
       new ListPartnerBookingsQuery(
         partnerId,
         query.status,
@@ -169,7 +185,10 @@ export class PartnerBookingController {
   ): Promise<BookingResponseDto> {
     const partnerId = await this.getPartnerId(user.id);
 
-    const booking = await this.queryBus.execute(new GetBookingQuery(id));
+    const booking = await this.queryBus.execute<
+      GetBookingQuery,
+      BookingResponseDto | null
+    >(new GetBookingQuery(id));
     if (!booking) {
       throw new NotFoundException('Booking not found');
     }

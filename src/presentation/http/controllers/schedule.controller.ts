@@ -28,6 +28,7 @@ import {
   GetSlotsByDateRangeQuery,
 } from '../../../core/application/schedule/queries';
 import { GetMyPartnerQuery } from '../../../core/application/partner/queries';
+import { PartnerResponseDto } from '../dto/partner';
 
 @Controller('locations/:locationId/slots')
 export class ScheduleController {
@@ -39,9 +40,10 @@ export class ScheduleController {
     @Param('locationId', ParseUUIDPipe) locationId: string,
     @Query() query: GetSlotsQueryDto,
   ): Promise<{ items: TimeSlotResponseDto[] }> {
-    return await this.queryBus.execute(
-      new GetAvailableSlotsQuery(locationId, new Date(query.date)),
-    );
+    return await this.queryBus.execute<
+      GetAvailableSlotsQuery,
+      { items: TimeSlotResponseDto[] }
+    >(new GetAvailableSlotsQuery(locationId, new Date(query.date)));
   }
 }
 
@@ -53,7 +55,10 @@ export class PartnerScheduleController {
   ) {}
 
   private async getPartnerId(userId: string): Promise<string> {
-    const partner = await this.queryBus.execute(new GetMyPartnerQuery(userId));
+    const partner = await this.queryBus.execute<
+      GetMyPartnerQuery,
+      PartnerResponseDto | null
+    >(new GetMyPartnerQuery(userId));
     if (!partner) {
       throw new NotFoundException('Partner profile not found');
     }

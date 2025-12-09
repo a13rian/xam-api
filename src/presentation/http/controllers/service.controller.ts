@@ -34,6 +34,7 @@ import {
   ListPartnerServicesQuery,
 } from '../../../core/application/service/queries';
 import { GetMyPartnerQuery } from '../../../core/application/partner/queries';
+import { PartnerResponseDto } from '../dto/partner';
 
 @Controller('services')
 export class ServiceController {
@@ -44,7 +45,10 @@ export class ServiceController {
   async search(
     @Query() query: ListServicesQueryDto,
   ): Promise<ServicesListResponseDto> {
-    return await this.queryBus.execute(
+    return await this.queryBus.execute<
+      ListServicesQuery,
+      ServicesListResponseDto
+    >(
       new ListServicesQuery(
         query.partnerId,
         query.categoryId,
@@ -61,7 +65,9 @@ export class ServiceController {
   async getById(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<ServiceResponseDto> {
-    return await this.queryBus.execute(new GetServiceQuery(id));
+    return await this.queryBus.execute<GetServiceQuery, ServiceResponseDto>(
+      new GetServiceQuery(id),
+    );
   }
 }
 
@@ -73,7 +79,10 @@ export class PartnerServiceController {
   ) {}
 
   private async getPartnerId(userId: string): Promise<string> {
-    const partner = await this.queryBus.execute(new GetMyPartnerQuery(userId));
+    const partner = await this.queryBus.execute<
+      GetMyPartnerQuery,
+      PartnerResponseDto | null
+    >(new GetMyPartnerQuery(userId));
     if (!partner) {
       throw new NotFoundException('Partner profile not found');
     }
@@ -85,9 +94,10 @@ export class PartnerServiceController {
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<{ items: ServiceResponseDto[]; total: number }> {
     const partnerId = await this.getPartnerId(user.id);
-    return await this.queryBus.execute(
-      new ListPartnerServicesQuery(partnerId, true),
-    );
+    return await this.queryBus.execute<
+      ListPartnerServicesQuery,
+      { items: ServiceResponseDto[]; total: number }
+    >(new ListPartnerServicesQuery(partnerId, true));
   }
 
   @Post()
@@ -97,7 +107,10 @@ export class PartnerServiceController {
   ): Promise<ServiceResponseDto> {
     const partnerId = await this.getPartnerId(user.id);
 
-    const result = await this.commandBus.execute(
+    const result = await this.commandBus.execute<
+      CreateServiceCommand,
+      { id: string }
+    >(
       new CreateServiceCommand(
         partnerId,
         dto.categoryId,
@@ -111,7 +124,9 @@ export class PartnerServiceController {
       ),
     );
 
-    return await this.queryBus.execute(new GetServiceQuery(result.id));
+    return await this.queryBus.execute<GetServiceQuery, ServiceResponseDto>(
+      new GetServiceQuery(result.id),
+    );
   }
 
   @Put(':id')
@@ -136,7 +151,9 @@ export class PartnerServiceController {
       ),
     );
 
-    return await this.queryBus.execute(new GetServiceQuery(id));
+    return await this.queryBus.execute<GetServiceQuery, ServiceResponseDto>(
+      new GetServiceQuery(id),
+    );
   }
 
   @Post(':id/toggle')

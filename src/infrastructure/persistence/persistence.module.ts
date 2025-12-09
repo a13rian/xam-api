@@ -11,6 +11,9 @@ import { WalletOrmEntity } from './typeorm/entities/wallet.orm-entity';
 import { WalletTransactionOrmEntity } from './typeorm/entities/wallet-transaction.orm-entity';
 import { PartnerOrmEntity } from './typeorm/entities/partner.orm-entity';
 import { PartnerDocumentOrmEntity } from './typeorm/entities/partner-document.orm-entity';
+import { PartnerBusinessOrmEntity } from './typeorm/entities/partner-business.orm-entity';
+import { PartnerIndividualOrmEntity } from './typeorm/entities/partner-individual.orm-entity';
+import { UserProfileOrmEntity } from './typeorm/entities/user-profile.orm-entity';
 import { ServiceCategoryOrmEntity } from './typeorm/entities/service-category.orm-entity';
 import { ServiceOrmEntity } from './typeorm/entities/service.orm-entity';
 import { PartnerLocationOrmEntity } from './typeorm/entities/partner-location.orm-entity';
@@ -25,6 +28,7 @@ import { StaffServiceOrmEntity } from './typeorm/entities/staff-service.orm-enti
 
 const entities = [
   UserOrmEntity,
+  UserProfileOrmEntity,
   RoleOrmEntity,
   PermissionOrmEntity,
   RefreshTokenOrmEntity,
@@ -34,6 +38,8 @@ const entities = [
   WalletTransactionOrmEntity,
   PartnerOrmEntity,
   PartnerDocumentOrmEntity,
+  PartnerBusinessOrmEntity,
+  PartnerIndividualOrmEntity,
   ServiceCategoryOrmEntity,
   ServiceOrmEntity,
   PartnerLocationOrmEntity,

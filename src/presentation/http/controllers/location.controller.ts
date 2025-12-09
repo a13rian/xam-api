@@ -33,6 +33,7 @@ import {
   GetOperatingHoursQuery,
 } from '../../../core/application/location/queries';
 import { GetMyPartnerQuery } from '../../../core/application/partner/queries';
+import { PartnerResponseDto } from '../dto/partner';
 
 @Controller('locations')
 export class LocationController {
@@ -43,7 +44,9 @@ export class LocationController {
   async getById(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<LocationResponseDto> {
-    return await this.queryBus.execute(new GetLocationQuery(id));
+    return await this.queryBus.execute<GetLocationQuery, LocationResponseDto>(
+      new GetLocationQuery(id),
+    );
   }
 
   @Get(':id/hours')
@@ -51,7 +54,10 @@ export class LocationController {
   async getOperatingHours(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<{ items: OperatingHoursResponseDto[] }> {
-    return await this.queryBus.execute(new GetOperatingHoursQuery(id));
+    return await this.queryBus.execute<
+      GetOperatingHoursQuery,
+      { items: OperatingHoursResponseDto[] }
+    >(new GetOperatingHoursQuery(id));
   }
 }
 
@@ -63,7 +69,10 @@ export class PartnerLocationController {
   ) {}
 
   private async getPartnerId(userId: string): Promise<string> {
-    const partner = await this.queryBus.execute(new GetMyPartnerQuery(userId));
+    const partner = await this.queryBus.execute<
+      GetMyPartnerQuery,
+      PartnerResponseDto | null
+    >(new GetMyPartnerQuery(userId));
     if (!partner) {
       throw new NotFoundException('Partner profile not found');
     }
@@ -75,9 +84,10 @@ export class PartnerLocationController {
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<{ items: LocationResponseDto[]; total: number }> {
     const partnerId = await this.getPartnerId(user.id);
-    return await this.queryBus.execute(
-      new ListPartnerLocationsQuery(partnerId),
-    );
+    return await this.queryBus.execute<
+      ListPartnerLocationsQuery,
+      { items: LocationResponseDto[]; total: number }
+    >(new ListPartnerLocationsQuery(partnerId));
   }
 
   @Post()
@@ -87,7 +97,10 @@ export class PartnerLocationController {
   ): Promise<LocationResponseDto> {
     const partnerId = await this.getPartnerId(user.id);
 
-    const result = await this.commandBus.execute(
+    const result = await this.commandBus.execute<
+      CreateLocationCommand,
+      { id: string }
+    >(
       new CreateLocationCommand(
         partnerId,
         dto.name,
@@ -102,7 +115,9 @@ export class PartnerLocationController {
       ),
     );
 
-    return await this.queryBus.execute(new GetLocationQuery(result.id));
+    return await this.queryBus.execute<GetLocationQuery, LocationResponseDto>(
+      new GetLocationQuery(result.id),
+    );
   }
 
   @Put(':id')
