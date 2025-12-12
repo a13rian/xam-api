@@ -19,8 +19,8 @@ import { BookingModule } from './presentation/modules/booking.module';
 import { CategoryModule } from './presentation/modules/category.module';
 import { HealthModule } from './presentation/modules/health.module';
 import { LocationModule } from './presentation/modules/location.module';
-import { PartnerStaffModule } from './presentation/modules/partner-staff.module';
-import { PartnerModule } from './presentation/modules/partner.module';
+import { AccountModule } from './presentation/modules/account.module';
+import { OrganizationModule } from './presentation/modules/organization.module';
 import { RoleModule } from './presentation/modules/role.module';
 import { ScheduleModule } from './presentation/modules/schedule.module';
 import { ServiceModule } from './presentation/modules/service.module';
@@ -77,7 +77,7 @@ import { ValidationPipe } from './shared/pipes/validation.pipe';
         skipIf: (context) => {
           const request = context.switchToHttp().getRequest<{ url?: string }>();
           // Skip throttling for swagger routes to avoid legacy route path warnings
-          return (
+          return !!(
             request.url?.includes('/docs') || request.url?.includes('/swagger')
           );
         },
@@ -89,13 +89,13 @@ import { ValidationPipe } from './shared/pipes/validation.pipe';
     UserModule,
     RoleModule,
     WalletModule,
-    PartnerModule,
     CategoryModule,
     ServiceModule,
     LocationModule,
     ScheduleModule,
     BookingModule,
-    PartnerStaffModule,
+    AccountModule,
+    OrganizationModule,
   ],
   providers: [
     {

@@ -5,7 +5,7 @@ export const BOOKING_REPOSITORY = Symbol('BOOKING_REPOSITORY');
 
 export interface BookingSearchOptions {
   customerId?: string;
-  partnerId?: string;
+  organizationId?: string;
   locationId?: string;
   status?: BookingStatusEnum;
   startDate?: Date;
@@ -24,7 +24,7 @@ export interface BookingSearchResult {
 export interface IBookingRepository {
   findById(id: string): Promise<Booking | null>;
   findByCustomerId(customerId: string): Promise<Booking[]>;
-  findByPartnerId(partnerId: string): Promise<Booking[]>;
+  findByOrganizationId(organizationId: string): Promise<Booking[]>;
   search(options: BookingSearchOptions): Promise<BookingSearchResult>;
   save(booking: Booking): Promise<void>;
   delete(id: string): Promise<void>;

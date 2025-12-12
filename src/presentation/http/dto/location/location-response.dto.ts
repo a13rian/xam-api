@@ -1,6 +1,6 @@
 export class LocationResponseDto {
   id: string;
-  partnerId: string;
+  organizationId: string;
   name: string;
   street: string;
   ward?: string;

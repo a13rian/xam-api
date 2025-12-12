@@ -8,7 +8,7 @@ import {
 
 export interface ServiceResponseDto {
   id: string;
-  partnerId: string;
+  organizationId: string;
   categoryId: string;
   name: string;
   description?: string;

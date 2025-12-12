@@ -31,8 +31,8 @@ export class RescheduleBookingHandler implements ICommandHandler<RescheduleBooki
     }
 
     // Verify permission
-    if (command.isPartner) {
-      if (booking.partnerId !== command.requestedBy) {
+    if (command.isOrganization) {
+      if (booking.organizationId !== command.requestedBy) {
         throw new ForbiddenException('You do not own this booking');
       }
     } else {

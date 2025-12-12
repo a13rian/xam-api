@@ -4,7 +4,7 @@ import { ServiceOrmEntity } from '../../../src/infrastructure/persistence/typeor
 import { BookingTypeEnum } from '../../../src/core/domain/service/value-objects/booking-type.vo';
 
 export interface CreateServiceOptions {
-  partnerId: string;
+  organizationId: string;
   categoryId: string;
   name?: string;
   description?: string;
@@ -18,7 +18,7 @@ export interface CreateServiceOptions {
 
 export interface CreatedService {
   id: string;
-  partnerId: string;
+  organizationId: string;
   categoryId: string;
   name: string;
   priceAmount: number;
@@ -38,7 +38,7 @@ export class ServiceFactory {
 
     const service = serviceRepo.create({
       id: uuidv4(),
-      partnerId: options.partnerId,
+      organizationId: options.organizationId,
       categoryId: options.categoryId,
       name: options.name ?? `Test Service ${serviceCounter}`,
       description: options.description ?? null,
@@ -54,7 +54,7 @@ export class ServiceFactory {
 
     return {
       id: service.id,
-      partnerId: service.partnerId,
+      organizationId: service.organizationId,
       categoryId: service.categoryId,
       name: service.name,
       priceAmount: Number(service.priceAmount),

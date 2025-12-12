@@ -27,7 +27,7 @@ export class SetOperatingHoursHandler implements ICommandHandler<SetOperatingHou
       throw new NotFoundException('Location not found');
     }
 
-    if (location.partnerId !== command.partnerId) {
+    if (location.organizationId !== command.organizationId) {
       throw new ForbiddenException('You do not own this location');
     }
 

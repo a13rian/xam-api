@@ -33,8 +33,8 @@ export class CancelBookingHandler implements ICommandHandler<CancelBookingComman
     }
 
     // Verify permission
-    if (command.isPartner) {
-      if (booking.partnerId !== command.cancelledBy) {
+    if (command.isOrganization) {
+      if (booking.organizationId !== command.cancelledBy) {
         throw new NotFoundException('Booking not found');
       }
     } else {

@@ -27,8 +27,8 @@ import {
   GetAvailableSlotsQuery,
   GetSlotsByDateRangeQuery,
 } from '../../../core/application/schedule/queries';
-import { GetMyPartnerQuery } from '../../../core/application/partner/queries';
-import { PartnerResponseDto } from '../dto/partner';
+import { GetMyAccountQuery } from '../../../core/application/account/queries';
+import { AccountResponseDto } from '../dto/account';
 
 @Controller('locations/:locationId/slots')
 export class ScheduleController {
@@ -54,15 +54,15 @@ export class PartnerScheduleController {
     private readonly queryBus: QueryBus,
   ) {}
 
-  private async getPartnerId(userId: string): Promise<string> {
-    const partner = await this.queryBus.execute<
-      GetMyPartnerQuery,
-      PartnerResponseDto | null
-    >(new GetMyPartnerQuery(userId));
-    if (!partner) {
-      throw new NotFoundException('Partner profile not found');
+  private async getOrganizationId(userId: string): Promise<string> {
+    const account = await this.queryBus.execute<
+      GetMyAccountQuery,
+      AccountResponseDto | null
+    >(new GetMyAccountQuery(userId));
+    if (!account || !account.organization?.id) {
+      throw new NotFoundException('Organization not found');
     }
-    return partner.id;
+    return account.organization.id;
   }
 
   @Get()
@@ -71,7 +71,7 @@ export class PartnerScheduleController {
     @Param('locationId', ParseUUIDPipe) locationId: string,
     @Query() query: GetSlotsByRangeQueryDto,
   ): Promise<{ items: TimeSlotResponseDto[] }> {
-    await this.getPartnerId(user.id); // Verify partner
+    await this.getOrganizationId(user.id); // Verify organization
 
     return await this.queryBus.execute(
       new GetSlotsByDateRangeQuery(
@@ -88,12 +88,12 @@ export class PartnerScheduleController {
     @Param('locationId', ParseUUIDPipe) locationId: string,
     @Body() dto: GenerateSlotsDto,
   ): Promise<{ count: number }> {
-    const partnerId = await this.getPartnerId(user.id);
+    const organizationId = await this.getOrganizationId(user.id);
 
     return await this.commandBus.execute(
       new GenerateSlotsCommand(
         locationId,
-        partnerId,
+        organizationId,
         new Date(dto.startDate),
         new Date(dto.endDate),
         dto.slotDurationMinutes,
@@ -107,8 +107,8 @@ export class PartnerScheduleController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('slotId', ParseUUIDPipe) slotId: string,
   ): Promise<void> {
-    const partnerId = await this.getPartnerId(user.id);
-    await this.commandBus.execute(new BlockSlotCommand(slotId, partnerId));
+    const organizationId = await this.getOrganizationId(user.id);
+    await this.commandBus.execute(new BlockSlotCommand(slotId, organizationId));
   }
 
   @Post(':slotId/unblock')
@@ -116,7 +116,9 @@ export class PartnerScheduleController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('slotId', ParseUUIDPipe) slotId: string,
   ): Promise<void> {
-    const partnerId = await this.getPartnerId(user.id);
-    await this.commandBus.execute(new UnblockSlotCommand(slotId, partnerId));
+    const organizationId = await this.getOrganizationId(user.id);
+    await this.commandBus.execute(
+      new UnblockSlotCommand(slotId, organizationId),
+    );
   }
 }

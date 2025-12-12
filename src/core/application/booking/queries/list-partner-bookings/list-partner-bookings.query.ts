@@ -2,7 +2,7 @@ import { BookingStatusEnum } from '../../../../domain/booking/value-objects/book
 
 export class ListPartnerBookingsQuery {
   constructor(
-    public readonly partnerId: string,
+    public readonly organizationId: string,
     public readonly status?: BookingStatusEnum,
     public readonly startDate?: Date,
     public readonly endDate?: Date,

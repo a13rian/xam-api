@@ -18,11 +18,29 @@ export class ListPartnerLocationsHandler implements IQueryHandler<ListPartnerLoc
     query: ListPartnerLocationsQuery,
   ): Promise<{ items: LocationResponseDto[]; total: number }> {
     const locations = await this.locationRepository.findByPartnerId(
-      query.partnerId,
+      query.organizationId,
     );
 
     return {
-      items: locations.map((l) => l.toObject()),
+      items: locations.map((l) => {
+        const obj = l.toObject();
+        return {
+          id: obj.id,
+          organizationId: obj.organizationId,
+          name: obj.name,
+          street: obj.street,
+          ward: obj.ward,
+          district: obj.district,
+          city: obj.city,
+          latitude: obj.latitude,
+          longitude: obj.longitude,
+          phone: obj.phone,
+          isPrimary: obj.isPrimary,
+          isActive: obj.isActive,
+          createdAt: obj.createdAt,
+          updatedAt: obj.updatedAt,
+        };
+      }),
       total: locations.length,
     };
   }

@@ -1,6 +1,6 @@
 export class ServiceResponseDto {
   id: string;
-  partnerId: string;
+  organizationId: string;
   categoryId: string;
   name: string;
   description?: string;

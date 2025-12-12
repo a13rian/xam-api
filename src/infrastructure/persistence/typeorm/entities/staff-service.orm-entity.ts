@@ -8,7 +8,7 @@ import {
   Index,
   Unique,
 } from 'typeorm';
-import { PartnerStaffOrmEntity } from './partner-staff.orm-entity';
+import { AccountOrmEntity } from './account.orm-entity';
 import { ServiceOrmEntity } from './service.orm-entity';
 
 @Entity('staff_services')
@@ -28,9 +28,9 @@ export class StaffServiceOrmEntity {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => PartnerStaffOrmEntity, { onDelete: 'CASCADE' })
+  @ManyToOne(() => AccountOrmEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'staffId' })
-  staff?: PartnerStaffOrmEntity;
+  staff?: AccountOrmEntity;
 
   @ManyToOne(() => ServiceOrmEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'serviceId' })

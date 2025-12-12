@@ -19,7 +19,7 @@ export class CompleteBookingHandler implements ICommandHandler<CompleteBookingCo
       throw new NotFoundException('Booking not found');
     }
 
-    if (booking.partnerId !== command.partnerId) {
+    if (booking.organizationId !== command.organizationId) {
       throw new NotFoundException('Booking not found');
     }
 

@@ -8,7 +8,7 @@ import {
 
 export interface LocationResponseDto {
   id: string;
-  partnerId: string;
+  organizationId: string;
   name: string;
   street: string;
   ward?: string;
@@ -36,6 +36,22 @@ export class GetLocationHandler implements IQueryHandler<GetLocationQuery> {
       throw new NotFoundException('Location not found');
     }
 
-    return location.toObject();
+    const obj = location.toObject();
+    return {
+      id: obj.id,
+      organizationId: obj.organizationId,
+      name: obj.name,
+      street: obj.street,
+      ward: obj.ward,
+      district: obj.district,
+      city: obj.city,
+      latitude: obj.latitude,
+      longitude: obj.longitude,
+      phone: obj.phone,
+      isPrimary: obj.isPrimary,
+      isActive: obj.isActive,
+      createdAt: obj.createdAt,
+      updatedAt: obj.updatedAt,
+    };
   }
 }

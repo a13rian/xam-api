@@ -1,7 +1,7 @@
 export class UpdateLocationCommand {
   constructor(
     public readonly id: string,
-    public readonly partnerId: string,
+    public readonly organizationId: string,
     public readonly name?: string,
     public readonly street?: string,
     public readonly ward?: string,

@@ -9,18 +9,18 @@ import {
   Index,
 } from 'typeorm';
 import { BookingTypeEnum } from '../../../../core/domain/service/value-objects/booking-type.vo';
-import { PartnerOrmEntity } from './partner.orm-entity';
+import { OrganizationOrmEntity } from './organization.orm-entity';
 import { ServiceCategoryOrmEntity } from './service-category.orm-entity';
 
 @Entity('services')
-@Index(['partnerId', 'isActive'])
+@Index(['organizationId', 'isActive'])
 export class ServiceOrmEntity {
   @PrimaryColumn('uuid')
   id: string;
 
   @Index()
   @Column('uuid')
-  partnerId: string;
+  organizationId: string;
 
   @Index()
   @Column('uuid')
@@ -60,9 +60,9 @@ export class ServiceOrmEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => PartnerOrmEntity, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'partnerId' })
-  partner?: PartnerOrmEntity;
+  @ManyToOne(() => OrganizationOrmEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'organizationId' })
+  organization?: OrganizationOrmEntity;
 
   @ManyToOne(() => ServiceCategoryOrmEntity, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'categoryId' })

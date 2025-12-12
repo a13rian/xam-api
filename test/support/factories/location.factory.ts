@@ -1,9 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import { DatabaseHelper } from '../database/database.helper';
-import { PartnerLocationOrmEntity } from '../../../src/infrastructure/persistence/typeorm/entities/partner-location.orm-entity';
+import { OrganizationLocationOrmEntity } from '../../../src/infrastructure/persistence/typeorm/entities/organization-location.orm-entity';
 
 export interface CreateLocationOptions {
-  partnerId: string;
+  organizationId: string;
   name?: string;
   street?: string;
   ward?: string;
@@ -18,7 +18,7 @@ export interface CreateLocationOptions {
 
 export interface CreatedLocation {
   id: string;
-  partnerId: string;
+  organizationId: string;
   name: string;
   street: string;
   district: string;
@@ -34,11 +34,11 @@ export class LocationFactory {
 
   async create(options: CreateLocationOptions): Promise<CreatedLocation> {
     locationCounter++;
-    const locationRepo = this.db.getRepository(PartnerLocationOrmEntity);
+    const locationRepo = this.db.getRepository(OrganizationLocationOrmEntity);
 
     const location = locationRepo.create({
       id: uuidv4(),
-      partnerId: options.partnerId,
+      organizationId: options.organizationId,
       name: options.name ?? `Location ${locationCounter}`,
       street: options.street ?? '123 Test Street',
       ward: options.ward ?? null,
@@ -55,7 +55,7 @@ export class LocationFactory {
 
     return {
       id: location.id,
-      partnerId: location.partnerId,
+      organizationId: location.organizationId,
       name: location.name,
       street: location.street,
       district: location.district,

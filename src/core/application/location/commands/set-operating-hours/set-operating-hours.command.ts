@@ -10,7 +10,7 @@ export interface OperatingHoursInput {
 export class SetOperatingHoursCommand {
   constructor(
     public readonly locationId: string,
-    public readonly partnerId: string,
+    public readonly organizationId: string,
     public readonly hours: OperatingHoursInput[],
   ) {}
 }

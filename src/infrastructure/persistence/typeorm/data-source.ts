@@ -7,12 +7,6 @@ import {
 } from './entities/booking.orm-entity';
 import { EmailVerificationTokenOrmEntity } from './entities/email-verification-token.orm-entity';
 import { OperatingHoursOrmEntity } from './entities/operating-hours.orm-entity';
-import { PartnerBusinessOrmEntity } from './entities/partner-business.orm-entity';
-import { PartnerDocumentOrmEntity } from './entities/partner-document.orm-entity';
-import { PartnerIndividualOrmEntity } from './entities/partner-individual.orm-entity';
-import { PartnerLocationOrmEntity } from './entities/partner-location.orm-entity';
-import { PartnerStaffOrmEntity } from './entities/partner-staff.orm-entity';
-import { PartnerOrmEntity } from './entities/partner.orm-entity';
 import { PasswordResetTokenOrmEntity } from './entities/password-reset-token.orm-entity';
 import { PermissionOrmEntity } from './entities/permission.orm-entity';
 import { RefreshTokenOrmEntity } from './entities/refresh-token.orm-entity';
@@ -25,6 +19,9 @@ import { UserProfileOrmEntity } from './entities/user-profile.orm-entity';
 import { UserOrmEntity } from './entities/user.orm-entity';
 import { WalletTransactionOrmEntity } from './entities/wallet-transaction.orm-entity';
 import { WalletOrmEntity } from './entities/wallet.orm-entity';
+import { AccountOrmEntity } from './entities/account.orm-entity';
+import { OrganizationOrmEntity } from './entities/organization.orm-entity';
+import { OrganizationLocationOrmEntity } from './entities/organization-location.orm-entity';
 
 config({ path: '.env.local' });
 config({ path: '.env' });
@@ -46,19 +43,16 @@ const dataSource = new DataSource({
     EmailVerificationTokenOrmEntity,
     WalletOrmEntity,
     WalletTransactionOrmEntity,
-    PartnerOrmEntity,
-    PartnerDocumentOrmEntity,
-    PartnerBusinessOrmEntity,
-    PartnerIndividualOrmEntity,
     ServiceCategoryOrmEntity,
     ServiceOrmEntity,
-    PartnerLocationOrmEntity,
+    OrganizationLocationOrmEntity,
     OperatingHoursOrmEntity,
     TimeSlotOrmEntity,
     BookingOrmEntity,
     BookingServiceOrmEntity,
-    PartnerStaffOrmEntity,
     StaffServiceOrmEntity,
+    AccountOrmEntity,
+    OrganizationOrmEntity,
   ],
   migrations: ['src/infrastructure/persistence/typeorm/migrations/*.ts'],
   synchronize: false,

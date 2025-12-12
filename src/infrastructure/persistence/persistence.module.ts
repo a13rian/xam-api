@@ -9,22 +9,19 @@ import { PasswordResetTokenOrmEntity } from './typeorm/entities/password-reset-t
 import { EmailVerificationTokenOrmEntity } from './typeorm/entities/email-verification-token.orm-entity';
 import { WalletOrmEntity } from './typeorm/entities/wallet.orm-entity';
 import { WalletTransactionOrmEntity } from './typeorm/entities/wallet-transaction.orm-entity';
-import { PartnerOrmEntity } from './typeorm/entities/partner.orm-entity';
-import { PartnerDocumentOrmEntity } from './typeorm/entities/partner-document.orm-entity';
-import { PartnerBusinessOrmEntity } from './typeorm/entities/partner-business.orm-entity';
-import { PartnerIndividualOrmEntity } from './typeorm/entities/partner-individual.orm-entity';
 import { UserProfileOrmEntity } from './typeorm/entities/user-profile.orm-entity';
 import { ServiceCategoryOrmEntity } from './typeorm/entities/service-category.orm-entity';
 import { ServiceOrmEntity } from './typeorm/entities/service.orm-entity';
-import { PartnerLocationOrmEntity } from './typeorm/entities/partner-location.orm-entity';
 import { OperatingHoursOrmEntity } from './typeorm/entities/operating-hours.orm-entity';
 import { TimeSlotOrmEntity } from './typeorm/entities/time-slot.orm-entity';
 import {
   BookingOrmEntity,
   BookingServiceOrmEntity,
 } from './typeorm/entities/booking.orm-entity';
-import { PartnerStaffOrmEntity } from './typeorm/entities/partner-staff.orm-entity';
 import { StaffServiceOrmEntity } from './typeorm/entities/staff-service.orm-entity';
+import { AccountOrmEntity } from './typeorm/entities/account.orm-entity';
+import { OrganizationOrmEntity } from './typeorm/entities/organization.orm-entity';
+import { OrganizationLocationOrmEntity } from './typeorm/entities/organization-location.orm-entity';
 
 const entities = [
   UserOrmEntity,
@@ -36,19 +33,16 @@ const entities = [
   EmailVerificationTokenOrmEntity,
   WalletOrmEntity,
   WalletTransactionOrmEntity,
-  PartnerOrmEntity,
-  PartnerDocumentOrmEntity,
-  PartnerBusinessOrmEntity,
-  PartnerIndividualOrmEntity,
   ServiceCategoryOrmEntity,
   ServiceOrmEntity,
-  PartnerLocationOrmEntity,
+  OrganizationLocationOrmEntity,
   OperatingHoursOrmEntity,
   TimeSlotOrmEntity,
   BookingOrmEntity,
   BookingServiceOrmEntity,
-  PartnerStaffOrmEntity,
   StaffServiceOrmEntity,
+  AccountOrmEntity,
+  OrganizationOrmEntity,
 ];
 
 @Module({

@@ -26,7 +26,7 @@ export class UnblockSlotHandler implements ICommandHandler<UnblockSlotCommand> {
     }
 
     const location = await this.locationRepository.findById(slot.locationId);
-    if (!location || location.partnerId !== command.partnerId) {
+    if (!location || location.organizationId !== command.organizationId) {
       throw new ForbiddenException('You do not own this time slot');
     }
 

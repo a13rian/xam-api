@@ -17,9 +17,9 @@ import {
   IServiceCategoryRepository,
 } from '../../../../domain/service/repositories/service-category.repository.interface';
 import {
-  PARTNER_REPOSITORY,
-  IPartnerRepository,
-} from '../../../../domain/partner/repositories/partner.repository.interface';
+  ORGANIZATION_REPOSITORY,
+  IOrganizationRepository,
+} from '../../../../domain/organization/repositories/organization.repository.interface';
 
 @CommandHandler(CreateServiceCommand)
 export class CreateServiceHandler implements ICommandHandler<CreateServiceCommand> {
@@ -28,18 +28,20 @@ export class CreateServiceHandler implements ICommandHandler<CreateServiceComman
     private readonly serviceRepository: IServiceRepository,
     @Inject(SERVICE_CATEGORY_REPOSITORY)
     private readonly categoryRepository: IServiceCategoryRepository,
-    @Inject(PARTNER_REPOSITORY)
-    private readonly partnerRepository: IPartnerRepository,
+    @Inject(ORGANIZATION_REPOSITORY)
+    private readonly organizationRepository: IOrganizationRepository,
   ) {}
 
   async execute(command: CreateServiceCommand): Promise<{ id: string }> {
-    // Verify partner exists and is active
-    const partner = await this.partnerRepository.findById(command.partnerId);
-    if (!partner) {
-      throw new NotFoundException('Partner not found');
+    // Verify organization exists and is active
+    const organization = await this.organizationRepository.findById(
+      command.organizationId,
+    );
+    if (!organization) {
+      throw new NotFoundException('Organization not found');
     }
-    if (!partner.status.isActive()) {
-      throw new ForbiddenException('Partner is not active');
+    if (!organization.status.isActive()) {
+      throw new ForbiddenException('Organization is not active');
     }
 
     // Verify category exists
@@ -49,19 +51,19 @@ export class CreateServiceHandler implements ICommandHandler<CreateServiceComman
     }
 
     // Check for duplicate service name
-    const exists = await this.serviceRepository.existsByPartnerIdAndName(
-      command.partnerId,
+    const exists = await this.serviceRepository.existsByOrganizationIdAndName(
+      command.organizationId,
       command.name,
     );
     if (exists) {
       throw new ConflictException(
-        'Service with this name already exists for this partner',
+        'Service with this name already exists for this organization',
       );
     }
 
     const service = Service.create({
       id: uuidv4(),
-      partnerId: command.partnerId,
+      organizationId: command.organizationId,
       categoryId: command.categoryId,
       name: command.name,
       description: command.description,

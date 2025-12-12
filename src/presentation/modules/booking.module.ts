@@ -14,21 +14,21 @@ import { BookingMapper } from '../../infrastructure/persistence/typeorm/mappers/
 import { BOOKING_REPOSITORY } from '../../core/domain/booking/repositories/booking.repository.interface';
 import { BookingCommandHandlers } from '../../core/application/booking/commands';
 import { BookingQueryHandlers } from '../../core/application/booking/queries';
-import { PartnerModule } from './partner.module';
 import { LocationModule } from './location.module';
 import { ServiceModule } from './service.module';
 import { WalletModule } from './wallet.module';
 import { ScheduleModule } from './schedule.module';
+import { OrganizationModule } from './organization.module';
 
 @Module({
   imports: [
     CqrsModule,
     TypeOrmModule.forFeature([BookingOrmEntity, BookingServiceOrmEntity]),
-    PartnerModule,
     LocationModule,
     ServiceModule,
     WalletModule,
     ScheduleModule,
+    OrganizationModule,
   ],
   controllers: [CustomerBookingController, PartnerBookingController],
   providers: [

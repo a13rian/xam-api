@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Booking } from '../../../../core/domain/booking/entities/booking.entity';
 import {
   IBookingRepository,
@@ -35,9 +35,9 @@ export class BookingRepository implements IBookingRepository {
     return entities.map((e) => this.mapper.toDomain(e));
   }
 
-  async findByPartnerId(partnerId: string): Promise<Booking[]> {
+  async findByOrganizationId(organizationId: string): Promise<Booking[]> {
     const entities = await this.repository.find({
-      where: { partnerId },
+      where: { organizationId },
       relations: ['services'],
       order: { scheduledDate: 'DESC', startTime: 'DESC' },
     });
@@ -59,9 +59,9 @@ export class BookingRepository implements IBookingRepository {
       });
     }
 
-    if (options.partnerId) {
-      query.andWhere('booking.partnerId = :partnerId', {
-        partnerId: options.partnerId,
+    if (options.organizationId) {
+      query.andWhere('booking.organizationId = :organizationId', {
+        organizationId: options.organizationId,
       });
     }
 

@@ -20,7 +20,7 @@ export class DeleteServiceHandler implements ICommandHandler<DeleteServiceComman
     }
 
     // Verify ownership - return 404 to not reveal resource existence
-    if (service.partnerId !== command.partnerId) {
+    if (service.organizationId !== command.organizationId) {
       throw new NotFoundException('Service not found');
     }
 

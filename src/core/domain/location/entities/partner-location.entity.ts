@@ -3,7 +3,7 @@ import { Address } from '../../shared/value-objects/address.vo';
 
 export interface PartnerLocationProps {
   id: string;
-  partnerId: string;
+  organizationId: string;
   name: string;
   address: Address;
   phone?: string;
@@ -15,7 +15,7 @@ export interface PartnerLocationProps {
 
 export class PartnerLocation extends AggregateRoot {
   private readonly _id: string;
-  private readonly _partnerId: string;
+  private readonly _organizationId: string;
   private _name: string;
   private _address: Address;
   private _phone?: string;
@@ -27,7 +27,7 @@ export class PartnerLocation extends AggregateRoot {
   constructor(props: PartnerLocationProps) {
     super();
     this._id = props.id;
-    this._partnerId = props.partnerId;
+    this._organizationId = props.organizationId;
     this._name = props.name;
     this._address = props.address;
     this._phone = props.phone;
@@ -41,8 +41,8 @@ export class PartnerLocation extends AggregateRoot {
     return this._id;
   }
 
-  get partnerId(): string {
-    return this._partnerId;
+  get organizationId(): string {
+    return this._organizationId;
   }
 
   get name(): string {
@@ -75,7 +75,7 @@ export class PartnerLocation extends AggregateRoot {
 
   static create(props: {
     id: string;
-    partnerId: string;
+    organizationId: string;
     name: string;
     street: string;
     ward?: string;
@@ -89,7 +89,7 @@ export class PartnerLocation extends AggregateRoot {
     const now = new Date();
     return new PartnerLocation({
       id: props.id,
-      partnerId: props.partnerId,
+      organizationId: props.organizationId,
       name: props.name,
       address: Address.create({
         street: props.street,
@@ -163,7 +163,7 @@ export class PartnerLocation extends AggregateRoot {
 
   toObject(): {
     id: string;
-    partnerId: string;
+    organizationId: string;
     name: string;
     street: string;
     ward?: string;
@@ -179,7 +179,7 @@ export class PartnerLocation extends AggregateRoot {
   } {
     return {
       id: this._id,
-      partnerId: this._partnerId,
+      organizationId: this._organizationId,
       name: this._name,
       street: this._address.street,
       ward: this._address.ward ?? undefined,

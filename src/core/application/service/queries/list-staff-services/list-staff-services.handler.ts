@@ -13,9 +13,9 @@ import {
   IServiceRepository,
 } from '../../../../domain/service/repositories/service.repository.interface';
 import {
-  PARTNER_STAFF_REPOSITORY,
-  IPartnerStaffRepository,
-} from '../../../../domain/partner/repositories/partner-staff.repository.interface';
+  ACCOUNT_REPOSITORY,
+  IAccountRepository,
+} from '../../../../domain/account/repositories/account.repository.interface';
 
 export interface StaffServiceResponseDto {
   id: string;
@@ -29,20 +29,22 @@ export class ListStaffServicesHandler implements IQueryHandler<ListStaffServices
   constructor(
     @Inject(STAFF_SERVICE_REPOSITORY)
     private readonly staffServiceRepository: IStaffServiceRepository,
-    @Inject(PARTNER_STAFF_REPOSITORY)
-    private readonly staffRepository: IPartnerStaffRepository,
+    @Inject(ACCOUNT_REPOSITORY)
+    private readonly accountRepository: IAccountRepository,
   ) {}
 
   async execute(
     query: ListStaffServicesQuery,
   ): Promise<{ items: StaffServiceResponseDto[] }> {
-    // Verify staff exists and belongs to partner
-    const staff = await this.staffRepository.findById(query.staffId);
-    if (!staff) {
+    // Verify staff account exists and belongs to organization
+    const staffAccount = await this.accountRepository.findById(query.staffId);
+    if (!staffAccount) {
       throw new NotFoundException('Staff not found');
     }
-    if (staff.partnerId !== query.partnerId) {
-      throw new ForbiddenException('Staff does not belong to this partner');
+    if (staffAccount.organizationId !== query.organizationId) {
+      throw new ForbiddenException(
+        'Staff does not belong to this organization',
+      );
     }
 
     const assignments = await this.staffServiceRepository.findByStaffId(
@@ -77,8 +79,10 @@ export class ListServiceStaffHandler implements IQueryHandler<ListServiceStaffQu
     if (!service) {
       throw new NotFoundException('Service not found');
     }
-    if (service.partnerId !== query.partnerId) {
-      throw new ForbiddenException('Service does not belong to this partner');
+    if (service.organizationId !== query.organizationId) {
+      throw new ForbiddenException(
+        'Service does not belong to this organization',
+      );
     }
 
     const assignments = await this.staffServiceRepository.findByServiceId(

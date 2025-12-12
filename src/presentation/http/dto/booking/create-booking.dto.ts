@@ -18,7 +18,7 @@ export class BookingServiceItemDto {
 
 export class CreateBookingDto {
   @IsUUID()
-  partnerId: string;
+  organizationId: string;
 
   @IsUUID()
   locationId: string;

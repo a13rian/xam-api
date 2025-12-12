@@ -12,14 +12,12 @@ import { TIME_SLOT_REPOSITORY } from '../../core/domain/schedule/repositories/ti
 import { ScheduleCommandHandlers } from '../../core/application/schedule/commands';
 import { ScheduleQueryHandlers } from '../../core/application/schedule/queries';
 import { LocationModule } from './location.module';
-import { PartnerModule } from './partner.module';
 
 @Module({
   imports: [
     CqrsModule,
     TypeOrmModule.forFeature([TimeSlotOrmEntity]),
     LocationModule,
-    PartnerModule,
   ],
   controllers: [ScheduleController, PartnerScheduleController],
   providers: [

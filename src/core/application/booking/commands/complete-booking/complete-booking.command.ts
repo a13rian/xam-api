@@ -1,6 +1,6 @@
 export class CompleteBookingCommand {
   constructor(
     public readonly bookingId: string,
-    public readonly partnerId: string,
+    public readonly organizationId: string,
   ) {}
 }

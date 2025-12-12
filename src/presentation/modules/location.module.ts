@@ -5,7 +5,7 @@ import {
   LocationController,
   PartnerLocationController,
 } from '../http/controllers/location.controller';
-import { PartnerLocationOrmEntity } from '../../infrastructure/persistence/typeorm/entities/partner-location.orm-entity';
+import { OrganizationLocationOrmEntity } from '../../infrastructure/persistence/typeorm/entities/organization-location.orm-entity';
 import { OperatingHoursOrmEntity } from '../../infrastructure/persistence/typeorm/entities/operating-hours.orm-entity';
 import { PartnerLocationRepository } from '../../infrastructure/persistence/typeorm/repositories/partner-location.repository';
 import { OperatingHoursRepository } from '../../infrastructure/persistence/typeorm/repositories/operating-hours.repository';
@@ -15,16 +15,16 @@ import { PARTNER_LOCATION_REPOSITORY } from '../../core/domain/location/reposito
 import { OPERATING_HOURS_REPOSITORY } from '../../core/domain/location/repositories/operating-hours.repository.interface';
 import { LocationCommandHandlers } from '../../core/application/location/commands';
 import { LocationQueryHandlers } from '../../core/application/location/queries';
-import { PartnerModule } from './partner.module';
+import { OrganizationModule } from './organization.module';
 
 @Module({
   imports: [
     CqrsModule,
     TypeOrmModule.forFeature([
-      PartnerLocationOrmEntity,
+      OrganizationLocationOrmEntity,
       OperatingHoursOrmEntity,
     ]),
-    PartnerModule,
+    OrganizationModule,
   ],
   controllers: [LocationController, PartnerLocationController],
   providers: [

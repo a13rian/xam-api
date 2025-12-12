@@ -34,8 +34,8 @@ import {
   ListCustomerBookingsQuery,
   ListPartnerBookingsQuery,
 } from '../../../core/application/booking/queries';
-import { GetMyPartnerQuery } from '../../../core/application/partner/queries';
-import { PartnerResponseDto } from '../dto/partner';
+import { GetMyAccountQuery } from '../../../core/application/account/queries';
+import { AccountResponseDto } from '../dto/account';
 
 @Controller('bookings')
 export class CustomerBookingController {
@@ -55,7 +55,7 @@ export class CustomerBookingController {
     >(
       new CreateBookingCommand(
         user.id,
-        dto.partnerId,
+        dto.organizationId,
         dto.locationId,
         new Date(dto.scheduledDate),
         dto.startTime,
@@ -145,15 +145,15 @@ export class PartnerBookingController {
     private readonly queryBus: QueryBus,
   ) {}
 
-  private async getPartnerId(userId: string): Promise<string> {
-    const partner = await this.queryBus.execute<
-      GetMyPartnerQuery,
-      PartnerResponseDto | null
-    >(new GetMyPartnerQuery(userId));
-    if (!partner) {
-      throw new NotFoundException('Partner profile not found');
+  private async getOrganizationId(userId: string): Promise<string> {
+    const account = await this.queryBus.execute<
+      GetMyAccountQuery,
+      AccountResponseDto | null
+    >(new GetMyAccountQuery(userId));
+    if (!account || !account.organization?.id) {
+      throw new NotFoundException('Organization not found');
     }
-    return partner.id;
+    return account.organization.id;
   }
 
   @Get()
@@ -161,14 +161,14 @@ export class PartnerBookingController {
     @CurrentUser() user: AuthenticatedUser,
     @Query() query: ListPartnerBookingsQueryDto,
   ): Promise<BookingsListResponseDto> {
-    const partnerId = await this.getPartnerId(user.id);
+    const organizationId = await this.getOrganizationId(user.id);
 
     return await this.queryBus.execute<
       ListPartnerBookingsQuery,
       BookingsListResponseDto
     >(
       new ListPartnerBookingsQuery(
-        partnerId,
+        organizationId,
         query.status,
         query.startDate ? new Date(query.startDate) : undefined,
         query.endDate ? new Date(query.endDate) : undefined,
@@ -183,7 +183,7 @@ export class PartnerBookingController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<BookingResponseDto> {
-    const partnerId = await this.getPartnerId(user.id);
+    const organizationId = await this.getOrganizationId(user.id);
 
     const booking = await this.queryBus.execute<
       GetBookingQuery,
@@ -192,8 +192,8 @@ export class PartnerBookingController {
     if (!booking) {
       throw new NotFoundException('Booking not found');
     }
-    // Ensure partner can only see their own bookings
-    if (booking.partnerId !== partnerId) {
+    // Ensure organization can only see their own bookings
+    if (booking.organizationId !== organizationId) {
       throw new NotFoundException('Booking not found');
     }
     return booking;
@@ -205,9 +205,9 @@ export class PartnerBookingController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<BookingResponseDto> {
-    const partnerId = await this.getPartnerId(user.id);
+    const organizationId = await this.getOrganizationId(user.id);
     return await this.commandBus.execute(
-      new ConfirmBookingCommand(id, partnerId),
+      new ConfirmBookingCommand(id, organizationId),
     );
   }
 
@@ -217,9 +217,9 @@ export class PartnerBookingController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<BookingResponseDto> {
-    const partnerId = await this.getPartnerId(user.id);
+    const organizationId = await this.getOrganizationId(user.id);
     return await this.commandBus.execute(
-      new StartBookingCommand(id, partnerId),
+      new StartBookingCommand(id, organizationId),
     );
   }
 
@@ -229,9 +229,9 @@ export class PartnerBookingController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<BookingResponseDto> {
-    const partnerId = await this.getPartnerId(user.id);
+    const organizationId = await this.getOrganizationId(user.id);
     return await this.commandBus.execute(
-      new CompleteBookingCommand(id, partnerId),
+      new CompleteBookingCommand(id, organizationId),
     );
   }
 
@@ -242,9 +242,9 @@ export class PartnerBookingController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: CancelBookingDto,
   ): Promise<BookingResponseDto> {
-    const partnerId = await this.getPartnerId(user.id);
+    const organizationId = await this.getOrganizationId(user.id);
     return await this.commandBus.execute(
-      new CancelBookingCommand(id, partnerId, dto.reason, true),
+      new CancelBookingCommand(id, organizationId, dto.reason, true),
     );
   }
 
@@ -255,11 +255,11 @@ export class PartnerBookingController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: RescheduleBookingDto,
   ): Promise<void> {
-    const partnerId = await this.getPartnerId(user.id);
+    const organizationId = await this.getOrganizationId(user.id);
     await this.commandBus.execute(
       new RescheduleBookingCommand(
         id,
-        partnerId,
+        organizationId,
         true,
         new Date(dto.newDate),
         dto.newStartTime,

@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PartnerLocation } from '../../../../core/domain/location/entities/partner-location.entity';
-import { PartnerLocationOrmEntity } from '../entities/partner-location.orm-entity';
+import { OrganizationLocationOrmEntity } from '../entities/organization-location.orm-entity';
 import { Address } from '../../../../core/domain/shared/value-objects/address.vo';
 
 @Injectable()
 export class PartnerLocationMapper {
-  toDomain(ormEntity: PartnerLocationOrmEntity): PartnerLocation {
+  toDomain(ormEntity: OrganizationLocationOrmEntity): PartnerLocation {
     return new PartnerLocation({
       id: ormEntity.id,
-      partnerId: ormEntity.partnerId,
+      organizationId: ormEntity.organizationId,
       name: ormEntity.name,
       address: Address.create({
         street: ormEntity.street,
@@ -28,11 +28,11 @@ export class PartnerLocationMapper {
     });
   }
 
-  toOrm(domain: PartnerLocation): PartnerLocationOrmEntity {
+  toOrm(domain: PartnerLocation): OrganizationLocationOrmEntity {
     const props = domain.toObject();
-    const ormEntity = new PartnerLocationOrmEntity();
+    const ormEntity = new OrganizationLocationOrmEntity();
     ormEntity.id = props.id;
-    ormEntity.partnerId = props.partnerId;
+    ormEntity.organizationId = props.organizationId;
     ormEntity.name = props.name;
     ormEntity.street = props.street;
     ormEntity.ward = props.ward;

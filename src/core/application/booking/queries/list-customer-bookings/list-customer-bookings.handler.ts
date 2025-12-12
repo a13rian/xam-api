@@ -37,7 +37,7 @@ export class ListCustomerBookingsHandler implements IQueryHandler<ListCustomerBo
         return {
           id: props.id,
           customerId: props.customerId,
-          partnerId: props.partnerId,
+          organizationId: props.organizationId,
           locationId: props.locationId,
           staffId: props.staffId,
           status: props.status,

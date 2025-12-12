@@ -3,6 +3,6 @@ export class CancelBookingCommand {
     public readonly bookingId: string,
     public readonly cancelledBy: string,
     public readonly reason?: string,
-    public readonly isPartner: boolean = false,
+    public readonly isOrganization: boolean = false,
   ) {}
 }

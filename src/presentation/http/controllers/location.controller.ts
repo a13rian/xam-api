@@ -32,8 +32,8 @@ import {
   ListPartnerLocationsQuery,
   GetOperatingHoursQuery,
 } from '../../../core/application/location/queries';
-import { GetMyPartnerQuery } from '../../../core/application/partner/queries';
-import { PartnerResponseDto } from '../dto/partner';
+import { GetMyAccountQuery } from '../../../core/application/account/queries';
+import { AccountResponseDto } from '../dto/account';
 
 @Controller('locations')
 export class LocationController {
@@ -68,26 +68,26 @@ export class PartnerLocationController {
     private readonly queryBus: QueryBus,
   ) {}
 
-  private async getPartnerId(userId: string): Promise<string> {
-    const partner = await this.queryBus.execute<
-      GetMyPartnerQuery,
-      PartnerResponseDto | null
-    >(new GetMyPartnerQuery(userId));
-    if (!partner) {
-      throw new NotFoundException('Partner profile not found');
+  private async getOrganizationId(userId: string): Promise<string> {
+    const account = await this.queryBus.execute<
+      GetMyAccountQuery,
+      AccountResponseDto | null
+    >(new GetMyAccountQuery(userId));
+    if (!account || !account.organization?.id) {
+      throw new NotFoundException('Organization not found');
     }
-    return partner.id;
+    return account.organization.id;
   }
 
   @Get()
   async list(
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<{ items: LocationResponseDto[]; total: number }> {
-    const partnerId = await this.getPartnerId(user.id);
+    const organizationId = await this.getOrganizationId(user.id);
     return await this.queryBus.execute<
       ListPartnerLocationsQuery,
       { items: LocationResponseDto[]; total: number }
-    >(new ListPartnerLocationsQuery(partnerId));
+    >(new ListPartnerLocationsQuery(organizationId));
   }
 
   @Post()
@@ -95,14 +95,14 @@ export class PartnerLocationController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: CreateLocationDto,
   ): Promise<LocationResponseDto> {
-    const partnerId = await this.getPartnerId(user.id);
+    const organizationId = await this.getOrganizationId(user.id);
 
     const result = await this.commandBus.execute<
       CreateLocationCommand,
       { id: string }
     >(
       new CreateLocationCommand(
-        partnerId,
+        organizationId,
         dto.name,
         dto.street,
         dto.district,
@@ -126,12 +126,12 @@ export class PartnerLocationController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateLocationDto,
   ): Promise<LocationResponseDto> {
-    const partnerId = await this.getPartnerId(user.id);
+    const organizationId = await this.getOrganizationId(user.id);
 
     await this.commandBus.execute(
       new UpdateLocationCommand(
         id,
-        partnerId,
+        organizationId,
         dto.name,
         dto.street,
         dto.ward,
@@ -151,9 +151,11 @@ export class PartnerLocationController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<LocationResponseDto> {
-    const partnerId = await this.getPartnerId(user.id);
+    const organizationId = await this.getOrganizationId(user.id);
 
-    await this.commandBus.execute(new SetPrimaryLocationCommand(id, partnerId));
+    await this.commandBus.execute(
+      new SetPrimaryLocationCommand(id, organizationId),
+    );
 
     return await this.queryBus.execute(new GetLocationQuery(id));
   }
@@ -164,10 +166,10 @@ export class PartnerLocationController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: SetOperatingHoursDto,
   ): Promise<{ items: OperatingHoursResponseDto[] }> {
-    const partnerId = await this.getPartnerId(user.id);
+    const organizationId = await this.getOrganizationId(user.id);
 
     await this.commandBus.execute(
-      new SetOperatingHoursCommand(id, partnerId, dto.hours),
+      new SetOperatingHoursCommand(id, organizationId, dto.hours),
     );
 
     return await this.queryBus.execute(new GetOperatingHoursQuery(id));
@@ -178,7 +180,9 @@ export class PartnerLocationController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<void> {
-    const partnerId = await this.getPartnerId(user.id);
-    await this.commandBus.execute(new DeleteLocationCommand(id, partnerId));
+    const organizationId = await this.getOrganizationId(user.id);
+    await this.commandBus.execute(
+      new DeleteLocationCommand(id, organizationId),
+    );
   }
 }

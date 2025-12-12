@@ -33,8 +33,8 @@ import {
   ListServicesQuery,
   ListPartnerServicesQuery,
 } from '../../../core/application/service/queries';
-import { GetMyPartnerQuery } from '../../../core/application/partner/queries';
-import { PartnerResponseDto } from '../dto/partner';
+import { GetMyAccountQuery } from '../../../core/application/account/queries';
+import { AccountResponseDto } from '../dto/account';
 
 @Controller('services')
 export class ServiceController {
@@ -50,7 +50,7 @@ export class ServiceController {
       ServicesListResponseDto
     >(
       new ListServicesQuery(
-        query.partnerId,
+        query.organizationId,
         query.categoryId,
         query.isActive ?? true,
         query.search,
@@ -78,26 +78,26 @@ export class PartnerServiceController {
     private readonly queryBus: QueryBus,
   ) {}
 
-  private async getPartnerId(userId: string): Promise<string> {
-    const partner = await this.queryBus.execute<
-      GetMyPartnerQuery,
-      PartnerResponseDto | null
-    >(new GetMyPartnerQuery(userId));
-    if (!partner) {
-      throw new NotFoundException('Partner profile not found');
+  private async getOrganizationId(userId: string): Promise<string> {
+    const account = await this.queryBus.execute<
+      GetMyAccountQuery,
+      AccountResponseDto | null
+    >(new GetMyAccountQuery(userId));
+    if (!account || !account.organization?.id) {
+      throw new NotFoundException('Organization not found');
     }
-    return partner.id;
+    return account.organization.id;
   }
 
   @Get()
   async list(
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<{ items: ServiceResponseDto[]; total: number }> {
-    const partnerId = await this.getPartnerId(user.id);
+    const organizationId = await this.getOrganizationId(user.id);
     return await this.queryBus.execute<
       ListPartnerServicesQuery,
       { items: ServiceResponseDto[]; total: number }
-    >(new ListPartnerServicesQuery(partnerId, true));
+    >(new ListPartnerServicesQuery(organizationId, true));
   }
 
   @Post()
@@ -105,14 +105,14 @@ export class PartnerServiceController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: CreateServiceDto,
   ): Promise<ServiceResponseDto> {
-    const partnerId = await this.getPartnerId(user.id);
+    const organizationId = await this.getOrganizationId(user.id);
 
     const result = await this.commandBus.execute<
       CreateServiceCommand,
       { id: string }
     >(
       new CreateServiceCommand(
-        partnerId,
+        organizationId,
         dto.categoryId,
         dto.name,
         dto.price,
@@ -135,12 +135,12 @@ export class PartnerServiceController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateServiceDto,
   ): Promise<ServiceResponseDto> {
-    const partnerId = await this.getPartnerId(user.id);
+    const organizationId = await this.getOrganizationId(user.id);
 
     await this.commandBus.execute(
       new UpdateServiceCommand(
         id,
-        partnerId,
+        organizationId,
         dto.name,
         dto.description,
         dto.categoryId,
@@ -162,10 +162,10 @@ export class PartnerServiceController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: ToggleServiceDto,
   ): Promise<ServiceResponseDto> {
-    const partnerId = await this.getPartnerId(user.id);
+    const organizationId = await this.getOrganizationId(user.id);
 
     await this.commandBus.execute(
-      new ToggleServiceCommand(id, partnerId, dto.isActive),
+      new ToggleServiceCommand(id, organizationId, dto.isActive),
     );
 
     return await this.queryBus.execute(new GetServiceQuery(id));
@@ -176,7 +176,7 @@ export class PartnerServiceController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<void> {
-    const partnerId = await this.getPartnerId(user.id);
-    await this.commandBus.execute(new DeleteServiceCommand(id, partnerId));
+    const organizationId = await this.getOrganizationId(user.id);
+    await this.commandBus.execute(new DeleteServiceCommand(id, organizationId));
   }
 }

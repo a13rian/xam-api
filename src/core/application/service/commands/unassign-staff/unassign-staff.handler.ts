@@ -10,9 +10,9 @@ import {
   IServiceRepository,
 } from '../../../../domain/service/repositories/service.repository.interface';
 import {
-  PARTNER_STAFF_REPOSITORY,
-  IPartnerStaffRepository,
-} from '../../../../domain/partner/repositories/partner-staff.repository.interface';
+  ACCOUNT_REPOSITORY,
+  IAccountRepository,
+} from '../../../../domain/account/repositories/account.repository.interface';
 
 @CommandHandler(UnassignStaffFromServiceCommand)
 export class UnassignStaffFromServiceHandler implements ICommandHandler<UnassignStaffFromServiceCommand> {
@@ -21,31 +21,32 @@ export class UnassignStaffFromServiceHandler implements ICommandHandler<Unassign
     private readonly staffServiceRepository: IStaffServiceRepository,
     @Inject(SERVICE_REPOSITORY)
     private readonly serviceRepository: IServiceRepository,
-    @Inject(PARTNER_STAFF_REPOSITORY)
-    private readonly staffRepository: IPartnerStaffRepository,
+    @Inject(ACCOUNT_REPOSITORY)
+    private readonly accountRepository: IAccountRepository,
   ) {}
 
   async execute(command: UnassignStaffFromServiceCommand): Promise<void> {
-    // Verify service exists and belongs to partner
+    // Verify service exists and belongs to organization
     const service = await this.serviceRepository.findById(command.serviceId);
     if (!service) {
       throw new NotFoundException('Service not found');
     }
-    if (service.partnerId !== command.partnerId) {
-      throw new ForbiddenException('Service does not belong to this partner');
+    if (service.organizationId !== command.organizationId) {
+      throw new ForbiddenException(
+        'Service does not belong to this organization',
+      );
     }
 
     // Verify requester has permission
-    const requester = await this.staffRepository.findByPartnerIdAndUserId(
-      command.partnerId,
-      command.requestedBy,
-    );
-    if (!requester) {
-      throw new ForbiddenException(
-        'You are not a staff member of this partner',
+    const requester =
+      await this.accountRepository.findByOrganizationIdAndUserId(
+        command.organizationId,
+        command.requestedBy,
       );
+    if (!requester) {
+      throw new ForbiddenException('You are not a member of this organization');
     }
-    if (!requester.role.canManageServices()) {
+    if (!requester.canManageServices()) {
       throw new ForbiddenException(
         'You do not have permission to manage staff assignments',
       );

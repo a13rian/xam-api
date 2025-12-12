@@ -18,7 +18,7 @@ export interface BookingServiceResponseDto {
 export interface BookingResponseDto {
   id: string;
   customerId: string;
-  partnerId: string;
+  organizationId: string;
   locationId: string;
   staffId?: string;
   status: string;
@@ -60,7 +60,7 @@ export class GetBookingHandler implements IQueryHandler<GetBookingQuery> {
     return {
       id: props.id,
       customerId: props.customerId,
-      partnerId: props.partnerId,
+      organizationId: props.organizationId,
       locationId: props.locationId,
       staffId: props.staffId,
       status: props.status,

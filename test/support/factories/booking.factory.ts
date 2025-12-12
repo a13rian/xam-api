@@ -8,7 +8,7 @@ import { BookingStatusEnum } from '../../../src/core/domain/booking/value-object
 
 export interface CreateBookingOptions {
   customerId: string;
-  partnerId: string;
+  organizationId: string;
   locationId: string;
   staffId?: string;
   status?: BookingStatusEnum;
@@ -34,7 +34,7 @@ export interface CreateBookingOptions {
 export interface CreatedBooking {
   id: string;
   customerId: string;
-  partnerId: string;
+  organizationId: string;
   locationId: string;
   status: BookingStatusEnum;
   scheduledDate: Date;
@@ -60,7 +60,7 @@ export class BookingFactory {
     const booking = bookingRepo.create({
       id: bookingId,
       customerId: options.customerId,
-      partnerId: options.partnerId,
+      organizationId: options.organizationId,
       locationId: options.locationId,
       staffId: options.staffId ?? null,
       status: options.status ?? BookingStatusEnum.PENDING,
@@ -98,7 +98,7 @@ export class BookingFactory {
     return {
       id: booking.id,
       customerId: booking.customerId,
-      partnerId: booking.partnerId,
+      organizationId: booking.organizationId,
       locationId: booking.locationId,
       status: booking.status,
       scheduledDate: booking.scheduledDate,

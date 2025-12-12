@@ -12,7 +12,7 @@ import { Transform, Type } from 'class-transformer';
 export class ListServicesQueryDto {
   @IsOptional()
   @IsUUID()
-  partnerId?: string;
+  organizationId?: string;
 
   @IsOptional()
   @IsUUID()

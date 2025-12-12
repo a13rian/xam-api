@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Not } from 'typeorm';
+import { Repository, Not, FindOptionsWhere } from 'typeorm';
 import { PartnerLocation } from '../../../../core/domain/location/entities/partner-location.entity';
 import { IPartnerLocationRepository } from '../../../../core/domain/location/repositories/partner-location.repository.interface';
-import { PartnerLocationOrmEntity } from '../entities/partner-location.orm-entity';
+import { OrganizationLocationOrmEntity } from '../entities/organization-location.orm-entity';
 import { PartnerLocationMapper } from '../mappers/partner-location.mapper';
 
 @Injectable()
 export class PartnerLocationRepository implements IPartnerLocationRepository {
   constructor(
-    @InjectRepository(PartnerLocationOrmEntity)
-    private readonly repository: Repository<PartnerLocationOrmEntity>,
+    @InjectRepository(OrganizationLocationOrmEntity)
+    private readonly repository: Repository<OrganizationLocationOrmEntity>,
     private readonly mapper: PartnerLocationMapper,
   ) {}
 
@@ -19,19 +19,19 @@ export class PartnerLocationRepository implements IPartnerLocationRepository {
     return entity ? this.mapper.toDomain(entity) : null;
   }
 
-  async findByPartnerId(partnerId: string): Promise<PartnerLocation[]> {
+  async findByPartnerId(organizationId: string): Promise<PartnerLocation[]> {
     const entities = await this.repository.find({
-      where: { partnerId },
+      where: { organizationId },
       order: { isPrimary: 'DESC', name: 'ASC' },
     });
     return entities.map((e) => this.mapper.toDomain(e));
   }
 
   async findPrimaryByPartnerId(
-    partnerId: string,
+    organizationId: string,
   ): Promise<PartnerLocation | null> {
     const entity = await this.repository.findOne({
-      where: { partnerId, isPrimary: true },
+      where: { organizationId, isPrimary: true },
     });
     return entity ? this.mapper.toDomain(entity) : null;
   }
@@ -46,10 +46,13 @@ export class PartnerLocationRepository implements IPartnerLocationRepository {
   }
 
   async clearPrimaryForPartner(
-    partnerId: string,
+    organizationId: string,
     excludeId?: string,
   ): Promise<void> {
-    const conditions: any = { partnerId, isPrimary: true };
+    const conditions: FindOptionsWhere<OrganizationLocationOrmEntity> = {
+      organizationId,
+      isPrimary: true,
+    };
     if (excludeId) {
       conditions.id = Not(excludeId);
     }

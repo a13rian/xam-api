@@ -1,3 +1,3 @@
 export class ListPartnerLocationsQuery {
-  constructor(public readonly partnerId: string) {}
+  constructor(public readonly organizationId: string) {}
 }

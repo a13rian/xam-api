@@ -1,0 +1,70 @@
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  Index,
+} from 'typeorm';
+import { OrganizationOrmEntity } from './organization.orm-entity';
+
+@Entity('organization_locations')
+export class OrganizationLocationOrmEntity {
+  @PrimaryColumn('uuid')
+  id: string;
+
+  @Index()
+  @Column('uuid')
+  organizationId: string;
+
+  @Column({ length: 200 })
+  name: string;
+
+  @Column({ type: 'text' })
+  street: string;
+
+  @Column({ length: 100, nullable: true })
+  ward?: string;
+
+  @Column({ length: 100 })
+  district: string;
+
+  @Column({ length: 100 })
+  city: string;
+
+  @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+  latitude?: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+  longitude?: number;
+
+  @Index('IDX_organization_locations_location', { spatial: true })
+  @Column({
+    type: 'geography',
+    spatialFeatureType: 'Point',
+    srid: 4326,
+    nullable: true,
+  })
+  location?: string;
+
+  @Column({ length: 20, nullable: true })
+  phone?: string;
+
+  @Column({ default: false })
+  isPrimary: boolean;
+
+  @Column({ default: true })
+  isActive: boolean;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @ManyToOne(() => OrganizationOrmEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'organizationId' })
+  organization?: OrganizationOrmEntity;
+}

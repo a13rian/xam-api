@@ -1,4 +1,4 @@
-import { TimeSlot, TimeSlotStatus } from '../entities/time-slot.entity';
+import { TimeSlot } from '../entities/time-slot.entity';
 
 export const TIME_SLOT_REPOSITORY = Symbol('TIME_SLOT_REPOSITORY');
 

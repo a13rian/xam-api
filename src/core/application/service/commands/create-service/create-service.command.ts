@@ -2,7 +2,7 @@ import { BookingTypeEnum } from '../../../../domain/service/value-objects/bookin
 
 export class CreateServiceCommand {
   constructor(
-    public readonly partnerId: string,
+    public readonly organizationId: string,
     public readonly categoryId: string,
     public readonly name: string,
     public readonly price: number,

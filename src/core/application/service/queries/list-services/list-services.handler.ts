@@ -23,7 +23,7 @@ export class ListServicesHandler implements IQueryHandler<ListServicesQuery> {
 
   async execute(query: ListServicesQuery): Promise<ServicesListResponseDto> {
     const result = await this.serviceRepository.search({
-      partnerId: query.partnerId,
+      organizationId: query.organizationId,
       categoryId: query.categoryId,
       isActive: query.isActive,
       search: query.search,

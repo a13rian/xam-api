@@ -1,12 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  Repository,
-  Between,
-  LessThanOrEqual,
-  MoreThanOrEqual,
-  And,
-} from 'typeorm';
+import { Repository, Between } from 'typeorm';
 import {
   TimeSlot,
   TimeSlotStatus,

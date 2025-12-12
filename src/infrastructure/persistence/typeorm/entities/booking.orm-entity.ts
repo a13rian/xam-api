@@ -11,12 +11,12 @@ import {
 } from 'typeorm';
 import { BookingStatusEnum } from '../../../../core/domain/booking/value-objects/booking-status.vo';
 import { UserOrmEntity } from './user.orm-entity';
-import { PartnerOrmEntity } from './partner.orm-entity';
-import { PartnerLocationOrmEntity } from './partner-location.orm-entity';
+import { OrganizationOrmEntity } from './organization.orm-entity';
+import { OrganizationLocationOrmEntity } from './organization-location.orm-entity';
 
 @Entity('bookings')
 @Index(['customerId', 'status'])
-@Index(['partnerId', 'scheduledDate'])
+@Index(['organizationId', 'scheduledDate'])
 export class BookingOrmEntity {
   @PrimaryColumn('uuid')
   id: string;
@@ -27,7 +27,7 @@ export class BookingOrmEntity {
 
   @Index()
   @Column('uuid')
-  partnerId: string;
+  organizationId: string;
 
   @Index()
   @Column('uuid')
@@ -105,13 +105,13 @@ export class BookingOrmEntity {
   @JoinColumn({ name: 'customerId' })
   customer?: UserOrmEntity;
 
-  @ManyToOne(() => PartnerOrmEntity)
-  @JoinColumn({ name: 'partnerId' })
-  partner?: PartnerOrmEntity;
+  @ManyToOne(() => OrganizationOrmEntity)
+  @JoinColumn({ name: 'organizationId' })
+  organization?: OrganizationOrmEntity;
 
-  @ManyToOne(() => PartnerLocationOrmEntity)
+  @ManyToOne(() => OrganizationLocationOrmEntity)
   @JoinColumn({ name: 'locationId' })
-  location?: PartnerLocationOrmEntity;
+  location?: OrganizationLocationOrmEntity;
 
   @OneToMany(() => BookingServiceOrmEntity, (bs) => bs.booking, {
     cascade: true,

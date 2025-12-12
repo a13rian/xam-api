@@ -20,7 +20,7 @@ export class ToggleServiceHandler implements ICommandHandler<ToggleServiceComman
     }
 
     // Verify ownership
-    if (service.partnerId !== command.partnerId) {
+    if (service.organizationId !== command.organizationId) {
       throw new ForbiddenException('You do not own this service');
     }
 

@@ -10,7 +10,7 @@ import {
   Unique,
 } from 'typeorm';
 import { DayOfWeek } from '../../../../core/domain/location/entities/operating-hours.entity';
-import { PartnerLocationOrmEntity } from './partner-location.orm-entity';
+import { OrganizationLocationOrmEntity } from './organization-location.orm-entity';
 
 @Entity('operating_hours')
 @Unique(['locationId', 'dayOfWeek'])
@@ -40,7 +40,7 @@ export class OperatingHoursOrmEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => PartnerLocationOrmEntity, { onDelete: 'CASCADE' })
+  @ManyToOne(() => OrganizationLocationOrmEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'locationId' })
-  location?: PartnerLocationOrmEntity;
+  location?: OrganizationLocationOrmEntity;
 }

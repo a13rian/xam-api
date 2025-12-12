@@ -5,7 +5,7 @@ export interface BookingServiceInput {
 export class CreateBookingCommand {
   constructor(
     public readonly customerId: string,
-    public readonly partnerId: string,
+    public readonly organizationId: string,
     public readonly locationId: string,
     public readonly scheduledDate: Date,
     public readonly startTime: string,

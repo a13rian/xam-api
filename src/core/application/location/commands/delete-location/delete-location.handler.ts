@@ -19,7 +19,7 @@ export class DeleteLocationHandler implements ICommandHandler<DeleteLocationComm
       throw new NotFoundException('Location not found');
     }
 
-    if (location.partnerId !== command.partnerId) {
+    if (location.organizationId !== command.organizationId) {
       throw new NotFoundException('Location not found');
     }
 

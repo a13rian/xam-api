@@ -9,20 +9,17 @@ import { PasswordResetTokenOrmEntity } from '../../src/infrastructure/persistenc
 import { EmailVerificationTokenOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/email-verification-token.orm-entity';
 import { WalletOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/wallet.orm-entity';
 import { WalletTransactionOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/wallet-transaction.orm-entity';
-import { PartnerOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/partner.orm-entity';
-import { PartnerBusinessOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/partner-business.orm-entity';
-import { PartnerIndividualOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/partner-individual.orm-entity';
-import { PartnerDocumentOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/partner-document.orm-entity';
+import { AccountOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/account.orm-entity';
+import { OrganizationOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/organization.orm-entity';
 import { ServiceCategoryOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/service-category.orm-entity';
 import { ServiceOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/service.orm-entity';
-import { PartnerLocationOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/partner-location.orm-entity';
+import { OrganizationLocationOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/organization-location.orm-entity';
 import { OperatingHoursOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/operating-hours.orm-entity';
 import { TimeSlotOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/time-slot.orm-entity';
 import {
   BookingOrmEntity,
   BookingServiceOrmEntity,
 } from '../../src/infrastructure/persistence/typeorm/entities/booking.orm-entity';
-import { PartnerStaffOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/partner-staff.orm-entity';
 import { StaffServiceOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/staff-service.orm-entity';
 import { seedPermissions } from '../../src/infrastructure/persistence/seeds/permissions.seed';
 import { seedRoles } from '../../src/infrastructure/persistence/seeds/roles.seed';
@@ -50,18 +47,15 @@ export default async function globalSetup(): Promise<void> {
       EmailVerificationTokenOrmEntity,
       WalletOrmEntity,
       WalletTransactionOrmEntity,
-      PartnerOrmEntity,
-      PartnerBusinessOrmEntity,
-      PartnerIndividualOrmEntity,
-      PartnerDocumentOrmEntity,
+      AccountOrmEntity,
+      OrganizationOrmEntity,
       ServiceCategoryOrmEntity,
       ServiceOrmEntity,
-      PartnerLocationOrmEntity,
+      OrganizationLocationOrmEntity,
       OperatingHoursOrmEntity,
       TimeSlotOrmEntity,
       BookingOrmEntity,
       BookingServiceOrmEntity,
-      PartnerStaffOrmEntity,
       StaffServiceOrmEntity,
     ],
     synchronize: true,

@@ -1,7 +1,7 @@
 export class UpdateServiceCommand {
   constructor(
     public readonly id: string,
-    public readonly partnerId: string,
+    public readonly organizationId: string,
     public readonly name?: string,
     public readonly description?: string,
     public readonly categoryId?: string,

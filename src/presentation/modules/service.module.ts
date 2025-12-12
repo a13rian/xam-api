@@ -16,14 +16,16 @@ import { STAFF_SERVICE_REPOSITORY } from '../../core/domain/service/repositories
 import { ServiceCommandHandlers } from '../../core/application/service/commands';
 import { ServiceQueryHandlers } from '../../core/application/service/queries';
 import { CategoryModule } from './category.module';
-import { PartnerModule } from './partner.module';
+import { AccountModule } from './account.module';
+import { OrganizationModule } from './organization.module';
 
 @Module({
   imports: [
     CqrsModule,
     TypeOrmModule.forFeature([ServiceOrmEntity, StaffServiceOrmEntity]),
     CategoryModule,
-    forwardRef(() => PartnerModule),
+    forwardRef(() => AccountModule),
+    OrganizationModule,
   ],
   controllers: [ServiceController, PartnerServiceController],
   providers: [

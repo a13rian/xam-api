@@ -34,7 +34,7 @@ export class GenerateSlotsHandler implements ICommandHandler<GenerateSlotsComman
     }
 
     // Verify ownership - return 404 to not reveal resource existence
-    if (location.partnerId !== command.partnerId) {
+    if (location.organizationId !== command.organizationId) {
       throw new NotFoundException('Location not found');
     }
 

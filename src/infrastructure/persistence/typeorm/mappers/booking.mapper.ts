@@ -26,7 +26,7 @@ export class BookingMapper {
     return new Booking({
       id: ormEntity.id,
       customerId: ormEntity.customerId,
-      partnerId: ormEntity.partnerId,
+      organizationId: ormEntity.organizationId,
       locationId: ormEntity.locationId,
       staffId: ormEntity.staffId,
       status: BookingStatus.fromString(ormEntity.status),
@@ -58,7 +58,7 @@ export class BookingMapper {
     const ormEntity = new BookingOrmEntity();
     ormEntity.id = props.id;
     ormEntity.customerId = props.customerId;
-    ormEntity.partnerId = props.partnerId;
+    ormEntity.organizationId = props.organizationId;
     ormEntity.locationId = props.locationId;
     ormEntity.staffId = props.staffId;
     ormEntity.status = props.status as any;

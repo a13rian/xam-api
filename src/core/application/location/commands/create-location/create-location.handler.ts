@@ -8,31 +8,33 @@ import {
   IPartnerLocationRepository,
 } from '../../../../domain/location/repositories/partner-location.repository.interface';
 import {
-  PARTNER_REPOSITORY,
-  IPartnerRepository,
-} from '../../../../domain/partner/repositories/partner.repository.interface';
+  ORGANIZATION_REPOSITORY,
+  IOrganizationRepository,
+} from '../../../../domain/organization/repositories/organization.repository.interface';
 
 @CommandHandler(CreateLocationCommand)
 export class CreateLocationHandler implements ICommandHandler<CreateLocationCommand> {
   constructor(
     @Inject(PARTNER_LOCATION_REPOSITORY)
     private readonly locationRepository: IPartnerLocationRepository,
-    @Inject(PARTNER_REPOSITORY)
-    private readonly partnerRepository: IPartnerRepository,
+    @Inject(ORGANIZATION_REPOSITORY)
+    private readonly organizationRepository: IOrganizationRepository,
   ) {}
 
   async execute(command: CreateLocationCommand): Promise<{ id: string }> {
-    const partner = await this.partnerRepository.findById(command.partnerId);
-    if (!partner) {
-      throw new NotFoundException('Partner not found');
+    const organization = await this.organizationRepository.findById(
+      command.organizationId,
+    );
+    if (!organization) {
+      throw new NotFoundException('Organization not found');
     }
-    if (!partner.status.isActive()) {
-      throw new NotFoundException('Partner not found');
+    if (!organization.status.isActive()) {
+      throw new NotFoundException('Organization not found');
     }
 
     const location = PartnerLocation.create({
       id: uuidv4(),
-      partnerId: command.partnerId,
+      organizationId: command.organizationId,
       name: command.name,
       street: command.street,
       ward: command.ward,
@@ -46,7 +48,9 @@ export class CreateLocationHandler implements ICommandHandler<CreateLocationComm
 
     // If this is the primary location, clear other primaries
     if (command.isPrimary) {
-      await this.locationRepository.clearPrimaryForPartner(command.partnerId);
+      await this.locationRepository.clearPrimaryForPartner(
+        command.organizationId,
+      );
     }
 
     await this.locationRepository.save(location);

@@ -19,13 +19,13 @@ export class SetPrimaryLocationHandler implements ICommandHandler<SetPrimaryLoca
       throw new NotFoundException('Location not found');
     }
 
-    if (location.partnerId !== command.partnerId) {
+    if (location.organizationId !== command.organizationId) {
       throw new ForbiddenException('You do not own this location');
     }
 
     // Clear primary from all other locations
     await this.locationRepository.clearPrimaryForPartner(
-      command.partnerId,
+      command.organizationId,
       command.id,
     );
 

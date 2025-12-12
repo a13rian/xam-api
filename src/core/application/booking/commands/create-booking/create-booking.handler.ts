@@ -9,13 +9,9 @@ import {
   IBookingRepository,
 } from '../../../../domain/booking/repositories/booking.repository.interface';
 import {
-  PARTNER_REPOSITORY,
-  IPartnerRepository,
-} from '../../../../domain/partner/repositories/partner.repository.interface';
-import {
-  PARTNER_LOCATION_REPOSITORY,
-  IPartnerLocationRepository,
-} from '../../../../domain/location/repositories/partner-location.repository.interface';
+  ORGANIZATION_REPOSITORY,
+  IOrganizationRepository,
+} from '../../../../domain/organization/repositories/organization.repository.interface';
 import {
   SERVICE_REPOSITORY,
   IServiceRepository,
@@ -26,37 +22,30 @@ export class CreateBookingHandler implements ICommandHandler<CreateBookingComman
   constructor(
     @Inject(BOOKING_REPOSITORY)
     private readonly bookingRepository: IBookingRepository,
-    @Inject(PARTNER_REPOSITORY)
-    private readonly partnerRepository: IPartnerRepository,
-    @Inject(PARTNER_LOCATION_REPOSITORY)
-    private readonly locationRepository: IPartnerLocationRepository,
+    @Inject(ORGANIZATION_REPOSITORY)
+    private readonly organizationRepository: IOrganizationRepository,
     @Inject(SERVICE_REPOSITORY)
     private readonly serviceRepository: IServiceRepository,
   ) {}
 
   async execute(command: CreateBookingCommand) {
-    // Validate partner
-    const partner = await this.partnerRepository.findById(command.partnerId);
-    if (!partner) {
-      throw new NotFoundException('Partner not found');
+    // Validate organization
+    const organization = await this.organizationRepository.findById(
+      command.organizationId,
+    );
+    if (!organization) {
+      throw new NotFoundException('Organization not found');
     }
-    if (!partner.status.isActive()) {
-      throw new BadRequestException('Partner is not active');
-    }
-
-    // Validate location
-    const location = await this.locationRepository.findById(command.locationId);
-    if (!location) {
-      throw new NotFoundException('Location not found');
-    }
-    if (location.partnerId !== command.partnerId) {
-      throw new BadRequestException('Location does not belong to this partner');
+    if (!organization.status.isActive()) {
+      throw new BadRequestException('Organization is not active');
     }
 
     // Validate home service
     if (command.isHomeService) {
-      if (!partner.isHomeServiceEnabled) {
-        throw new BadRequestException('Partner does not offer home service');
+      if (!organization.isHomeServiceEnabled) {
+        throw new BadRequestException(
+          'Organization does not offer home service',
+        );
       }
       if (!command.customerAddress) {
         throw new BadRequestException(
@@ -84,9 +73,9 @@ export class CreateBookingHandler implements ICommandHandler<CreateBookingComman
           `Service ${serviceInput.serviceId} not found`,
         );
       }
-      if (service.partnerId !== command.partnerId) {
+      if (service.organizationId !== command.organizationId) {
         throw new BadRequestException(
-          'Service does not belong to this partner',
+          'Service does not belong to this organization',
         );
       }
       if (!service.isActive) {
@@ -123,7 +112,7 @@ export class CreateBookingHandler implements ICommandHandler<CreateBookingComman
     const booking = Booking.create({
       id: bookingId,
       customerId: command.customerId,
-      partnerId: command.partnerId,
+      organizationId: command.organizationId,
       locationId: command.locationId,
       staffId: command.staffId,
       scheduledDate: command.scheduledDate,

@@ -4,7 +4,7 @@ import { Money } from '../../shared/value-objects/money.vo';
 
 export interface ServiceProps {
   id: string;
-  partnerId: string;
+  organizationId: string;
   categoryId: string;
   name: string;
   description?: string;
@@ -19,7 +19,7 @@ export interface ServiceProps {
 
 export class Service extends AggregateRoot {
   private readonly _id: string;
-  private readonly _partnerId: string;
+  private readonly _organizationId: string;
   private _categoryId: string;
   private _name: string;
   private _description?: string;
@@ -34,7 +34,7 @@ export class Service extends AggregateRoot {
   constructor(props: ServiceProps) {
     super();
     this._id = props.id;
-    this._partnerId = props.partnerId;
+    this._organizationId = props.organizationId;
     this._categoryId = props.categoryId;
     this._name = props.name;
     this._description = props.description;
@@ -51,8 +51,8 @@ export class Service extends AggregateRoot {
     return this._id;
   }
 
-  get partnerId(): string {
-    return this._partnerId;
+  get organizationId(): string {
+    return this._organizationId;
   }
 
   get categoryId(): string {
@@ -97,7 +97,7 @@ export class Service extends AggregateRoot {
 
   static create(props: {
     id: string;
-    partnerId: string;
+    organizationId: string;
     categoryId: string;
     name: string;
     description?: string;
@@ -110,7 +110,7 @@ export class Service extends AggregateRoot {
     const now = new Date();
     return new Service({
       id: props.id,
-      partnerId: props.partnerId,
+      organizationId: props.organizationId,
       categoryId: props.categoryId,
       name: props.name,
       description: props.description,
@@ -179,7 +179,7 @@ export class Service extends AggregateRoot {
 
   toObject(): {
     id: string;
-    partnerId: string;
+    organizationId: string;
     categoryId: string;
     name: string;
     description?: string;
@@ -194,7 +194,7 @@ export class Service extends AggregateRoot {
   } {
     return {
       id: this._id,
-      partnerId: this._partnerId,
+      organizationId: this._organizationId,
       categoryId: this._categoryId,
       name: this._name,
       description: this._description,

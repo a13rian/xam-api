@@ -12,7 +12,7 @@ export class BookingServiceResponseDto {
 export class BookingResponseDto {
   id: string;
   customerId: string;
-  partnerId: string;
+  organizationId: string;
   locationId: string;
   staffId?: string;
   status: BookingStatusEnum;

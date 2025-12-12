@@ -26,7 +26,7 @@ export class ConfirmBookingHandler implements ICommandHandler<ConfirmBookingComm
       throw new NotFoundException('Booking not found');
     }
 
-    if (booking.partnerId !== command.partnerId) {
+    if (booking.organizationId !== command.organizationId) {
       throw new NotFoundException('Booking not found');
     }
 

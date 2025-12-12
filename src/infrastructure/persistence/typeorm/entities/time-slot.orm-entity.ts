@@ -10,7 +10,7 @@ import {
   Unique,
 } from 'typeorm';
 import { TimeSlotStatus } from '../../../../core/domain/schedule/entities/time-slot.entity';
-import { PartnerLocationOrmEntity } from './partner-location.orm-entity';
+import { OrganizationLocationOrmEntity } from './organization-location.orm-entity';
 
 @Entity('time_slots')
 @Index(['locationId', 'date', 'status'])
@@ -57,7 +57,7 @@ export class TimeSlotOrmEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => PartnerLocationOrmEntity, { onDelete: 'CASCADE' })
+  @ManyToOne(() => OrganizationLocationOrmEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'locationId' })
-  location?: PartnerLocationOrmEntity;
+  location?: OrganizationLocationOrmEntity;
 }

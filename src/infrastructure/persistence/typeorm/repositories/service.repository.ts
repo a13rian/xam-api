@@ -23,9 +23,9 @@ export class ServiceRepository implements IServiceRepository {
     return entity ? this.mapper.toDomain(entity) : null;
   }
 
-  async findByPartnerId(partnerId: string): Promise<Service[]> {
+  async findByOrganizationId(organizationId: string): Promise<Service[]> {
     const entities = await this.repository.find({
-      where: { partnerId },
+      where: { organizationId },
       order: { sortOrder: 'ASC', name: 'ASC' },
     });
     return entities.map((e) => this.mapper.toDomain(e));
@@ -46,9 +46,9 @@ export class ServiceRepository implements IServiceRepository {
 
     const query = this.repository.createQueryBuilder('service');
 
-    if (options.partnerId) {
-      query.andWhere('service.partnerId = :partnerId', {
-        partnerId: options.partnerId,
+    if (options.organizationId) {
+      query.andWhere('service.organizationId = :organizationId', {
+        organizationId: options.organizationId,
       });
     }
 
@@ -95,14 +95,14 @@ export class ServiceRepository implements IServiceRepository {
     await this.repository.delete(id);
   }
 
-  async existsByPartnerIdAndName(
-    partnerId: string,
+  async existsByOrganizationIdAndName(
+    organizationId: string,
     name: string,
     excludeId?: string,
   ): Promise<boolean> {
     const query = this.repository
       .createQueryBuilder('service')
-      .where('service.partnerId = :partnerId', { partnerId })
+      .where('service.organizationId = :organizationId', { organizationId })
       .andWhere('LOWER(service.name) = LOWER(:name)', { name });
 
     if (excludeId) {

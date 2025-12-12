@@ -59,17 +59,15 @@ export class DatabaseHelper {
       'operating_hours',
       // Staff related
       'staff_services',
-      'partner_staff',
       // Service related
       'services',
       'service_categories',
       // Location related
-      'partner_locations',
-      // Partner related (CTI child tables first)
-      'partner_businesses',
-      'partner_individuals',
-      'partner_documents',
-      'partners',
+      'organization_locations',
+      // Organization/Account related
+      'organization_documents',
+      'accounts',
+      'organizations',
       // Wallet related
       'wallet_transactions',
       'wallets',

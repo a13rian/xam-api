@@ -1,15 +1,12 @@
 import { AggregateRoot } from '@nestjs/cqrs';
-import {
-  BookingStatus,
-  BookingStatusEnum,
-} from '../value-objects/booking-status.vo';
+import { BookingStatus } from '../value-objects/booking-status.vo';
 import { BookingService } from './booking-service.entity';
 import { ValidationException } from '../../../../shared/exceptions/domain.exception';
 
 export interface BookingProps {
   id: string;
   customerId: string;
-  partnerId: string;
+  organizationId: string;
   locationId: string;
   staffId?: string;
   status: BookingStatus;
@@ -38,13 +35,13 @@ export interface BookingProps {
 export class Booking extends AggregateRoot {
   private readonly _id: string;
   private readonly _customerId: string;
-  private readonly _partnerId: string;
+  private readonly _organizationId: string;
   private readonly _locationId: string;
   private readonly _staffId?: string;
   private _status: BookingStatus;
-  private readonly _scheduledDate: Date;
-  private readonly _startTime: string;
-  private readonly _endTime: string;
+  private _scheduledDate: Date;
+  private _startTime: string;
+  private _endTime: string;
   private readonly _totalAmount: number;
   private _paidAmount: number;
   private readonly _currency: string;
@@ -67,7 +64,7 @@ export class Booking extends AggregateRoot {
     super();
     this._id = props.id;
     this._customerId = props.customerId;
-    this._partnerId = props.partnerId;
+    this._organizationId = props.organizationId;
     this._locationId = props.locationId;
     this._staffId = props.staffId;
     this._status = props.status;
@@ -100,8 +97,8 @@ export class Booking extends AggregateRoot {
   get customerId(): string {
     return this._customerId;
   }
-  get partnerId(): string {
-    return this._partnerId;
+  get organizationId(): string {
+    return this._organizationId;
   }
   get locationId(): string {
     return this._locationId;
@@ -176,7 +173,7 @@ export class Booking extends AggregateRoot {
   static create(props: {
     id: string;
     customerId: string;
-    partnerId: string;
+    organizationId: string;
     locationId: string;
     staffId?: string;
     scheduledDate: Date;
@@ -262,9 +259,9 @@ export class Booking extends AggregateRoot {
         'Booking cannot be rescheduled in current status',
       );
     }
-    (this as any)._scheduledDate = newDate;
-    (this as any)._startTime = newStartTime;
-    (this as any)._endTime = newEndTime;
+    this._scheduledDate = newDate;
+    this._startTime = newStartTime;
+    this._endTime = newEndTime;
     this._updatedAt = new Date();
   }
 
@@ -301,7 +298,7 @@ export class Booking extends AggregateRoot {
   toObject(): {
     id: string;
     customerId: string;
-    partnerId: string;
+    organizationId: string;
     locationId: string;
     staffId?: string;
     status: string;
@@ -329,7 +326,7 @@ export class Booking extends AggregateRoot {
     return {
       id: this._id,
       customerId: this._customerId,
-      partnerId: this._partnerId,
+      organizationId: this._organizationId,
       locationId: this._locationId,
       staffId: this._staffId,
       status: this._status.value,

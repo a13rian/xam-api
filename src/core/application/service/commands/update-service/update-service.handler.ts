@@ -26,20 +26,20 @@ export class UpdateServiceHandler implements ICommandHandler<UpdateServiceComman
     }
 
     // Verify ownership - return 404 to not reveal resource existence
-    if (service.partnerId !== command.partnerId) {
+    if (service.organizationId !== command.organizationId) {
       throw new NotFoundException('Service not found');
     }
 
     // Check for duplicate name if updating
     if (command.name) {
-      const exists = await this.serviceRepository.existsByPartnerIdAndName(
-        command.partnerId,
+      const exists = await this.serviceRepository.existsByOrganizationIdAndName(
+        command.organizationId,
         command.name,
         command.id,
       );
       if (exists) {
         throw new ConflictException(
-          'Service with this name already exists for this partner',
+          'Service with this name already exists for this organization',
         );
       }
     }

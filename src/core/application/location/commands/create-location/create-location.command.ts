@@ -1,6 +1,6 @@
 export class CreateLocationCommand {
   constructor(
-    public readonly partnerId: string,
+    public readonly organizationId: string,
     public readonly name: string,
     public readonly street: string,
     public readonly district: string,

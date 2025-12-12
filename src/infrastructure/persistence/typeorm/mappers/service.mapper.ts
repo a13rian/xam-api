@@ -9,7 +9,7 @@ export class ServiceMapper {
   toDomain(ormEntity: ServiceOrmEntity): Service {
     return new Service({
       id: ormEntity.id,
-      partnerId: ormEntity.partnerId,
+      organizationId: ormEntity.organizationId,
       categoryId: ormEntity.categoryId,
       name: ormEntity.name,
       description: ormEntity.description,
@@ -30,7 +30,7 @@ export class ServiceMapper {
     const props = domain.toObject();
     const ormEntity = new ServiceOrmEntity();
     ormEntity.id = props.id;
-    ormEntity.partnerId = props.partnerId;
+    ormEntity.organizationId = props.organizationId;
     ormEntity.categoryId = props.categoryId;
     ormEntity.name = props.name;
     ormEntity.description = props.description;

@@ -17,8 +17,8 @@ export class ListPartnerServicesHandler implements IQueryHandler<ListPartnerServ
   async execute(
     query: ListPartnerServicesQuery,
   ): Promise<{ items: ServiceResponseDto[]; total: number }> {
-    let services = await this.serviceRepository.findByPartnerId(
-      query.partnerId,
+    let services = await this.serviceRepository.findByOrganizationId(
+      query.organizationId,
     );
 
     if (!query.includeInactive) {
