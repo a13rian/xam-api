@@ -7,4 +7,5 @@ export interface IAppConfig {
   readonly corsOrigins: string[];
   readonly isProduction: boolean;
   readonly isDevelopment: boolean;
+  readonly shutdownTimeout: number;
 }

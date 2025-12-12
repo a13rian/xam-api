@@ -2,15 +2,22 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { CqrsModule } from '@nestjs/cqrs';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
 import type { IAppConfig } from './core/application/ports/config/app.config.port';
 import type { ILoggerConfig } from './core/application/ports/config/logger.config.port';
+import type { IThrottleConfig } from './core/application/ports/config/throttle.config.port';
 import { AppConfigModule, validateEnv } from './infrastructure/config';
-import { APP_CONFIG, LOGGER_CONFIG } from './shared/constants/injection-tokens';
+import {
+  APP_CONFIG,
+  LOGGER_CONFIG,
+  THROTTLE_CONFIG,
+} from './shared/constants/injection-tokens';
 import { PersistenceModule } from './infrastructure/persistence/persistence.module';
 import { AuthModule } from './presentation/modules/auth.module';
 import { BookingModule } from './presentation/modules/booking.module';
 import { CategoryModule } from './presentation/modules/category.module';
+import { HealthModule } from './presentation/modules/health.module';
 import { LocationModule } from './presentation/modules/location.module';
 import { PartnerStaffModule } from './presentation/modules/partner-staff.module';
 import { PartnerModule } from './presentation/modules/partner.module';
@@ -57,7 +64,27 @@ import { ValidationPipe } from './shared/pipes/validation.pipe';
       }),
     }),
     CqrsModule.forRoot(),
+    ThrottlerModule.forRootAsync({
+      imports: [AppConfigModule],
+      inject: [THROTTLE_CONFIG],
+      useFactory: (throttleConfig: IThrottleConfig) => ({
+        throttlers: [
+          {
+            ttl: throttleConfig.ttl * 1000,
+            limit: throttleConfig.limit,
+          },
+        ],
+        skipIf: (context) => {
+          const request = context.switchToHttp().getRequest<{ url?: string }>();
+          // Skip throttling for swagger routes to avoid legacy route path warnings
+          return (
+            request.url?.includes('/docs') || request.url?.includes('/swagger')
+          );
+        },
+      }),
+    }),
     PersistenceModule,
+    HealthModule,
     AuthModule,
     UserModule,
     RoleModule,
@@ -71,6 +98,10 @@ import { ValidationPipe } from './shared/pipes/validation.pipe';
     PartnerStaffModule,
   ],
   providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,

@@ -35,6 +35,16 @@ const envSchema = z.object({
   JWT_EXPIRES_IN: z.string().optional().default('15m'),
   JWT_REFRESH_SECRET: z.string().optional(),
   JWT_REFRESH_EXPIRES_IN: z.string().optional().default('7d'),
+
+  // Rate Limiting
+  THROTTLE_TTL: z.coerce.number().int().positive().default(60),
+  THROTTLE_LIMIT: z.coerce.number().int().positive().default(100),
+
+  // Swagger
+  SWAGGER_ENABLED: booleanString,
+
+  // Graceful Shutdown
+  SHUTDOWN_TIMEOUT: z.coerce.number().int().positive().default(10000),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;

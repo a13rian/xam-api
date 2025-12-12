@@ -44,4 +44,8 @@ export class AppConfigService implements IAppConfig {
   get isDevelopment(): boolean {
     return this.nodeEnv === 'development' || this.nodeEnv === 'local';
   }
+
+  get shutdownTimeout(): number {
+    return this.configService.get<number>('SHUTDOWN_TIMEOUT') ?? 10000;
+  }
 }
