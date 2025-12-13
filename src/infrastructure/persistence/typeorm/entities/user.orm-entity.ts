@@ -1,19 +1,10 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  ManyToMany,
-  JoinTable,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Index,
-} from 'typeorm';
+import { Entity, Column, ManyToMany, JoinTable, Index } from 'typeorm';
 import { RoleOrmEntity } from './role.orm-entity';
+import { BaseOrmEntity } from './base.orm-entity';
 
 @Entity('users')
-export class UserOrmEntity {
-  @PrimaryColumn('uuid')
-  id: string;
+export class UserOrmEntity extends BaseOrmEntity {
+  protected readonly idPrefix = 'usr';
 
   @Column({ unique: true })
   @Index()
@@ -47,10 +38,4 @@ export class UserOrmEntity {
 
   @Column({ type: 'timestamp', nullable: true })
   lockedUntil: Date | null;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }

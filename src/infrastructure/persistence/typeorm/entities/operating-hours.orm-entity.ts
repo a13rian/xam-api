@@ -1,22 +1,12 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
-  Index,
-  Unique,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, Index, Unique } from 'typeorm';
 import { DayOfWeek } from '../../../../core/domain/location/entities/operating-hours.entity';
 import { OrganizationLocationOrmEntity } from './organization-location.orm-entity';
+import { BaseOrmEntity } from './base.orm-entity';
 
 @Entity('operating_hours')
 @Unique(['locationId', 'dayOfWeek'])
-export class OperatingHoursOrmEntity {
-  @PrimaryColumn('uuid')
-  id: string;
+export class OperatingHoursOrmEntity extends BaseOrmEntity {
+  protected readonly idPrefix = 'hrs';
 
   @Index()
   @Column('uuid')
@@ -33,12 +23,6 @@ export class OperatingHoursOrmEntity {
 
   @Column({ default: false })
   isClosed: boolean;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 
   @ManyToOne(() => OrganizationLocationOrmEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'locationId' })

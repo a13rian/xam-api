@@ -1,18 +1,10 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  CreateDateColumn,
-  Index,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, Column, Index, ManyToOne, JoinColumn } from 'typeorm';
 import { UserOrmEntity } from './user.orm-entity';
+import { BaseOrmEntity } from './base.orm-entity';
 
 @Entity('password_reset_tokens')
-export class PasswordResetTokenOrmEntity {
-  @PrimaryColumn('uuid')
-  id: string;
+export class PasswordResetTokenOrmEntity extends BaseOrmEntity {
+  protected readonly idPrefix = 'prt';
 
   @Column()
   @Index()
@@ -31,7 +23,4 @@ export class PasswordResetTokenOrmEntity {
 
   @Column({ default: false })
   isUsed: boolean;
-
-  @CreateDateColumn()
-  createdAt: Date;
 }

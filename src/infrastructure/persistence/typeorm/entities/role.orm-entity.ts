@@ -1,20 +1,11 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToMany,
-  JoinTable,
-  Index,
-} from 'typeorm';
+import { Entity, Column, ManyToMany, JoinTable, Index } from 'typeorm';
 import { PermissionOrmEntity } from './permission.orm-entity';
+import { BaseOrmEntity } from './base.orm-entity';
 
 @Entity('roles')
 @Index(['name', 'organizationId'], { unique: true })
-export class RoleOrmEntity {
-  @PrimaryColumn('uuid')
-  id: string;
+export class RoleOrmEntity extends BaseOrmEntity {
+  protected readonly idPrefix = 'rol';
 
   @Column()
   name: string;
@@ -38,10 +29,4 @@ export class RoleOrmEntity {
     inverseJoinColumn: { name: 'permissionId', referencedColumnName: 'id' },
   })
   permissions: PermissionOrmEntity[];
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }

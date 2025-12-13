@@ -1,18 +1,10 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  CreateDateColumn,
-  Index,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, Column, Index, ManyToOne, JoinColumn } from 'typeorm';
 import { UserOrmEntity } from './user.orm-entity';
+import { BaseOrmEntity } from './base.orm-entity';
 
 @Entity('refresh_tokens')
-export class RefreshTokenOrmEntity {
-  @PrimaryColumn('uuid')
-  id: string;
+export class RefreshTokenOrmEntity extends BaseOrmEntity {
+  protected readonly idPrefix = 'rtk';
 
   @Column()
   @Index()
@@ -37,7 +29,4 @@ export class RefreshTokenOrmEntity {
 
   @Column({ default: false })
   isRevoked: boolean;
-
-  @CreateDateColumn()
-  createdAt: Date;
 }

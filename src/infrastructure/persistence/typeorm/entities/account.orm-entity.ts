@@ -1,9 +1,6 @@
 import {
   Entity,
-  PrimaryColumn,
   Column,
-  CreateDateColumn,
-  UpdateDateColumn,
   ManyToOne,
   OneToOne,
   JoinColumn,
@@ -15,15 +12,15 @@ import { AccountStatusEnum } from '../../../../core/domain/account/value-objects
 import { InvitationStatusEnum } from '../../../../core/domain/account/value-objects/invitation-status.vo';
 import { UserOrmEntity } from './user.orm-entity';
 import { OrganizationOrmEntity } from './organization.orm-entity';
+import { BaseOrmEntity } from './base.orm-entity';
 
 @Entity('accounts')
 @Index(['organizationId', 'userId'], {
   unique: true,
   where: '"organizationId" IS NOT NULL AND "userId" IS NOT NULL',
 })
-export class AccountOrmEntity {
-  @PrimaryColumn('uuid')
-  id: string;
+export class AccountOrmEntity extends BaseOrmEntity {
+  protected readonly idPrefix = 'acc';
 
   @Column({ type: 'uuid', unique: true })
   @Index()
@@ -103,9 +100,33 @@ export class AccountOrmEntity {
   @Column({ type: 'text', nullable: true })
   rejectionReason: string | null;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  // Address fields
+  @Column({ type: 'text', nullable: true })
+  street: string | null;
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  ward: string | null;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  district: string | null;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  city: string | null;
+
+  // Coordinate fields for distance tracking
+  @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+  latitude: number | null;
+
+  @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+  longitude: number | null;
+
+  // PostGIS location for spatial queries
+  @Index('IDX_accounts_location', { spatial: true })
+  @Column({
+    type: 'geography',
+    spatialFeatureType: 'Point',
+    srid: 4326,
+    nullable: true,
+  })
+  location: string | null;
 }

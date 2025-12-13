@@ -1,22 +1,13 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
-  Index,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { BookingTypeEnum } from '../../../../core/domain/service/value-objects/booking-type.vo';
 import { OrganizationOrmEntity } from './organization.orm-entity';
 import { ServiceCategoryOrmEntity } from './service-category.orm-entity';
+import { BaseOrmEntity } from './base.orm-entity';
 
 @Entity('services')
 @Index(['organizationId', 'isActive'])
-export class ServiceOrmEntity {
-  @PrimaryColumn('uuid')
-  id: string;
+export class ServiceOrmEntity extends BaseOrmEntity {
+  protected readonly idPrefix = 'srv';
 
   @Index()
   @Column('uuid')
@@ -53,12 +44,6 @@ export class ServiceOrmEntity {
 
   @Column({ type: 'int', default: 0 })
   sortOrder: number;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 
   @ManyToOne(() => OrganizationOrmEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'organizationId' })

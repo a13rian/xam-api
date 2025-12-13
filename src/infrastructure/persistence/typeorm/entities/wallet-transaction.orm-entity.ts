@@ -1,20 +1,12 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-  CreateDateColumn,
-  Index,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
 import type { WalletOrmEntity } from './wallet.orm-entity';
 import { TransactionTypeEnum } from '../../../../core/domain/wallet/value-objects/transaction-type.vo';
+import { BaseOrmEntity } from './base.orm-entity';
 
 @Entity('wallet_transactions')
 @Index(['walletId', 'createdAt'])
-export class WalletTransactionOrmEntity {
-  @PrimaryColumn('uuid')
-  id: string;
+export class WalletTransactionOrmEntity extends BaseOrmEntity {
+  protected readonly idPrefix = 'wtx';
 
   @Column({ type: 'uuid' })
   @Index()
@@ -46,7 +38,4 @@ export class WalletTransactionOrmEntity {
 
   @Column({ type: 'text' })
   description: string;
-
-  @CreateDateColumn()
-  createdAt: Date;
 }

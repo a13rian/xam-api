@@ -1,18 +1,10 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  CreateDateColumn,
-  Index,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, Column, Index, ManyToOne, JoinColumn } from 'typeorm';
 import { UserOrmEntity } from './user.orm-entity';
+import { BaseOrmEntity } from './base.orm-entity';
 
 @Entity('email_verification_tokens')
-export class EmailVerificationTokenOrmEntity {
-  @PrimaryColumn('uuid')
-  id: string;
+export class EmailVerificationTokenOrmEntity extends BaseOrmEntity {
+  protected readonly idPrefix = 'evt';
 
   @Column()
   @Index()
@@ -31,7 +23,4 @@ export class EmailVerificationTokenOrmEntity {
 
   @Column({ default: false })
   isUsed: boolean;
-
-  @CreateDateColumn()
-  createdAt: Date;
 }

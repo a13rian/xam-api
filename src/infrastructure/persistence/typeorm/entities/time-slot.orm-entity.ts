@@ -1,23 +1,13 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
-  Index,
-  Unique,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, Index, Unique } from 'typeorm';
 import { TimeSlotStatus } from '../../../../core/domain/schedule/entities/time-slot.entity';
 import { OrganizationLocationOrmEntity } from './organization-location.orm-entity';
+import { BaseOrmEntity } from './base.orm-entity';
 
 @Entity('time_slots')
 @Index(['locationId', 'date', 'status'])
 @Unique(['locationId', 'staffId', 'date', 'startTime'])
-export class TimeSlotOrmEntity {
-  @PrimaryColumn('uuid')
-  id: string;
+export class TimeSlotOrmEntity extends BaseOrmEntity {
+  protected readonly idPrefix = 'slt';
 
   @Index()
   @Column('uuid')
@@ -50,12 +40,6 @@ export class TimeSlotOrmEntity {
   @ManyToOne('BookingOrmEntity', { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'bookingId' })
   booking?: any;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 
   @ManyToOne(() => OrganizationLocationOrmEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'locationId' })

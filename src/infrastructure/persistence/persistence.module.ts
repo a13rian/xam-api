@@ -22,6 +22,9 @@ import { StaffServiceOrmEntity } from './typeorm/entities/staff-service.orm-enti
 import { AccountOrmEntity } from './typeorm/entities/account.orm-entity';
 import { OrganizationOrmEntity } from './typeorm/entities/organization.orm-entity';
 import { OrganizationLocationOrmEntity } from './typeorm/entities/organization-location.orm-entity';
+import { ProvinceOrmEntity } from './typeorm/entities/province.orm-entity';
+import { DistrictOrmEntity } from './typeorm/entities/district.orm-entity';
+import { WardOrmEntity } from './typeorm/entities/ward.orm-entity';
 
 const entities = [
   UserOrmEntity,
@@ -43,6 +46,9 @@ const entities = [
   StaffServiceOrmEntity,
   AccountOrmEntity,
   OrganizationOrmEntity,
+  ProvinceOrmEntity,
+  DistrictOrmEntity,
+  WardOrmEntity,
 ];
 
 @Module({

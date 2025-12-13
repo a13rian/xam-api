@@ -1,17 +1,10 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  CreateDateColumn,
-  ManyToMany,
-  Index,
-} from 'typeorm';
+import { Entity, Column, ManyToMany, Index } from 'typeorm';
 import { RoleOrmEntity } from './role.orm-entity';
+import { BaseOrmEntity } from './base.orm-entity';
 
 @Entity('permissions')
-export class PermissionOrmEntity {
-  @PrimaryColumn('uuid')
-  id: string;
+export class PermissionOrmEntity extends BaseOrmEntity {
+  protected readonly idPrefix = 'prm';
 
   @Column({ unique: true })
   @Index()
@@ -29,12 +22,6 @@ export class PermissionOrmEntity {
 
   @Column()
   action: string;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  updatedAt: Date;
 
   @ManyToMany(() => RoleOrmEntity, (role) => role.permissions)
   roles: RoleOrmEntity[];

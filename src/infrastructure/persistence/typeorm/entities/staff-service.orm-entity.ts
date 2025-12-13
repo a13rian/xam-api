@@ -1,21 +1,12 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  CreateDateColumn,
-  ManyToOne,
-  JoinColumn,
-  Index,
-  Unique,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, Index, Unique } from 'typeorm';
 import { AccountOrmEntity } from './account.orm-entity';
 import { ServiceOrmEntity } from './service.orm-entity';
+import { BaseOrmEntity } from './base.orm-entity';
 
 @Entity('staff_services')
 @Unique(['staffId', 'serviceId'])
-export class StaffServiceOrmEntity {
-  @PrimaryColumn('uuid')
-  id: string;
+export class StaffServiceOrmEntity extends BaseOrmEntity {
+  protected readonly idPrefix = 'ssv';
 
   @Index()
   @Column('uuid')
@@ -24,9 +15,6 @@ export class StaffServiceOrmEntity {
   @Index()
   @Column('uuid')
   serviceId: string;
-
-  @CreateDateColumn()
-  createdAt: Date;
 
   @ManyToOne(() => AccountOrmEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'staffId' })

@@ -1,17 +1,10 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Index,
-} from 'typeorm';
+import { Entity, Column, Index } from 'typeorm';
 import { OrganizationStatusEnum } from '../../../../core/domain/organization/value-objects/organization-status.vo';
+import { BaseOrmEntity } from './base.orm-entity';
 
 @Entity('organizations')
-export class OrganizationOrmEntity {
-  @PrimaryColumn('uuid')
-  id: string;
+export class OrganizationOrmEntity extends BaseOrmEntity {
+  protected readonly idPrefix = 'org';
 
   @Column({ type: 'enum', enum: OrganizationStatusEnum })
   @Index()
@@ -62,10 +55,4 @@ export class OrganizationOrmEntity {
 
   @Column({ type: 'date', nullable: true })
   establishedDate: Date | null;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }

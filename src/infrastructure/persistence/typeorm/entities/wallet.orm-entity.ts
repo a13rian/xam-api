@@ -1,23 +1,20 @@
 import {
   Entity,
-  PrimaryColumn,
   Column,
   OneToOne,
   OneToMany,
   JoinColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
   Index,
   Check,
 } from 'typeorm';
 import { UserOrmEntity } from './user.orm-entity';
 import type { WalletTransactionOrmEntity } from './wallet-transaction.orm-entity';
+import { BaseOrmEntity } from './base.orm-entity';
 
 @Entity('wallets')
 @Check('"balance" >= 0')
-export class WalletOrmEntity {
-  @PrimaryColumn('uuid')
-  id: string;
+export class WalletOrmEntity extends BaseOrmEntity {
+  protected readonly idPrefix = 'wlt';
 
   @Column({ type: 'uuid', unique: true })
   @Index()
@@ -32,12 +29,6 @@ export class WalletOrmEntity {
 
   @Column({ length: 3, default: 'VND' })
   currency: string;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 
   @OneToMany('WalletTransactionOrmEntity', 'wallet')
   transactions: WalletTransactionOrmEntity[];

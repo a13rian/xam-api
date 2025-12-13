@@ -1,19 +1,10 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
-  Index,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { OrganizationOrmEntity } from './organization.orm-entity';
+import { BaseOrmEntity } from './base.orm-entity';
 
 @Entity('organization_locations')
-export class OrganizationLocationOrmEntity {
-  @PrimaryColumn('uuid')
-  id: string;
+export class OrganizationLocationOrmEntity extends BaseOrmEntity {
+  protected readonly idPrefix = 'loc';
 
   @Index()
   @Column('uuid')
@@ -57,12 +48,6 @@ export class OrganizationLocationOrmEntity {
 
   @Column({ default: true })
   isActive: boolean;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 
   @ManyToOne(() => OrganizationOrmEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'organizationId' })

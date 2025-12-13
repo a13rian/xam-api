@@ -1,25 +1,22 @@
 import {
-  Entity,
-  PrimaryColumn,
   Column,
-  CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
+  Index,
+  JoinColumn,
   ManyToOne,
   OneToMany,
-  JoinColumn,
-  Index,
 } from 'typeorm';
 import { BookingStatusEnum } from '../../../../core/domain/booking/value-objects/booking-status.vo';
-import { UserOrmEntity } from './user.orm-entity';
-import { OrganizationOrmEntity } from './organization.orm-entity';
+import { BaseOrmEntity } from './base.orm-entity';
 import { OrganizationLocationOrmEntity } from './organization-location.orm-entity';
+import { OrganizationOrmEntity } from './organization.orm-entity';
+import { UserOrmEntity } from './user.orm-entity';
 
 @Entity('bookings')
 @Index(['customerId', 'status'])
 @Index(['organizationId', 'scheduledDate'])
-export class BookingOrmEntity {
-  @PrimaryColumn('uuid')
-  id: string;
+export class BookingOrmEntity extends BaseOrmEntity {
+  protected readonly idPrefix = 'bkg';
 
   @Index()
   @Column('uuid')
@@ -95,12 +92,6 @@ export class BookingOrmEntity {
   @Column({ type: 'timestamp', nullable: true })
   cancelledAt?: Date;
 
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
   @ManyToOne(() => UserOrmEntity)
   @JoinColumn({ name: 'customerId' })
   customer?: UserOrmEntity;
@@ -120,9 +111,8 @@ export class BookingOrmEntity {
 }
 
 @Entity('booking_services')
-export class BookingServiceOrmEntity {
-  @PrimaryColumn('uuid')
-  id: string;
+export class BookingServiceOrmEntity extends BaseOrmEntity {
+  protected readonly idPrefix = 'bsv';
 
   @Index()
   @Column('uuid')

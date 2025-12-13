@@ -1,19 +1,16 @@
 import {
   Entity,
-  PrimaryColumn,
   Column,
-  CreateDateColumn,
-  UpdateDateColumn,
   ManyToOne,
   OneToMany,
   JoinColumn,
   Index,
 } from 'typeorm';
+import { BaseOrmEntity } from './base.orm-entity';
 
 @Entity('service_categories')
-export class ServiceCategoryOrmEntity {
-  @PrimaryColumn('uuid')
-  id: string;
+export class ServiceCategoryOrmEntity extends BaseOrmEntity {
+  protected readonly idPrefix = 'cat';
 
   @Column({ length: 100 })
   name: string;
@@ -38,12 +35,6 @@ export class ServiceCategoryOrmEntity {
   @Index()
   @Column({ default: true })
   isActive: boolean;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 
   @ManyToOne(() => ServiceCategoryOrmEntity, (category) => category.children, {
     nullable: true,

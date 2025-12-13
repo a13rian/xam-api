@@ -6,9 +6,21 @@ import { PermissionOrmEntity } from '../typeorm/entities/permission.orm-entity';
 import { RefreshTokenOrmEntity } from '../typeorm/entities/refresh-token.orm-entity';
 import { PasswordResetTokenOrmEntity } from '../typeorm/entities/password-reset-token.orm-entity';
 import { EmailVerificationTokenOrmEntity } from '../typeorm/entities/email-verification-token.orm-entity';
+import { ProvinceOrmEntity } from '../typeorm/entities/province.orm-entity';
+import { DistrictOrmEntity } from '../typeorm/entities/district.orm-entity';
+import { WardOrmEntity } from '../typeorm/entities/ward.orm-entity';
+import { OrganizationOrmEntity } from '../typeorm/entities/organization.orm-entity';
+import { OrganizationLocationOrmEntity } from '../typeorm/entities/organization-location.orm-entity';
+import { AccountOrmEntity } from '../typeorm/entities/account.orm-entity';
 import { seedPermissions } from './permissions.seed';
 import { seedRoles } from './roles.seed';
 import { seedUsers } from './users.seed';
+import { seedProvinces } from './provinces.seed';
+import { seedDistricts } from './districts.seed';
+import { seedWards } from './wards.seed';
+import { seedNormalUsers, seedBulkUsers } from './seed-users.seed';
+import { seedOrganizations } from './seed-organizations.seed';
+import { seedAccountsWithLocations } from './seed-accounts.seed';
 
 config({ path: '.env.local' });
 config({ path: '.env' });
@@ -27,8 +39,14 @@ const dataSource = new DataSource({
     RefreshTokenOrmEntity,
     PasswordResetTokenOrmEntity,
     EmailVerificationTokenOrmEntity,
+    ProvinceOrmEntity,
+    DistrictOrmEntity,
+    WardOrmEntity,
+    OrganizationOrmEntity,
+    OrganizationLocationOrmEntity,
+    AccountOrmEntity,
   ],
-  synchronize: true,
+  synchronize: false,
 });
 
 async function runSeeds() {
@@ -39,6 +57,17 @@ async function runSeeds() {
     const permissions = await seedPermissions(dataSource);
     const roles = await seedRoles(dataSource, permissions);
     await seedUsers(dataSource, roles);
+
+    // Geographic seeds
+    const provinces = await seedProvinces(dataSource);
+    const districts = await seedDistricts(dataSource, provinces);
+    await seedWards(dataSource, districts);
+
+    // Additional users and accounts with locations
+    await seedNormalUsers(dataSource, roles);
+    const bulkUsers = await seedBulkUsers(dataSource, roles, 1000);
+    const { orgs } = await seedOrganizations(dataSource);
+    await seedAccountsWithLocations(dataSource, bulkUsers, orgs);
 
     console.log('All seeds completed successfully');
   } catch (error) {
