@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { IAccountRepository } from '../../../../core/domain/account/repositories/account.repository.interface';
+import {
+  IAccountRepository,
+  AccountSearchOptions,
+  AccountSearchResult,
+} from '../../../../core/domain/account/repositories/account.repository.interface';
 import { Account } from '../../../../core/domain/account/entities/account.entity';
 import { AccountStatusEnum } from '../../../../core/domain/account/value-objects/account-status.vo';
 import { AccountTypeEnum } from '../../../../core/domain/account/value-objects/account-type.vo';
@@ -139,5 +143,127 @@ export class AccountRepository implements IAccountRepository {
       where: { organizationId },
     });
     return count > 0;
+  }
+
+  async searchByLocation(
+    options: AccountSearchOptions,
+  ): Promise<AccountSearchResult> {
+    const {
+      latitude,
+      longitude,
+      radiusKm,
+      search,
+      city,
+      district,
+      ward,
+      page,
+      limit,
+    } = options;
+    const skip = (page - 1) * limit;
+    const radiusMeters = radiusKm * 1000;
+
+    const query = this.ormRepository
+      .createQueryBuilder('account')
+      .select([
+        'account.id',
+        'account.displayName',
+        'account.type',
+        'account.status',
+        'account.street',
+        'account.ward',
+        'account.district',
+        'account.city',
+        'account.latitude',
+        'account.longitude',
+      ])
+      .addSelect(
+        `ST_Distance(account.location, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography) / 1000`,
+        'distance_km',
+      )
+      .where('account.location IS NOT NULL')
+      .andWhere('account.isActive = true')
+      .andWhere(
+        `ST_DWithin(account.location, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography, :radius)`,
+      )
+      .setParameters({ lng: longitude, lat: latitude, radius: radiusMeters });
+
+    // Optional filters
+    if (search) {
+      query.andWhere('account.displayName ILIKE :search', {
+        search: `%${search}%`,
+      });
+    }
+    if (city) {
+      query.andWhere('account.city = :city', { city });
+    }
+    if (district) {
+      query.andWhere('account.district = :district', { district });
+    }
+    if (ward) {
+      query.andWhere('account.ward = :ward', { ward });
+    }
+
+    // Order by distance
+    query.orderBy('distance_km', 'ASC');
+
+    // Get total count (need separate query for count with spatial filter)
+    const countQuery = this.ormRepository
+      .createQueryBuilder('account')
+      .where('account.location IS NOT NULL')
+      .andWhere('account.isActive = true')
+      .andWhere(
+        `ST_DWithin(account.location, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography, :radius)`,
+      )
+      .setParameters({ lng: longitude, lat: latitude, radius: radiusMeters });
+
+    if (search) {
+      countQuery.andWhere('account.displayName ILIKE :search', {
+        search: `%${search}%`,
+      });
+    }
+    if (city) {
+      countQuery.andWhere('account.city = :city', { city });
+    }
+    if (district) {
+      countQuery.andWhere('account.district = :district', { district });
+    }
+    if (ward) {
+      countQuery.andWhere('account.ward = :ward', { ward });
+    }
+
+    const total = await countQuery.getCount();
+
+    // Get paginated results
+    const rawResults = await query.offset(skip).limit(limit).getRawMany<{
+      account_id: string;
+      account_displayName: string;
+      account_type: string;
+      account_status: string;
+      account_street: string | null;
+      account_ward: string | null;
+      account_district: string | null;
+      account_city: string | null;
+      account_latitude: string | null;
+      account_longitude: string | null;
+      distance_km: string;
+    }>();
+
+    const items = rawResults.map((row) => ({
+      id: row.account_id,
+      displayName: row.account_displayName,
+      type: row.account_type,
+      status: row.account_status,
+      street: row.account_street,
+      ward: row.account_ward,
+      district: row.account_district,
+      city: row.account_city,
+      latitude: row.account_latitude ? parseFloat(row.account_latitude) : null,
+      longitude: row.account_longitude
+        ? parseFloat(row.account_longitude)
+        : null,
+      distanceKm: parseFloat(row.distance_km),
+    }));
+
+    return { items, total, page, limit };
   }
 }

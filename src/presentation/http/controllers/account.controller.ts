@@ -4,18 +4,23 @@ import {
   Post,
   Body,
   Param,
+  Query,
   ParseUUIDPipe,
   HttpCode,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 import { RequirePermissions } from '../../../shared/decorators/permissions.decorator';
+import { Public } from '../../../shared/decorators/public.decorator';
 import { PERMISSIONS } from '../../../shared/constants/permissions';
 import { AuthenticatedUser } from '../../../shared/interfaces/authenticated-user.interface';
 import {
   RegisterAccountDto,
   RegisterAccountResponseDto,
   AccountResponseDto,
+  SearchAccountsDto,
+  SearchAccountsResponseDto,
 } from '../dto/account';
 import {
   RegisterAccountCommand,
@@ -26,13 +31,40 @@ import {
   GetMyAccountQuery,
   GetMyAccountResult,
 } from '../../../core/application/account/queries/get-my-account';
+import { SearchAccountsByLocationQuery } from '../../../core/application/account/queries/search-accounts-by-location';
 
+@ApiTags('accounts')
 @Controller('accounts')
 export class AccountController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
   ) {}
+
+  @Get('search')
+  @Public()
+  @ApiOperation({
+    summary: 'Search accounts by location',
+    description:
+      'Find accounts within a specified radius from given coordinates, sorted by distance',
+  })
+  async searchByLocation(
+    @Query() dto: SearchAccountsDto,
+  ): Promise<SearchAccountsResponseDto> {
+    return this.queryBus.execute(
+      new SearchAccountsByLocationQuery(
+        dto.latitude,
+        dto.longitude,
+        dto.radiusKm ?? 10,
+        dto.search,
+        dto.city,
+        dto.district,
+        dto.ward,
+        dto.page ?? 1,
+        dto.limit ?? 20,
+      ),
+    );
+  }
 
   @Post('register')
   async register(

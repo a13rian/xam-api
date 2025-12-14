@@ -5,6 +5,39 @@ import { PaginationOptions } from '../../../../shared/interfaces/pagination.inte
 
 export const ACCOUNT_REPOSITORY = Symbol('IAccountRepository');
 
+export interface AccountSearchOptions {
+  latitude: number;
+  longitude: number;
+  radiusKm: number;
+  search?: string;
+  city?: string;
+  district?: string;
+  ward?: string;
+  page: number;
+  limit: number;
+}
+
+export interface AccountSearchResultItem {
+  id: string;
+  displayName: string;
+  type: string;
+  status: string;
+  street: string | null;
+  ward: string | null;
+  district: string | null;
+  city: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  distanceKm: number;
+}
+
+export interface AccountSearchResult {
+  items: AccountSearchResultItem[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 export interface IAccountRepository {
   findById(id: string): Promise<Account | null>;
   findByUserId(userId: string): Promise<Account | null>;
@@ -37,4 +70,5 @@ export interface IAccountRepository {
     organizationId: string,
     email: string,
   ): Promise<boolean>;
+  searchByLocation(options: AccountSearchOptions): Promise<AccountSearchResult>;
 }
