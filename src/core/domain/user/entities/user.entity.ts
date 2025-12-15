@@ -11,6 +11,7 @@ export interface UserProps {
   password: Password;
   firstName: string;
   lastName: string;
+  avatarUrl?: string | null;
   isActive?: boolean;
   emailVerifiedAt?: Date | null;
   roleIds?: string[];
@@ -35,6 +36,7 @@ export class User extends AggregateRoot {
   private _password: Password;
   private _firstName: string;
   private _lastName: string;
+  private _avatarUrl: string | null;
   private _isActive: boolean;
   private _emailVerifiedAt: Date | null;
   private _roleIds: string[];
@@ -51,6 +53,7 @@ export class User extends AggregateRoot {
     this._password = props.password;
     this._firstName = props.firstName;
     this._lastName = props.lastName;
+    this._avatarUrl = props.avatarUrl ?? null;
     this._isActive = props.isActive ?? true;
     this._emailVerifiedAt = props.emailVerifiedAt ?? null;
     this._roleIds = props.roleIds ?? [];
@@ -154,6 +157,11 @@ export class User extends AggregateRoot {
     this._updatedAt = new Date();
   }
 
+  public updateAvatar(avatarUrl: string | null): void {
+    this._avatarUrl = avatarUrl;
+    this._updatedAt = new Date();
+  }
+
   public get isLocked(): boolean {
     if (!this._lockedUntil) return false;
     if (this._lockedUntil <= new Date()) {
@@ -181,6 +189,9 @@ export class User extends AggregateRoot {
   }
   get fullName(): string {
     return `${this._firstName} ${this._lastName}`;
+  }
+  get avatarUrl(): string | null {
+    return this._avatarUrl;
   }
   get isActive(): boolean {
     return this._isActive;

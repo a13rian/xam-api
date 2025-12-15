@@ -19,6 +19,9 @@ export class UserOrmEntity extends BaseOrmEntity {
   @Column()
   lastName: string;
 
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  avatarUrl: string | null;
+
   @Column({ default: true })
   isActive: boolean;
 

@@ -11,17 +11,22 @@ import {
   CreateUserHandler,
   UpdateUserHandler,
   DeleteUserHandler,
+  UpdateUserAvatarHandler,
+  RemoveUserAvatarHandler,
 } from '../../core/application/user/commands';
 import {
   GetUserHandler,
   ListUsersHandler,
 } from '../../core/application/user/queries';
 import { RoleModule } from './role.module';
+import { StorageModule } from './storage.module';
 
 const CommandHandlers = [
   CreateUserHandler,
   UpdateUserHandler,
   DeleteUserHandler,
+  UpdateUserAvatarHandler,
+  RemoveUserAvatarHandler,
 ];
 
 const QueryHandlers = [GetUserHandler, ListUsersHandler];
@@ -31,6 +36,7 @@ const QueryHandlers = [GetUserHandler, ListUsersHandler];
     CqrsModule,
     TypeOrmModule.forFeature([UserOrmEntity, RoleOrmEntity]),
     forwardRef(() => RoleModule),
+    StorageModule,
   ],
   controllers: [UserController],
   providers: [

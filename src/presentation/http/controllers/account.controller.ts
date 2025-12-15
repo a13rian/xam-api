@@ -10,9 +10,15 @@ import {
   Query,
   ParseUUIDPipe,
   HttpCode,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 import { RequirePermissions } from '../../../shared/decorators/permissions.decorator';
 import { Public } from '../../../shared/decorators/public.decorator';
@@ -29,7 +35,12 @@ import {
   UpdateGalleryImageDto,
   ReorderGalleryDto,
   GalleryItemResponseDto,
+  UploadGalleryImageDto,
 } from '../dto/account';
+import {
+  UploadFileCommand,
+  UploadFileResult,
+} from '../../../core/application/storage/commands';
 import {
   RegisterAccountCommand,
   ApproveAccountCommand,
@@ -177,8 +188,8 @@ export class AccountController {
 
   @Post('me/gallery')
   @ApiOperation({
-    summary: 'Add gallery image',
-    description: 'Add a new image to the account gallery',
+    summary: 'Add gallery image by URL',
+    description: 'Add a new image to the account gallery using an image URL',
   })
   async addGalleryImage(
     @CurrentUser() user: AuthenticatedUser,
@@ -198,6 +209,92 @@ export class AccountController {
         dto.imageUrl,
         dto.caption,
         dto.sortOrder,
+      ),
+    );
+
+    return gallery.toObject() as unknown as GalleryItemResponseDto;
+  }
+
+  @Post('me/gallery/upload')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({
+    summary: 'Upload gallery image',
+    description: 'Upload an image file directly to the account gallery',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['file'],
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'Image file to upload',
+        },
+        caption: {
+          type: 'string',
+          description: 'Optional image caption',
+        },
+        sortOrder: {
+          type: 'number',
+          description: 'Sort order (default: 0)',
+        },
+      },
+    },
+  })
+  async uploadGalleryImage(
+    @CurrentUser() user: AuthenticatedUser,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }), // 10MB
+          new FileTypeValidator({
+            fileType: /image\/(jpeg|png|gif|webp)$/i,
+            skipMagicNumbersValidation: true,
+          }),
+        ],
+        fileIsRequired: true,
+      }),
+    )
+    file: Express.Multer.File,
+    @Body() dto: UploadGalleryImageDto,
+  ): Promise<GalleryItemResponseDto> {
+    // Get the account
+    const myAccount = await this.queryBus.execute<
+      GetMyAccountQuery,
+      GetMyAccountResult
+    >(new GetMyAccountQuery(user.id));
+
+    // Upload file to storage
+    const uploadResult = await this.commandBus.execute<
+      UploadFileCommand,
+      UploadFileResult
+    >(
+      new UploadFileCommand(
+        {
+          buffer: file.buffer,
+          originalname: file.originalname,
+          mimetype: file.mimetype,
+          size: file.size,
+        },
+        myAccount.id,
+        'account',
+        'gallery',
+      ),
+    );
+
+    // Create gallery entry with uploaded file URL
+    const gallery = await this.commandBus.execute<
+      AddGalleryImageCommand,
+      AccountGallery
+    >(
+      new AddGalleryImageCommand(
+        myAccount.id,
+        uploadResult.url,
+        dto.caption,
+        dto.sortOrder,
+        uploadResult.key,
       ),
     );
 

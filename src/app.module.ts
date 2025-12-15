@@ -26,6 +26,7 @@ import { ScheduleModule } from './presentation/modules/schedule.module';
 import { ServiceModule } from './presentation/modules/service.module';
 import { UserModule } from './presentation/modules/user.module';
 import { WalletModule } from './presentation/modules/wallet.module';
+import { StorageModule } from './presentation/modules/storage.module';
 import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
 import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 import { PermissionGuard } from './shared/guards/permission.guard';
@@ -96,6 +97,7 @@ import { ValidationPipe } from './shared/pipes/validation.pipe';
     BookingModule,
     AccountModule,
     OrganizationModule,
+    StorageModule,
   ],
   providers: [
     {

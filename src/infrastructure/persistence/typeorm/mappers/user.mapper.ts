@@ -13,6 +13,7 @@ export class UserMapper {
       password: Password.fromHash(entity.passwordHash),
       firstName: entity.firstName,
       lastName: entity.lastName,
+      avatarUrl: entity.avatarUrl,
       isActive: entity.isActive,
       emailVerifiedAt: entity.emailVerifiedAt,
       roleIds: entity.roles?.map((r) => r.id) ?? [],
@@ -31,6 +32,7 @@ export class UserMapper {
     entity.passwordHash = domain.password.hash;
     entity.firstName = domain.firstName;
     entity.lastName = domain.lastName;
+    entity.avatarUrl = domain.avatarUrl;
     entity.isActive = domain.isActive;
     entity.emailVerifiedAt = domain.emailVerifiedAt;
     entity.failedLoginAttempts = domain.failedLoginAttempts;

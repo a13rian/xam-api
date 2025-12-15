@@ -5,6 +5,7 @@ export interface AccountGalleryProps {
   id: string;
   accountId: string;
   imageUrl: string;
+  storageKey?: string | null;
   caption?: string | null;
   sortOrder: number;
   createdAt: Date;
@@ -14,6 +15,7 @@ export interface AccountGalleryProps {
 export interface CreateAccountGalleryProps {
   accountId: string;
   imageUrl: string;
+  storageKey?: string;
   caption?: string;
   sortOrder?: number;
 }
@@ -22,6 +24,7 @@ export class AccountGallery {
   private readonly _id: string;
   private readonly _accountId: string;
   private _imageUrl: string;
+  private _storageKey: string | null;
   private _caption: string | null;
   private _sortOrder: number;
   private readonly _createdAt: Date;
@@ -31,6 +34,7 @@ export class AccountGallery {
     this._id = props.id;
     this._accountId = props.accountId;
     this._imageUrl = props.imageUrl;
+    this._storageKey = props.storageKey ?? null;
     this._caption = props.caption ?? null;
     this._sortOrder = props.sortOrder;
     this._createdAt = props.createdAt;
@@ -47,6 +51,7 @@ export class AccountGallery {
       id: `gal_${uuidv4()}`,
       accountId: props.accountId,
       imageUrl: props.imageUrl.trim(),
+      storageKey: props.storageKey?.trim() ?? null,
       caption: props.caption?.trim() ?? null,
       sortOrder: props.sortOrder ?? 0,
       createdAt: now,
@@ -58,11 +63,14 @@ export class AccountGallery {
     return new AccountGallery(props);
   }
 
-  updateImage(imageUrl: string): void {
+  updateImage(imageUrl: string, storageKey?: string): void {
     if (!imageUrl || imageUrl.trim().length === 0) {
       throw new ValidationException('Image URL is required');
     }
     this._imageUrl = imageUrl.trim();
+    if (storageKey !== undefined) {
+      this._storageKey = storageKey?.trim() ?? null;
+    }
     this._updatedAt = new Date();
   }
 
@@ -91,6 +99,10 @@ export class AccountGallery {
     return this._imageUrl;
   }
 
+  get storageKey(): string | null {
+    return this._storageKey;
+  }
+
   get caption(): string | null {
     return this._caption;
   }
@@ -112,6 +124,7 @@ export class AccountGallery {
       id: this._id,
       accountId: this._accountId,
       imageUrl: this._imageUrl,
+      storageKey: this._storageKey,
       caption: this._caption,
       sortOrder: this._sortOrder,
       createdAt: this._createdAt,

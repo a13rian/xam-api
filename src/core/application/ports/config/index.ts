@@ -4,3 +4,4 @@ export * from './jwt.config.port';
 export * from './logger.config.port';
 export * from './swagger.config.port';
 export * from './throttle.config.port';
+export * from './storage.config.port';

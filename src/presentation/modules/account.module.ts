@@ -17,6 +17,7 @@ import { AccountCommandHandlers } from '../../core/application/account/commands'
 import { AccountQueryHandlers } from '../../core/application/account/queries';
 import { UserModule } from './user.module';
 import { OrganizationModule } from './organization.module';
+import { StorageModule } from './storage.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { OrganizationModule } from './organization.module';
     TypeOrmModule.forFeature([AccountOrmEntity, AccountGalleryOrmEntity]),
     forwardRef(() => UserModule),
     forwardRef(() => OrganizationModule),
+    StorageModule,
   ],
   controllers: [AccountController, AdminAccountController],
   providers: [

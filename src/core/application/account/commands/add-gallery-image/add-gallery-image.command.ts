@@ -4,5 +4,6 @@ export class AddGalleryImageCommand {
     public readonly imageUrl: string,
     public readonly caption?: string,
     public readonly sortOrder?: number,
+    public readonly storageKey?: string,
   ) {}
 }

@@ -29,6 +29,7 @@ export class AddGalleryImageHandler implements ICommandHandler<AddGalleryImageCo
     const gallery = AccountGallery.create({
       accountId: command.accountId,
       imageUrl: command.imageUrl,
+      storageKey: command.storageKey,
       caption: command.caption,
       sortOrder: command.sortOrder,
     });

@@ -9,6 +9,7 @@ export class AccountGalleryMapper {
       id: entity.id,
       accountId: entity.accountId,
       imageUrl: entity.imageUrl,
+      storageKey: entity.storageKey,
       caption: entity.caption,
       sortOrder: entity.sortOrder,
       createdAt: entity.createdAt,
@@ -21,6 +22,7 @@ export class AccountGalleryMapper {
     entity.id = domain.id;
     entity.accountId = domain.accountId;
     entity.imageUrl = domain.imageUrl;
+    entity.storageKey = domain.storageKey;
     entity.caption = domain.caption;
     entity.sortOrder = domain.sortOrder;
     entity.createdAt = domain.createdAt;

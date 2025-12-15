@@ -6,6 +6,7 @@ import { JwtConfigService } from './jwt.config.js';
 import { LoggerConfigService } from './logger.config.js';
 import { SwaggerConfigService } from './swagger.config.js';
 import { ThrottleConfigService } from './throttle.config.js';
+import { StorageConfigService } from './storage.config.js';
 import {
   APP_CONFIG,
   DATABASE_CONFIG,
@@ -13,6 +14,7 @@ import {
   LOGGER_CONFIG,
   SWAGGER_CONFIG,
   THROTTLE_CONFIG,
+  STORAGE_CONFIG,
 } from '@shared/constants/injection-tokens.js';
 
 @Global()
@@ -25,6 +27,7 @@ import {
     LoggerConfigService,
     SwaggerConfigService,
     ThrottleConfigService,
+    StorageConfigService,
     {
       provide: APP_CONFIG,
       useExisting: AppConfigService,
@@ -49,6 +52,10 @@ import {
       provide: THROTTLE_CONFIG,
       useExisting: ThrottleConfigService,
     },
+    {
+      provide: STORAGE_CONFIG,
+      useExisting: StorageConfigService,
+    },
   ],
   exports: [
     APP_CONFIG,
@@ -57,12 +64,14 @@ import {
     LOGGER_CONFIG,
     SWAGGER_CONFIG,
     THROTTLE_CONFIG,
+    STORAGE_CONFIG,
     AppConfigService,
     DatabaseConfigService,
     JwtConfigService,
     LoggerConfigService,
     SwaggerConfigService,
     ThrottleConfigService,
+    StorageConfigService,
   ],
 })
 export class AppConfigModule {}

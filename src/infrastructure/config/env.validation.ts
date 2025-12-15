@@ -45,6 +45,18 @@ const envSchema = z.object({
 
   // Graceful Shutdown
   SHUTDOWN_TIMEOUT: z.coerce.number().int().positive().default(10000),
+
+  // MinIO / S3 Storage
+  MINIO_ENDPOINT: z.string().optional().default('localhost'),
+  MINIO_PORT: z.coerce.number().int().positive().default(9000),
+  MINIO_USE_SSL: booleanString,
+  MINIO_ACCESS_KEY: z.string().optional().default('minioadmin'),
+  MINIO_SECRET_KEY: z.string().optional().default('minioadmin'),
+  MINIO_REGION: z.string().optional().default('us-east-1'),
+  MINIO_PUBLIC_URL: z.string().optional(),
+  STORAGE_MAX_FILE_SIZE: z.coerce.number().int().positive().default(10485760), // 10MB
+  STORAGE_BUCKET_AVATARS: z.string().optional().default('avatars'),
+  STORAGE_BUCKET_GALLERY: z.string().optional().default('gallery'),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;

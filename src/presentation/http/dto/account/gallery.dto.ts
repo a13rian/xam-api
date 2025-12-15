@@ -66,6 +66,21 @@ export class ReorderGalleryDto {
   items: GalleryItemOrderDto[];
 }
 
+export class UploadGalleryImageDto {
+  @ApiPropertyOptional({ description: 'Image caption' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  caption?: string;
+
+  @ApiPropertyOptional({ description: 'Sort order', default: 0 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  sortOrder?: number;
+}
+
 export class GalleryItemResponseDto {
   @ApiProperty({ description: 'Gallery item ID' })
   id: string;
@@ -75,6 +90,9 @@ export class GalleryItemResponseDto {
 
   @ApiProperty({ description: 'Image URL' })
   imageUrl: string;
+
+  @ApiPropertyOptional({ description: 'Storage key for file deletion' })
+  storageKey?: string | null;
 
   @ApiPropertyOptional({ description: 'Image caption' })
   caption: string | null;
