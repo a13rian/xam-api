@@ -13,11 +13,128 @@ import {
   getRandomOffset,
   getRandomStreetNumber,
   CityData,
+  taglines,
+  badgeTypes,
+  vietnamesePhonePrefixes,
+  DistrictLocation,
 } from './data/city-locations';
+import { SocialLinksData } from '../../../core/domain/account/value-objects/social-links.vo';
+import { ServiceAreaData } from '../../../core/domain/account/value-objects/service-area.vo';
+import { PriceRangeData } from '../../../core/domain/account/value-objects/price-range.vo';
+import { WorkingHoursData } from '../../../core/domain/account/value-objects/working-hours.vo';
 
 // Distribution constants
 const PERSONAL_ACCOUNTS = 700;
 const STAFF_ACCOUNTS = 300; // 100 owners + 200 staff (2 per org)
+
+// ===== Helper Functions for Profile Fields =====
+
+function generatePhone(): string {
+  const prefix = getRandomElement(vietnamesePhonePrefixes);
+  const suffix = String(Math.floor(Math.random() * 10000000)).padStart(7, '0');
+  return `${prefix}${suffix}`;
+}
+
+function generateBusinessEmail(displayName: string, index: number): string {
+  const normalized = displayName
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .replace(/\s+/g, '.');
+  return `${normalized}.${index}@business.example.com`;
+}
+
+function generateSocialLinks(hasAllLinks: boolean): SocialLinksData | null {
+  if (Math.random() < 0.3) return null; // 30% no social links
+
+  const links: SocialLinksData = {};
+
+  if (hasAllLinks || Math.random() > 0.3) {
+    links.facebook = `https://facebook.com/profile${Math.floor(Math.random() * 100000)}`;
+  }
+  if (hasAllLinks || Math.random() > 0.5) {
+    links.instagram = `https://instagram.com/user${Math.floor(Math.random() * 100000)}`;
+  }
+  if (Math.random() > 0.6) {
+    links.zalo = generatePhone();
+  }
+  if (Math.random() > 0.8) {
+    links.tiktok = `https://tiktok.com/@user${Math.floor(Math.random() * 100000)}`;
+  }
+
+  return Object.keys(links).length > 0 ? links : null;
+}
+
+function generateWorkingHours(): WorkingHoursData {
+  const standardDay = { open: '09:00', close: '18:00', isOpen: true };
+  const saturdayHours = { open: '09:00', close: '17:00', isOpen: true };
+  const sundayClosed = { open: '', close: '', isOpen: false };
+
+  return {
+    monday: standardDay,
+    tuesday: standardDay,
+    wednesday: standardDay,
+    thursday: standardDay,
+    friday: standardDay,
+    saturday: Math.random() > 0.3 ? saturdayHours : sundayClosed,
+    sunday:
+      Math.random() > 0.7
+        ? { open: '10:00', close: '16:00', isOpen: true }
+        : sundayClosed,
+  };
+}
+
+function generatePriceRange(): PriceRangeData {
+  const minOptions = [100000, 150000, 200000, 250000, 300000];
+  const min = getRandomElement(minOptions);
+  const maxMultiplier = Math.floor(Math.random() * 5) + 3; // 3x to 7x
+  const max = min * maxMultiplier;
+
+  return { min, max, currency: 'VND' };
+}
+
+function generateServiceAreas(
+  district: DistrictLocation,
+  city: CityData,
+): ServiceAreaData[] {
+  const areas: ServiceAreaData[] = [
+    { district: district.name, city: city.name },
+  ];
+
+  // 50% chance to add neighboring districts
+  if (Math.random() > 0.5 && city.districts.length > 1) {
+    const otherDistrict = city.districts.find((d) => d.name !== district.name);
+    if (otherDistrict) {
+      areas.push({ district: otherDistrict.name, city: city.name });
+    }
+  }
+
+  return areas;
+}
+
+function generateRating(): number {
+  // Generate ratings between 3.5 and 5.0
+  return Math.round((3.5 + Math.random() * 1.5) * 10) / 10;
+}
+
+function generateBadges(isVerified: boolean): string[] {
+  if (!isVerified) return [];
+
+  const numBadges = Math.floor(Math.random() * 3) + 1; // 1-3 badges
+  const shuffled = [...badgeTypes].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, numBadges);
+}
+
+function generateAvatarUrl(index: number): string {
+  return `https://picsum.photos/seed/avatar${index}/200/200`;
+}
+
+function generateCoverImageUrl(index: number): string | null {
+  if (Math.random() < 0.3) return null; // 30% no cover
+  return `https://picsum.photos/seed/cover${index}/800/300`;
+}
 
 function getCityByIndex(index: number, total: number): CityData {
   // 40% HCM, 35% Ha Noi, 25% Da Nang
@@ -150,12 +267,15 @@ function getCityForOrgIndex(index: number): CityData {
   return danangData;
 }
 
+let staffAccountIndex = 0;
+
 function createStaffAccount(
   user: UserOrmEntity,
   org: OrganizationOrmEntity,
   role: AccountRoleEnum,
   city: CityData,
 ): AccountOrmEntity {
+  staffAccountIndex++;
   const district = getRandomElement(city.districts);
   const street = getRandomElement(district.streets);
   const ward = getRandomElement(district.wards);
@@ -165,11 +285,13 @@ function createStaffAccount(
   const longitude = district.longitude + getRandomOffset();
 
   const account = new AccountOrmEntity();
+  const displayName = generateDisplayName(user);
+
   account.userId = user.id;
   account.organizationId = org.id;
   account.type = AccountTypeEnum.BUSINESS;
   account.role = role;
-  account.displayName = generateDisplayName(user);
+  account.displayName = displayName;
   account.status = AccountStatusEnum.ACTIVE;
   account.isActive = true;
   account.approvedAt = new Date();
@@ -200,13 +322,49 @@ function createStaffAccount(
   account.approvedBy = null;
   account.rejectionReason = null;
 
+  // ===== New Profile Fields =====
+
+  // Media fields
+  account.avatarUrl = generateAvatarUrl(staffAccountIndex);
+  account.coverImageUrl = generateCoverImageUrl(staffAccountIndex);
+  account.videoIntroUrl = null;
+
+  // Contact & Social fields
+  account.phone = generatePhone();
+  account.businessEmail = generateBusinessEmail(displayName, staffAccountIndex);
+  account.website =
+    Math.random() > 0.7 ? `https://www.example-${staffAccountIndex}.com` : null;
+  account.socialLinks = generateSocialLinks(role === AccountRoleEnum.OWNER);
+
+  // Professional/Service fields
+  account.tagline = getRandomElement(taglines);
+  account.serviceAreas = generateServiceAreas(district, city);
+  account.languages = Math.random() > 0.6 ? ['vi', 'en'] : ['vi'];
+  account.workingHours = generateWorkingHours();
+  account.priceRange = generatePriceRange();
+
+  // Trust & Verification fields
+  // Owners: 50% verified, Members: 20% verified
+  const verificationChance = role === AccountRoleEnum.OWNER ? 0.5 : 0.2;
+  account.isVerified = Math.random() < verificationChance;
+  account.verifiedAt = account.isVerified
+    ? new Date(Date.now() - Math.random() * 180 * 24 * 60 * 60 * 1000) // Random date within last 180 days
+    : null;
+  account.badges = generateBadges(account.isVerified);
+  account.rating = generateRating();
+  account.totalReviews = Math.floor(Math.random() * 500);
+  account.completedBookings = Math.floor(Math.random() * 1000);
+
   return account;
 }
+
+let personalAccountIndex = 0;
 
 function createPersonalAccount(
   user: UserOrmEntity,
   city: CityData,
 ): AccountOrmEntity {
+  personalAccountIndex++;
   const district = getRandomElement(city.districts);
   const street = getRandomElement(district.streets);
   const ward = getRandomElement(district.wards);
@@ -250,6 +408,34 @@ function createPersonalAccount(
   account.acceptedAt = null;
   account.approvedBy = null;
   account.rejectionReason = null;
+
+  // ===== New Profile Fields (Minimal for Personal Accounts) =====
+
+  // Media fields - avatar only
+  account.avatarUrl = generateAvatarUrl(1000 + personalAccountIndex); // Offset to avoid collision
+  account.coverImageUrl = null;
+  account.videoIntroUrl = null;
+
+  // Contact & Social fields - minimal
+  account.phone = Math.random() > 0.5 ? generatePhone() : null;
+  account.businessEmail = null;
+  account.website = null;
+  account.socialLinks = Math.random() > 0.8 ? generateSocialLinks(false) : null;
+
+  // Professional/Service fields - minimal
+  account.tagline = null;
+  account.serviceAreas = [];
+  account.languages = ['vi'];
+  account.workingHours = null;
+  account.priceRange = null;
+
+  // Trust & Verification fields - not verified
+  account.isVerified = false;
+  account.verifiedAt = null;
+  account.badges = [];
+  account.rating = null;
+  account.totalReviews = 0;
+  account.completedBookings = 0;
 
   return account;
 }

@@ -3,15 +3,22 @@ import {
   Column,
   ManyToOne,
   OneToOne,
+  OneToMany,
   JoinColumn,
   Index,
+  VirtualColumn,
 } from 'typeorm';
 import { AccountTypeEnum } from '../../../../core/domain/account/value-objects/account-type.vo';
 import { AccountRoleEnum } from '../../../../core/domain/account/value-objects/account-role.vo';
 import { AccountStatusEnum } from '../../../../core/domain/account/value-objects/account-status.vo';
 import { InvitationStatusEnum } from '../../../../core/domain/account/value-objects/invitation-status.vo';
+import { SocialLinksData } from '../../../../core/domain/account/value-objects/social-links.vo';
+import { ServiceAreaData } from '../../../../core/domain/account/value-objects/service-area.vo';
+import { PriceRangeData } from '../../../../core/domain/account/value-objects/price-range.vo';
+import { WorkingHoursData } from '../../../../core/domain/account/value-objects/working-hours.vo';
 import { UserOrmEntity } from './user.orm-entity';
 import { OrganizationOrmEntity } from './organization.orm-entity';
+import { AccountGalleryOrmEntity } from './account-gallery.orm-entity';
 import { BaseOrmEntity } from './base.orm-entity';
 
 @Entity('accounts')
@@ -113,6 +120,13 @@ export class AccountOrmEntity extends BaseOrmEntity {
   @Column({ type: 'varchar', length: 100, nullable: true })
   city: string | null;
 
+  // Virtual column combining address fields
+  @VirtualColumn({
+    query: (alias) =>
+      `CONCAT_WS(', ', ${alias}.street, ${alias}.ward, ${alias}.district, ${alias}.city)`,
+  })
+  address: string;
+
   // Coordinate fields for distance tracking
   @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
   latitude: number | null;
@@ -129,4 +143,69 @@ export class AccountOrmEntity extends BaseOrmEntity {
     nullable: true,
   })
   location: string | null;
+
+  // Media fields
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  avatarUrl: string | null;
+
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  coverImageUrl: string | null;
+
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  videoIntroUrl: string | null;
+
+  // Contact & Social fields
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  phone: string | null;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  businessEmail: string | null;
+
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  website: string | null;
+
+  @Column({ type: 'jsonb', nullable: true })
+  socialLinks: SocialLinksData | null;
+
+  // Professional/Service fields
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  tagline: string | null;
+
+  @Column({ type: 'jsonb', default: '[]' })
+  serviceAreas: ServiceAreaData[];
+
+  @Column({ type: 'jsonb', default: '[]' })
+  languages: string[];
+
+  @Column({ type: 'jsonb', nullable: true })
+  workingHours: WorkingHoursData | null;
+
+  @Column({ type: 'jsonb', nullable: true })
+  priceRange: PriceRangeData | null;
+
+  // Trust & Verification fields
+  @Column({ default: false })
+  @Index()
+  isVerified: boolean;
+
+  @Column({ type: 'timestamp', nullable: true })
+  verifiedAt: Date | null;
+
+  @Column({ type: 'jsonb', default: '[]' })
+  badges: string[];
+
+  @Column({ type: 'decimal', precision: 2, scale: 1, nullable: true })
+  rating: number | null;
+
+  @Column({ type: 'int', default: 0 })
+  totalReviews: number;
+
+  @Column({ type: 'int', default: 0 })
+  completedBookings: number;
+
+  // Gallery relation
+  @OneToMany(() => AccountGalleryOrmEntity, (gallery) => gallery.account, {
+    cascade: true,
+  })
+  gallery: AccountGalleryOrmEntity[];
 }

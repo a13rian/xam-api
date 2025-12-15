@@ -483,6 +483,60 @@ export function getRandomStreetNumber(): string {
   return String(Math.floor(Math.random() * 200) + 1);
 }
 
+// Vietnamese taglines for account profiles
+export const taglines: string[] = [
+  'Dịch vụ chuyên nghiệp, giá cả hợp lý',
+  'Chất lượng là ưu tiên hàng đầu',
+  'Mang đến sự hài lòng cho khách hàng',
+  'Tận tâm - Chuyên nghiệp - Uy tín',
+  'Đẹp tự nhiên, tự tin tỏa sáng',
+  'Nơi vẻ đẹp được chăm sóc',
+  'Làm đẹp là nghệ thuật',
+  'Biến giấc mơ đẹp thành hiện thực',
+  'Chăm sóc tận tình, kết quả hoàn hảo',
+  'Sáng tạo và đam mê',
+  'Phong cách của bạn, chuyên nghiệp của chúng tôi',
+  'Đơn giản mà tinh tế',
+  'Vẻ đẹp trong từng chi tiết',
+  'Niềm tin và chất lượng',
+  'Khách hàng là trung tâm',
+];
+
+// Badge types for verified accounts
+export const badgeTypes: string[] = [
+  'top_rated',
+  'quick_response',
+  'verified_pro',
+  'trending',
+  'new_talent',
+  'super_host',
+  'best_seller',
+  'customer_choice',
+];
+
+// Phone prefixes for Vietnamese mobile numbers
+export const vietnamesePhonePrefixes: string[] = [
+  '090',
+  '091',
+  '092',
+  '093',
+  '094',
+  '096',
+  '097',
+  '098',
+  '099',
+  '086',
+  '083',
+  '084',
+  '085',
+  '088',
+  '070',
+  '076',
+  '077',
+  '078',
+  '079',
+];
+
 // All cities data for easy access
 export const allCitiesData: CityData[] = [hcmData, hanoiData, danangData];
 

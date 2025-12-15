@@ -20,6 +20,7 @@ import { UserOrmEntity } from './entities/user.orm-entity';
 import { WalletTransactionOrmEntity } from './entities/wallet-transaction.orm-entity';
 import { WalletOrmEntity } from './entities/wallet.orm-entity';
 import { AccountOrmEntity } from './entities/account.orm-entity';
+import { AccountGalleryOrmEntity } from './entities/account-gallery.orm-entity';
 import { OrganizationOrmEntity } from './entities/organization.orm-entity';
 import { OrganizationLocationOrmEntity } from './entities/organization-location.orm-entity';
 import { ProvinceOrmEntity } from './entities/province.orm-entity';
@@ -55,6 +56,7 @@ const dataSource = new DataSource({
     BookingServiceOrmEntity,
     StaffServiceOrmEntity,
     AccountOrmEntity,
+    AccountGalleryOrmEntity,
     OrganizationOrmEntity,
     ProvinceOrmEntity,
     DistrictOrmEntity,

@@ -7,6 +7,6 @@ export class SwaggerConfigService implements ISwaggerConfig {
   constructor(private readonly configService: ConfigService) {}
 
   get enabled(): boolean {
-    return this.configService.get<boolean>('SWAGGER_ENABLED') ?? false;
+    return Boolean(this.configService.get<boolean>('SWAGGER_ENABLED'));
   }
 }

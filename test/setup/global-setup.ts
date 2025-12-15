@@ -21,6 +21,7 @@ import {
   BookingServiceOrmEntity,
 } from '../../src/infrastructure/persistence/typeorm/entities/booking.orm-entity';
 import { StaffServiceOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/staff-service.orm-entity';
+import { AccountGalleryOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/account-gallery.orm-entity';
 import { seedPermissions } from '../../src/infrastructure/persistence/seeds/permissions.seed';
 import { seedRoles } from '../../src/infrastructure/persistence/seeds/roles.seed';
 
@@ -57,6 +58,7 @@ export default async function globalSetup(): Promise<void> {
       BookingOrmEntity,
       BookingServiceOrmEntity,
       StaffServiceOrmEntity,
+      AccountGalleryOrmEntity,
     ],
     synchronize: true,
     dropSchema: true, // Drop all tables before each test run

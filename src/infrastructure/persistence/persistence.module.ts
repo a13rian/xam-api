@@ -20,6 +20,7 @@ import {
 } from './typeorm/entities/booking.orm-entity';
 import { StaffServiceOrmEntity } from './typeorm/entities/staff-service.orm-entity';
 import { AccountOrmEntity } from './typeorm/entities/account.orm-entity';
+import { AccountGalleryOrmEntity } from './typeorm/entities/account-gallery.orm-entity';
 import { OrganizationOrmEntity } from './typeorm/entities/organization.orm-entity';
 import { OrganizationLocationOrmEntity } from './typeorm/entities/organization-location.orm-entity';
 import { ProvinceOrmEntity } from './typeorm/entities/province.orm-entity';
@@ -45,6 +46,7 @@ const entities = [
   BookingServiceOrmEntity,
   StaffServiceOrmEntity,
   AccountOrmEntity,
+  AccountGalleryOrmEntity,
   OrganizationOrmEntity,
   ProvinceOrmEntity,
   DistrictOrmEntity,

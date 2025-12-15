@@ -2,6 +2,10 @@ import { DatabaseHelper } from '../database/database.helper';
 import { AccountOrmEntity } from '../../../src/infrastructure/persistence/typeorm/entities/account.orm-entity';
 import { AccountTypeEnum } from '../../../src/core/domain/account/value-objects/account-type.vo';
 import { AccountStatusEnum } from '../../../src/core/domain/account/value-objects/account-status.vo';
+import { SocialLinksData } from '../../../src/core/domain/account/value-objects/social-links.vo';
+import { ServiceAreaData } from '../../../src/core/domain/account/value-objects/service-area.vo';
+import { PriceRangeData } from '../../../src/core/domain/account/value-objects/price-range.vo';
+import { WorkingHoursData } from '../../../src/core/domain/account/value-objects/working-hours.vo';
 import { UserFactory, CreateUserOptions, CreatedUser } from './user.factory';
 
 export interface CreateAccountOptions {
@@ -21,6 +25,28 @@ export interface CreateAccountOptions {
   yearsExperience?: number | null;
   certifications?: string[];
   userOptions?: CreateUserOptions;
+  // Media fields
+  avatarUrl?: string | null;
+  coverImageUrl?: string | null;
+  videoIntroUrl?: string | null;
+  // Contact & Social fields
+  phone?: string | null;
+  businessEmail?: string | null;
+  website?: string | null;
+  socialLinks?: SocialLinksData | null;
+  // Professional/Service fields
+  tagline?: string | null;
+  serviceAreas?: ServiceAreaData[];
+  languages?: string[];
+  workingHours?: WorkingHoursData | null;
+  priceRange?: PriceRangeData | null;
+  // Trust & Verification fields
+  isVerified?: boolean;
+  verifiedAt?: Date | null;
+  badges?: string[];
+  rating?: number | null;
+  totalReviews?: number;
+  completedBookings?: number;
 }
 
 export interface CreatedAccount {
@@ -38,6 +64,28 @@ export interface CreatedAccount {
   latitude: number | null;
   longitude: number | null;
   user: CreatedUser;
+  // Media fields
+  avatarUrl: string | null;
+  coverImageUrl: string | null;
+  videoIntroUrl: string | null;
+  // Contact & Social fields
+  phone: string | null;
+  businessEmail: string | null;
+  website: string | null;
+  socialLinks: SocialLinksData | null;
+  // Professional/Service fields
+  tagline: string | null;
+  serviceAreas: ServiceAreaData[];
+  languages: string[];
+  workingHours: WorkingHoursData | null;
+  priceRange: PriceRangeData | null;
+  // Trust & Verification fields
+  isVerified: boolean;
+  verifiedAt: Date | null;
+  badges: string[];
+  rating: number | null;
+  totalReviews: number;
+  completedBookings: number;
 }
 
 let accountCounter = 0;
@@ -78,6 +126,28 @@ export class AccountFactory {
       specialization: options.specialization ?? null,
       yearsExperience: options.yearsExperience ?? null,
       certifications: options.certifications ?? [],
+      // Media fields
+      avatarUrl: options.avatarUrl ?? null,
+      coverImageUrl: options.coverImageUrl ?? null,
+      videoIntroUrl: options.videoIntroUrl ?? null,
+      // Contact & Social fields
+      phone: options.phone ?? null,
+      businessEmail: options.businessEmail ?? null,
+      website: options.website ?? null,
+      socialLinks: options.socialLinks ?? null,
+      // Professional/Service fields
+      tagline: options.tagline ?? null,
+      serviceAreas: options.serviceAreas ?? [],
+      languages: options.languages ?? [],
+      workingHours: options.workingHours ?? null,
+      priceRange: options.priceRange ?? null,
+      // Trust & Verification fields
+      isVerified: options.isVerified ?? false,
+      verifiedAt: options.verifiedAt ?? null,
+      badges: options.badges ?? [],
+      rating: options.rating ?? null,
+      totalReviews: options.totalReviews ?? 0,
+      completedBookings: options.completedBookings ?? 0,
     });
 
     // Set location as GeoJSON object for PostGIS if coordinates provided
@@ -106,6 +176,28 @@ export class AccountFactory {
       latitude: account.latitude,
       longitude: account.longitude,
       user,
+      // Media fields
+      avatarUrl: account.avatarUrl,
+      coverImageUrl: account.coverImageUrl,
+      videoIntroUrl: account.videoIntroUrl,
+      // Contact & Social fields
+      phone: account.phone,
+      businessEmail: account.businessEmail,
+      website: account.website,
+      socialLinks: account.socialLinks,
+      // Professional/Service fields
+      tagline: account.tagline,
+      serviceAreas: account.serviceAreas,
+      languages: account.languages,
+      workingHours: account.workingHours,
+      priceRange: account.priceRange,
+      // Trust & Verification fields
+      isVerified: account.isVerified,
+      verifiedAt: account.verifiedAt,
+      badges: account.badges,
+      rating: account.rating,
+      totalReviews: account.totalReviews,
+      completedBookings: account.completedBookings,
     };
   }
 
@@ -145,6 +237,31 @@ export class AccountFactory {
     return this.create({
       ...options,
       status: AccountStatusEnum.PENDING,
+    });
+  }
+
+  async createVerified(
+    options: CreateAccountOptions = {},
+  ): Promise<CreatedAccount> {
+    return this.create({
+      ...options,
+      isVerified: true,
+      verifiedAt: new Date(),
+    });
+  }
+
+  async createWithProfile(
+    options: CreateAccountOptions = {},
+  ): Promise<CreatedAccount> {
+    return this.create({
+      avatarUrl: 'https://example.com/avatar.jpg',
+      coverImageUrl: 'https://example.com/cover.jpg',
+      phone: '0901234567',
+      businessEmail: 'business@example.com',
+      website: 'https://example.com',
+      tagline: 'Professional services',
+      languages: ['vi', 'en'],
+      ...options,
     });
   }
 

@@ -10,6 +10,10 @@ import {
   InvitationStatus,
   InvitationStatusEnum,
 } from '../value-objects/invitation-status.vo';
+import { SocialLinks } from '../value-objects/social-links.vo';
+import { ServiceArea } from '../value-objects/service-area.vo';
+import { PriceRange } from '../value-objects/price-range.vo';
+import { WorkingHours } from '../value-objects/working-hours.vo';
 import { ValidationException } from '../../../../shared/exceptions/domain.exception';
 import { AccountCreatedEvent } from '../events/account-created.event';
 import { AccountApprovedEvent } from '../events/account-approved.event';
@@ -39,6 +43,28 @@ export interface AccountProps {
   rejectionReason?: string | null;
   createdAt: Date;
   updatedAt: Date;
+  // Media fields
+  avatarUrl?: string | null;
+  coverImageUrl?: string | null;
+  videoIntroUrl?: string | null;
+  // Contact & Social fields
+  phone?: string | null;
+  businessEmail?: string | null;
+  website?: string | null;
+  socialLinks?: SocialLinks | null;
+  // Professional/Service fields
+  tagline?: string | null;
+  serviceAreas?: ServiceArea[];
+  languages?: string[];
+  workingHours?: WorkingHours | null;
+  priceRange?: PriceRange | null;
+  // Trust & Verification fields
+  isVerified: boolean;
+  verifiedAt?: Date | null;
+  badges?: string[];
+  rating?: number | null;
+  totalReviews: number;
+  completedBookings: number;
 }
 
 export interface CreateIndividualAccountProps {
@@ -87,6 +113,28 @@ export class Account extends AggregateRoot {
   private _rejectionReason: string | null;
   private readonly _createdAt: Date;
   private _updatedAt: Date;
+  // Media fields
+  private _avatarUrl: string | null;
+  private _coverImageUrl: string | null;
+  private _videoIntroUrl: string | null;
+  // Contact & Social fields
+  private _phone: string | null;
+  private _businessEmail: string | null;
+  private _website: string | null;
+  private _socialLinks: SocialLinks | null;
+  // Professional/Service fields
+  private _tagline: string | null;
+  private _serviceAreas: ServiceArea[];
+  private _languages: string[];
+  private _workingHours: WorkingHours | null;
+  private _priceRange: PriceRange | null;
+  // Trust & Verification fields
+  private _isVerified: boolean;
+  private _verifiedAt: Date | null;
+  private _badges: string[];
+  private _rating: number | null;
+  private _totalReviews: number;
+  private _completedBookings: number;
 
   private constructor(props: AccountProps) {
     super();
@@ -112,6 +160,28 @@ export class Account extends AggregateRoot {
     this._rejectionReason = props.rejectionReason ?? null;
     this._createdAt = props.createdAt;
     this._updatedAt = props.updatedAt;
+    // Media fields
+    this._avatarUrl = props.avatarUrl ?? null;
+    this._coverImageUrl = props.coverImageUrl ?? null;
+    this._videoIntroUrl = props.videoIntroUrl ?? null;
+    // Contact & Social fields
+    this._phone = props.phone ?? null;
+    this._businessEmail = props.businessEmail ?? null;
+    this._website = props.website ?? null;
+    this._socialLinks = props.socialLinks ?? null;
+    // Professional/Service fields
+    this._tagline = props.tagline ?? null;
+    this._serviceAreas = props.serviceAreas ?? [];
+    this._languages = props.languages ?? [];
+    this._workingHours = props.workingHours ?? null;
+    this._priceRange = props.priceRange ?? null;
+    // Trust & Verification fields
+    this._isVerified = props.isVerified ?? false;
+    this._verifiedAt = props.verifiedAt ?? null;
+    this._badges = props.badges ?? [];
+    this._rating = props.rating ?? null;
+    this._totalReviews = props.totalReviews ?? 0;
+    this._completedBookings = props.completedBookings ?? 0;
   }
 
   static createIndividual(props: CreateIndividualAccountProps): Account {
@@ -139,6 +209,28 @@ export class Account extends AggregateRoot {
       rejectionReason: null,
       createdAt: now,
       updatedAt: now,
+      // Media fields
+      avatarUrl: null,
+      coverImageUrl: null,
+      videoIntroUrl: null,
+      // Contact & Social fields
+      phone: null,
+      businessEmail: null,
+      website: null,
+      socialLinks: null,
+      // Professional/Service fields
+      tagline: null,
+      serviceAreas: [],
+      languages: [],
+      workingHours: null,
+      priceRange: null,
+      // Trust & Verification fields
+      isVerified: false,
+      verifiedAt: null,
+      badges: [],
+      rating: null,
+      totalReviews: 0,
+      completedBookings: 0,
     });
 
     account.apply(
@@ -178,6 +270,28 @@ export class Account extends AggregateRoot {
       rejectionReason: null,
       createdAt: now,
       updatedAt: now,
+      // Media fields
+      avatarUrl: null,
+      coverImageUrl: null,
+      videoIntroUrl: null,
+      // Contact & Social fields
+      phone: null,
+      businessEmail: null,
+      website: null,
+      socialLinks: null,
+      // Professional/Service fields
+      tagline: null,
+      serviceAreas: [],
+      languages: [],
+      workingHours: null,
+      priceRange: null,
+      // Trust & Verification fields
+      isVerified: false,
+      verifiedAt: null,
+      badges: [],
+      rating: null,
+      totalReviews: 0,
+      completedBookings: 0,
     });
 
     account.apply(
@@ -223,6 +337,28 @@ export class Account extends AggregateRoot {
       rejectionReason: null,
       createdAt: now,
       updatedAt: now,
+      // Media fields
+      avatarUrl: null,
+      coverImageUrl: null,
+      videoIntroUrl: null,
+      // Contact & Social fields
+      phone: null,
+      businessEmail: null,
+      website: null,
+      socialLinks: null,
+      // Professional/Service fields
+      tagline: null,
+      serviceAreas: [],
+      languages: [],
+      workingHours: null,
+      priceRange: null,
+      // Trust & Verification fields
+      isVerified: false,
+      verifiedAt: null,
+      badges: [],
+      rating: null,
+      totalReviews: 0,
+      completedBookings: 0,
     });
   }
 
@@ -374,6 +510,113 @@ export class Account extends AggregateRoot {
     this._updatedAt = new Date();
   }
 
+  updateMedia(props: {
+    avatarUrl?: string | null;
+    coverImageUrl?: string | null;
+    videoIntroUrl?: string | null;
+  }): void {
+    if (props.avatarUrl !== undefined) {
+      this._avatarUrl = props.avatarUrl;
+    }
+    if (props.coverImageUrl !== undefined) {
+      this._coverImageUrl = props.coverImageUrl;
+    }
+    if (props.videoIntroUrl !== undefined) {
+      this._videoIntroUrl = props.videoIntroUrl;
+    }
+    this._updatedAt = new Date();
+  }
+
+  updateContactInfo(props: {
+    phone?: string | null;
+    businessEmail?: string | null;
+    website?: string | null;
+    socialLinks?: SocialLinks | null;
+  }): void {
+    if (props.phone !== undefined) {
+      this._phone = props.phone;
+    }
+    if (props.businessEmail !== undefined) {
+      this._businessEmail = props.businessEmail;
+    }
+    if (props.website !== undefined) {
+      this._website = props.website;
+    }
+    if (props.socialLinks !== undefined) {
+      this._socialLinks = props.socialLinks;
+    }
+    this._updatedAt = new Date();
+  }
+
+  updateProfessionalInfo(props: {
+    tagline?: string | null;
+    serviceAreas?: ServiceArea[];
+    languages?: string[];
+    workingHours?: WorkingHours | null;
+    priceRange?: PriceRange | null;
+  }): void {
+    if (props.tagline !== undefined) {
+      this._tagline = props.tagline;
+    }
+    if (props.serviceAreas !== undefined) {
+      this._serviceAreas = props.serviceAreas;
+    }
+    if (props.languages !== undefined) {
+      this._languages = props.languages;
+    }
+    if (props.workingHours !== undefined) {
+      this._workingHours = props.workingHours;
+    }
+    if (props.priceRange !== undefined) {
+      this._priceRange = props.priceRange;
+    }
+    this._updatedAt = new Date();
+  }
+
+  verify(): void {
+    if (this._isVerified) {
+      throw new ValidationException('Account is already verified');
+    }
+    this._isVerified = true;
+    this._verifiedAt = new Date();
+    this._updatedAt = new Date();
+  }
+
+  unverify(): void {
+    this._isVerified = false;
+    this._verifiedAt = null;
+    this._updatedAt = new Date();
+  }
+
+  addBadge(badge: string): void {
+    if (!this._badges.includes(badge)) {
+      this._badges.push(badge);
+      this._updatedAt = new Date();
+    }
+  }
+
+  removeBadge(badge: string): void {
+    const index = this._badges.indexOf(badge);
+    if (index > -1) {
+      this._badges.splice(index, 1);
+      this._updatedAt = new Date();
+    }
+  }
+
+  updateRating(rating: number, totalReviews: number): void {
+    if (rating < 0 || rating > 5) {
+      throw new ValidationException('Rating must be between 0 and 5');
+    }
+    this._rating = rating;
+    this._totalReviews = totalReviews;
+    this._updatedAt = new Date();
+  }
+
+  incrementCompletedBookings(): void {
+    this._completedBookings += 1;
+    this._updatedAt = new Date();
+  }
+
   canManageOrganization(): boolean {
     return this._role?.canManageOrganization() ?? false;
   }
@@ -502,6 +745,82 @@ export class Account extends AggregateRoot {
     return this._updatedAt;
   }
 
+  // Media getters
+  get avatarUrl(): string | null {
+    return this._avatarUrl;
+  }
+
+  get coverImageUrl(): string | null {
+    return this._coverImageUrl;
+  }
+
+  get videoIntroUrl(): string | null {
+    return this._videoIntroUrl;
+  }
+
+  // Contact & Social getters
+  get phone(): string | null {
+    return this._phone;
+  }
+
+  get businessEmail(): string | null {
+    return this._businessEmail;
+  }
+
+  get website(): string | null {
+    return this._website;
+  }
+
+  get socialLinks(): SocialLinks | null {
+    return this._socialLinks;
+  }
+
+  // Professional/Service getters
+  get tagline(): string | null {
+    return this._tagline;
+  }
+
+  get serviceAreas(): ServiceArea[] {
+    return this._serviceAreas;
+  }
+
+  get languages(): string[] {
+    return this._languages;
+  }
+
+  get workingHours(): WorkingHours | null {
+    return this._workingHours;
+  }
+
+  get priceRange(): PriceRange | null {
+    return this._priceRange;
+  }
+
+  // Trust & Verification getters
+  get isVerified(): boolean {
+    return this._isVerified;
+  }
+
+  get verifiedAt(): Date | null {
+    return this._verifiedAt;
+  }
+
+  get badges(): string[] {
+    return this._badges;
+  }
+
+  get rating(): number | null {
+    return this._rating;
+  }
+
+  get totalReviews(): number {
+    return this._totalReviews;
+  }
+
+  get completedBookings(): number {
+    return this._completedBookings;
+  }
+
   toObject(): Record<string, unknown> {
     return {
       id: this._id,
@@ -526,6 +845,28 @@ export class Account extends AggregateRoot {
       rejectionReason: this._rejectionReason,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
+      // Media fields
+      avatarUrl: this._avatarUrl,
+      coverImageUrl: this._coverImageUrl,
+      videoIntroUrl: this._videoIntroUrl,
+      // Contact & Social fields
+      phone: this._phone,
+      businessEmail: this._businessEmail,
+      website: this._website,
+      socialLinks: this._socialLinks?.toJSON() ?? null,
+      // Professional/Service fields
+      tagline: this._tagline,
+      serviceAreas: this._serviceAreas.map((sa) => sa.toJSON()),
+      languages: this._languages,
+      workingHours: this._workingHours?.toJSON() ?? null,
+      priceRange: this._priceRange?.toJSON() ?? null,
+      // Trust & Verification fields
+      isVerified: this._isVerified,
+      verifiedAt: this._verifiedAt,
+      badges: this._badges,
+      rating: this._rating,
+      totalReviews: this._totalReviews,
+      completedBookings: this._completedBookings,
     };
   }
 }

@@ -65,6 +65,7 @@ export class DatabaseHelper {
       // Location related
       'organization_locations',
       // Organization/Account related
+      'account_gallery',
       'organization_documents',
       'accounts',
       'organizations',

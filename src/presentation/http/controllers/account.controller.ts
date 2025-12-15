@@ -2,6 +2,9 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
+  Put,
+  Delete,
   Body,
   Param,
   Query,
@@ -21,10 +24,20 @@ import {
   AccountResponseDto,
   SearchAccountsDto,
   SearchAccountsResponseDto,
+  UpdateAccountProfileDto,
+  AddGalleryImageDto,
+  UpdateGalleryImageDto,
+  ReorderGalleryDto,
+  GalleryItemResponseDto,
 } from '../dto/account';
 import {
   RegisterAccountCommand,
   ApproveAccountCommand,
+  UpdateAccountProfileCommand,
+  AddGalleryImageCommand,
+  UpdateGalleryImageCommand,
+  RemoveGalleryImageCommand,
+  ReorderGalleryImagesCommand,
 } from '../../../core/application/account/commands';
 import { RegisterAccountResult } from '../../../core/application/account/commands/register-account/register-account.handler';
 import {
@@ -32,6 +45,9 @@ import {
   GetMyAccountResult,
 } from '../../../core/application/account/queries/get-my-account';
 import { SearchAccountsByLocationQuery } from '../../../core/application/account/queries/search-accounts-by-location';
+import { GetAccountGalleryQuery } from '../../../core/application/account/queries/get-account-gallery';
+import { Account } from '../../../core/domain/account/entities/account.entity';
+import { AccountGallery } from '../../../core/domain/account/entities/account-gallery.entity';
 
 @ApiTags('accounts')
 @Controller('accounts')
@@ -110,6 +126,171 @@ export class AccountController {
     >(new GetMyAccountQuery(user.id));
 
     return result as AccountResponseDto;
+  }
+
+  @Patch('me/profile')
+  @ApiOperation({
+    summary: 'Update my account profile',
+    description:
+      'Update profile fields including media, contact, and professional info',
+  })
+  async updateProfile(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: UpdateAccountProfileDto,
+  ): Promise<AccountResponseDto> {
+    // First get the account to find its ID
+    const myAccount = await this.queryBus.execute<
+      GetMyAccountQuery,
+      GetMyAccountResult
+    >(new GetMyAccountQuery(user.id));
+
+    const account = await this.commandBus.execute<
+      UpdateAccountProfileCommand,
+      Account
+    >(new UpdateAccountProfileCommand(myAccount.id, dto));
+
+    return account.toObject() as unknown as AccountResponseDto;
+  }
+
+  @Get('me/gallery')
+  @ApiOperation({
+    summary: 'Get my gallery images',
+    description: 'Retrieve all gallery images for the current account',
+  })
+  async getMyGallery(
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<GalleryItemResponseDto[]> {
+    const myAccount = await this.queryBus.execute<
+      GetMyAccountQuery,
+      GetMyAccountResult
+    >(new GetMyAccountQuery(user.id));
+
+    const gallery = await this.queryBus.execute<
+      GetAccountGalleryQuery,
+      AccountGallery[]
+    >(new GetAccountGalleryQuery(myAccount.id));
+
+    return gallery.map(
+      (item) => item.toObject() as unknown as GalleryItemResponseDto,
+    );
+  }
+
+  @Post('me/gallery')
+  @ApiOperation({
+    summary: 'Add gallery image',
+    description: 'Add a new image to the account gallery',
+  })
+  async addGalleryImage(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: AddGalleryImageDto,
+  ): Promise<GalleryItemResponseDto> {
+    const myAccount = await this.queryBus.execute<
+      GetMyAccountQuery,
+      GetMyAccountResult
+    >(new GetMyAccountQuery(user.id));
+
+    const gallery = await this.commandBus.execute<
+      AddGalleryImageCommand,
+      AccountGallery
+    >(
+      new AddGalleryImageCommand(
+        myAccount.id,
+        dto.imageUrl,
+        dto.caption,
+        dto.sortOrder,
+      ),
+    );
+
+    return gallery.toObject() as unknown as GalleryItemResponseDto;
+  }
+
+  @Patch('me/gallery/:id')
+  @ApiOperation({
+    summary: 'Update gallery image',
+    description: 'Update an existing gallery image caption or URL',
+  })
+  async updateGalleryImage(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') galleryId: string,
+    @Body() dto: UpdateGalleryImageDto,
+  ): Promise<GalleryItemResponseDto> {
+    const myAccount = await this.queryBus.execute<
+      GetMyAccountQuery,
+      GetMyAccountResult
+    >(new GetMyAccountQuery(user.id));
+
+    const gallery = await this.commandBus.execute<
+      UpdateGalleryImageCommand,
+      AccountGallery
+    >(
+      new UpdateGalleryImageCommand(
+        myAccount.id,
+        galleryId,
+        dto.imageUrl,
+        dto.caption,
+      ),
+    );
+
+    return gallery.toObject() as unknown as GalleryItemResponseDto;
+  }
+
+  @Delete('me/gallery/:id')
+  @HttpCode(204)
+  @ApiOperation({
+    summary: 'Remove gallery image',
+    description: 'Delete an image from the account gallery',
+  })
+  async removeGalleryImage(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') galleryId: string,
+  ): Promise<void> {
+    const myAccount = await this.queryBus.execute<
+      GetMyAccountQuery,
+      GetMyAccountResult
+    >(new GetMyAccountQuery(user.id));
+
+    await this.commandBus.execute(
+      new RemoveGalleryImageCommand(myAccount.id, galleryId),
+    );
+  }
+
+  @Put('me/gallery/reorder')
+  @HttpCode(200)
+  @ApiOperation({
+    summary: 'Reorder gallery images',
+    description: 'Update the sort order of gallery images',
+  })
+  async reorderGallery(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: ReorderGalleryDto,
+  ): Promise<void> {
+    const myAccount = await this.queryBus.execute<
+      GetMyAccountQuery,
+      GetMyAccountResult
+    >(new GetMyAccountQuery(user.id));
+
+    await this.commandBus.execute(
+      new ReorderGalleryImagesCommand(myAccount.id, dto.items),
+    );
+  }
+
+  @Get(':id/gallery')
+  @Public()
+  @ApiOperation({
+    summary: 'Get account gallery',
+    description: 'View gallery images for a public account',
+  })
+  async getAccountGallery(
+    @Param('id') accountId: string,
+  ): Promise<GalleryItemResponseDto[]> {
+    const gallery = await this.queryBus.execute<
+      GetAccountGalleryQuery,
+      AccountGallery[]
+    >(new GetAccountGalleryQuery(accountId));
+
+    return gallery.map(
+      (item) => item.toObject() as unknown as GalleryItemResponseDto,
+    );
   }
 }
 
