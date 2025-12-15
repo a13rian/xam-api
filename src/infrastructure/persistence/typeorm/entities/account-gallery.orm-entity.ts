@@ -1,6 +1,6 @@
 import { Entity, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { BaseOrmEntity } from './base.orm-entity';
-import { AccountOrmEntity } from './account.orm-entity';
+import type { AccountOrmEntity } from './account.orm-entity';
 
 @Entity('account_gallery')
 @Index(['accountId', 'sortOrder'])
@@ -11,7 +11,7 @@ export class AccountGalleryOrmEntity extends BaseOrmEntity {
   @Index()
   accountId: string;
 
-  @ManyToOne(() => AccountOrmEntity, (account) => account.gallery, {
+  @ManyToOne('AccountOrmEntity', 'gallery', {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'accountId' })
