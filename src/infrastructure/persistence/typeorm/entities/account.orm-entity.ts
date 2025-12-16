@@ -203,8 +203,9 @@ export class AccountOrmEntity extends BaseOrmEntity {
   @Column({ type: 'int', default: 0 })
   completedBookings: number;
 
-  // Gallery relation
-  @OneToMany(() => AccountGalleryOrmEntity, (gallery) => gallery.account, {
+  // Gallery relation - using string reference for inverse side
+  // to match the string-based ManyToOne on AccountGalleryOrmEntity
+  @OneToMany('AccountGalleryOrmEntity', 'account', {
     cascade: true,
   })
   gallery: AccountGalleryOrmEntity[];

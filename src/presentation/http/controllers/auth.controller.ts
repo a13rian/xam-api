@@ -6,6 +6,7 @@ import {
   Req,
   HttpCode,
   HttpStatus,
+  Patch,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Request } from 'express';
@@ -23,6 +24,7 @@ import {
   RefreshTokenResponseDto,
   RegisterResponseDto,
   MessageResponseDto,
+  UpdateProfileDto,
 } from '../dto/auth';
 import {
   RegisterCommand,
@@ -36,6 +38,7 @@ import {
 import { RegisterResult } from '../../../core/application/auth/commands/register/register.handler';
 import { GetMeQuery } from '../../../core/application/auth/queries';
 import { GetMeResult } from '../../../core/application/auth/queries/get-me/get-me.handler';
+import { UpdateUserCommand } from '../../../core/application/user/commands';
 
 @Controller('auth')
 export class AuthController {
@@ -122,6 +125,20 @@ export class AuthController {
 
   @Get('me')
   async getMe(@CurrentUser() user: AuthenticatedUser): Promise<GetMeResult> {
+    return await this.queryBus.execute(new GetMeQuery(user.id));
+  }
+
+  @Patch('me')
+  async updateProfile(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: UpdateProfileDto,
+  ): Promise<GetMeResult> {
+    const { firstName, lastName }: UpdateProfileDto = dto;
+
+    await this.commandBus.execute(
+      new UpdateUserCommand(user.id, firstName, lastName),
+    );
+
     return await this.queryBus.execute(new GetMeQuery(user.id));
   }
 

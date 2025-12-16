@@ -12,6 +12,7 @@ import { WardOrmEntity } from '../typeorm/entities/ward.orm-entity';
 import { OrganizationOrmEntity } from '../typeorm/entities/organization.orm-entity';
 import { OrganizationLocationOrmEntity } from '../typeorm/entities/organization-location.orm-entity';
 import { AccountOrmEntity } from '../typeorm/entities/account.orm-entity';
+import { AccountGalleryOrmEntity } from '../typeorm/entities/account-gallery.orm-entity';
 import { seedPermissions } from './permissions.seed';
 import { seedRoles } from './roles.seed';
 import { seedUsers } from './users.seed';
@@ -45,6 +46,7 @@ const dataSource = new DataSource({
     OrganizationOrmEntity,
     OrganizationLocationOrmEntity,
     AccountOrmEntity,
+    AccountGalleryOrmEntity,
   ],
   synchronize: false,
 });

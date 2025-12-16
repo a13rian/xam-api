@@ -1,9 +1,11 @@
 import { AggregateRoot } from '@nestjs/cqrs';
-import { v4 as uuidv4 } from 'uuid';
+import { createId } from '@paralleldrive/cuid2';
 import { Email } from '../value-objects/email.vo';
 import { Password } from '../value-objects/password.vo';
 import { UserCreatedEvent } from '../events/user-created.event';
 import { UserUpdatedEvent } from '../events/user-updated.event';
+
+const USER_ID_PREFIX = 'usr';
 
 export interface UserProps {
   id?: string;
@@ -48,7 +50,7 @@ export class User extends AggregateRoot {
 
   private constructor(props: UserProps) {
     super();
-    this._id = props.id || uuidv4();
+    this._id = props.id || `${USER_ID_PREFIX}_${createId()}`;
     this._email = props.email;
     this._password = props.password;
     this._firstName = props.firstName;

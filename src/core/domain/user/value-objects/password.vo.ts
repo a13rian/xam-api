@@ -4,7 +4,7 @@ import { ValidationException } from '../../../../shared/exceptions/domain.except
 export class Password {
   private readonly _hash: string;
   private static readonly SALT_ROUNDS = 12;
-  private static readonly MIN_LENGTH = 8;
+  private static readonly MIN_LENGTH = 6;
 
   private constructor(hash: string) {
     this._hash = hash;
@@ -25,22 +25,6 @@ export class Password {
       throw new ValidationException(
         `Password must be at least ${Password.MIN_LENGTH} characters long`,
       );
-    }
-
-    if (!/[A-Z]/.test(password)) {
-      throw new ValidationException(
-        'Password must contain at least one uppercase letter',
-      );
-    }
-
-    if (!/[a-z]/.test(password)) {
-      throw new ValidationException(
-        'Password must contain at least one lowercase letter',
-      );
-    }
-
-    if (!/\d/.test(password)) {
-      throw new ValidationException('Password must contain at least one digit');
     }
   }
 

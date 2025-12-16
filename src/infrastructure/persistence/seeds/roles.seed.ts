@@ -57,6 +57,12 @@ const roles: RoleSeedConfig[] = [
     isSystem: true,
     permissionCodes: ['organization:read', 'role:read', 'role:list'],
   },
+  {
+    name: 'user',
+    description: 'Default role for registered users',
+    isSystem: true,
+    permissionCodes: [],
+  },
 ];
 
 export async function seedRoles(

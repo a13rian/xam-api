@@ -1,5 +1,5 @@
 import { AggregateRoot } from '@nestjs/cqrs';
-import { v4 as uuidv4 } from 'uuid';
+import { createId } from '@paralleldrive/cuid2';
 import { AccountType, AccountTypeEnum } from '../value-objects/account-type.vo';
 import { AccountRole, AccountRoleEnum } from '../value-objects/account-role.vo';
 import {
@@ -19,6 +19,8 @@ import { AccountCreatedEvent } from '../events/account-created.event';
 import { AccountApprovedEvent } from '../events/account-approved.event';
 import { AccountRejectedEvent } from '../events/account-rejected.event';
 import { AccountSuspendedEvent } from '../events/account-suspended.event';
+
+const ACCOUNT_ID_PREFIX = 'acc';
 
 export interface AccountProps {
   id: string;
@@ -187,7 +189,7 @@ export class Account extends AggregateRoot {
   static createIndividual(props: CreateIndividualAccountProps): Account {
     const now = new Date();
     const account = new Account({
-      id: uuidv4(),
+      id: `${ACCOUNT_ID_PREFIX}_${createId()}`,
       userId: props.userId,
       organizationId: null,
       type: AccountType.individual(),
@@ -248,7 +250,7 @@ export class Account extends AggregateRoot {
   static createBusinessOwner(props: CreateBusinessOwnerAccountProps): Account {
     const now = new Date();
     const account = new Account({
-      id: uuidv4(),
+      id: `${ACCOUNT_ID_PREFIX}_${createId()}`,
       userId: props.userId,
       organizationId: props.organizationId,
       type: AccountType.business(),
@@ -312,10 +314,10 @@ export class Account extends AggregateRoot {
     }
 
     const now = new Date();
-    const token = uuidv4();
+    const token = createId();
 
     return new Account({
-      id: uuidv4(),
+      id: `${ACCOUNT_ID_PREFIX}_${createId()}`,
       userId: '', // Will be set when invitation is accepted
       organizationId: props.organizationId,
       type: AccountType.business(),
