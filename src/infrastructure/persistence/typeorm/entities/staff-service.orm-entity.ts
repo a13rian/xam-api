@@ -17,10 +17,10 @@ export class StaffServiceOrmEntity extends BaseOrmEntity {
   serviceId: string;
 
   @ManyToOne(() => AccountOrmEntity, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'staffId' })
+  @JoinColumn({ name: 'staff_id' })
   staff?: AccountOrmEntity;
 
   @ManyToOne(() => ServiceOrmEntity, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'serviceId' })
+  @JoinColumn({ name: 'service_id' })
   service?: ServiceOrmEntity;
 }

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppConfigModule, DatabaseConfigService } from '../config';
+import { SnakeNamingStrategy } from './typeorm/naming-strategies/snake-naming.strategy';
 import { UserOrmEntity } from './typeorm/entities/user.orm-entity';
 import { RoleOrmEntity } from './typeorm/entities/role.orm-entity';
 import { PermissionOrmEntity } from './typeorm/entities/permission.orm-entity';
@@ -65,6 +66,7 @@ const entities = [
         username: databaseConfig.username,
         password: databaseConfig.password,
         database: databaseConfig.name,
+        namingStrategy: new SnakeNamingStrategy(),
         entities,
         migrations: ['dist/infrastructure/persistence/typeorm/migrations/*.js'],
         migrationsRun: false,

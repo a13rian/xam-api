@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
 import { AccountOrmEntity } from '../typeorm/entities/account.orm-entity';
+import { AccountGalleryOrmEntity } from '../typeorm/entities/account-gallery.orm-entity';
 import { UserOrmEntity } from '../typeorm/entities/user.orm-entity';
 import { OrganizationOrmEntity } from '../typeorm/entities/organization.orm-entity';
 import { AccountTypeEnum } from '../../../core/domain/account/value-objects/account-type.vo';
@@ -136,6 +137,39 @@ function generateCoverImageUrl(index: number): string | null {
   return `https://picsum.photos/seed/cover${index}/800/300`;
 }
 
+// Gallery captions for variety
+const galleryCaptions = [
+  'Không gian làm việc',
+  'Dịch vụ chuyên nghiệp',
+  'Khách hàng hài lòng',
+  'Thiết bị hiện đại',
+  'Sản phẩm mẫu',
+  'Đội ngũ nhân viên',
+  'Showroom',
+  'Trước và sau',
+  null, // Some without captions
+  null,
+];
+
+function generateGalleryItems(
+  accountId: string,
+  accountIndex: number,
+): AccountGalleryOrmEntity[] {
+  const galleries: AccountGalleryOrmEntity[] = [];
+
+  for (let i = 0; i < 10; i++) {
+    const gallery = new AccountGalleryOrmEntity();
+    gallery.accountId = accountId;
+    gallery.imageUrl = `https://picsum.photos/seed/gallery${accountIndex}_${i}/600/400`;
+    gallery.storageKey = null;
+    gallery.caption = getRandomElement(galleryCaptions);
+    gallery.sortOrder = i;
+    galleries.push(gallery);
+  }
+
+  return galleries;
+}
+
 function getCityByIndex(index: number, total: number): CityData {
   // 40% HCM, 35% Ha Noi, 25% Da Nang
   const hcmThreshold = Math.floor(total * 0.4);
@@ -156,6 +190,7 @@ export async function seedAccountsWithLocations(
   organizations: OrganizationOrmEntity[],
 ): Promise<AccountOrmEntity[]> {
   const accountRepository = dataSource.getRepository(AccountOrmEntity);
+  const galleryRepository = dataSource.getRepository(AccountGalleryOrmEntity);
 
   // Check if bulk accounts already exist
   const existingBulkAccount = await accountRepository
@@ -248,14 +283,40 @@ export async function seedAccountsWithLocations(
   // Batch save accounts
   const BATCH_SIZE = 100;
   let seededCount = 0;
+  const allGalleries: AccountGalleryOrmEntity[] = [];
+
   for (let i = 0; i < allAccounts.length; i += BATCH_SIZE) {
     const batch = allAccounts.slice(i, i + BATCH_SIZE);
-    await accountRepository.save(batch);
+    const savedAccounts = await accountRepository.save(batch);
+
+    // Generate galleries for saved accounts
+    savedAccounts.forEach((account, batchIndex) => {
+      const globalIndex = i + batchIndex;
+      const galleries = generateGalleryItems(account.id, globalIndex);
+      allGalleries.push(...galleries);
+    });
+
     seededCount += batch.length;
     console.log(`Seeded ${seededCount}/${allAccounts.length} accounts...`);
   }
 
-  console.log(`Seeded ${allAccounts.length} accounts with locations`);
+  // Batch save galleries
+  if (allGalleries.length > 0) {
+    console.log(`Seeding ${allGalleries.length} gallery images...`);
+    let gallerySeededCount = 0;
+    for (let i = 0; i < allGalleries.length; i += BATCH_SIZE) {
+      const batch = allGalleries.slice(i, i + BATCH_SIZE);
+      await galleryRepository.save(batch);
+      gallerySeededCount += batch.length;
+      console.log(
+        `Seeded ${gallerySeededCount}/${allGalleries.length} gallery images...`,
+      );
+    }
+  }
+
+  console.log(
+    `Seeded ${allAccounts.length} accounts with ${allGalleries.length} gallery images`,
+  );
 
   return allAccounts;
 }

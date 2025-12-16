@@ -16,7 +16,7 @@ export class UserProfileOrmEntity {
   userId: string;
 
   @OneToOne(() => UserOrmEntity, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'userId' })
+  @JoinColumn({ name: 'user_id' })
   user: UserOrmEntity;
 
   @Column({ type: 'text', nullable: true })

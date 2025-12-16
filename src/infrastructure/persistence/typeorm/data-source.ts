@@ -1,6 +1,7 @@
 import { config } from 'dotenv';
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
+import { SnakeNamingStrategy } from './naming-strategies/snake-naming.strategy';
 import {
   BookingOrmEntity,
   BookingServiceOrmEntity,
@@ -37,6 +38,7 @@ const dataSource = new DataSource({
   username: process.env.DB_USERNAME || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_DATABASE || 'xam_api',
+  namingStrategy: new SnakeNamingStrategy(),
   entities: [
     UserOrmEntity,
     UserProfileOrmEntity,
@@ -68,3 +70,5 @@ const dataSource = new DataSource({
 });
 
 export default dataSource;
+
+//await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS postgis`);

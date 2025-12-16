@@ -133,10 +133,23 @@ export class AuthController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: UpdateProfileDto,
   ): Promise<GetMeResult> {
-    const { firstName, lastName }: UpdateProfileDto = dto;
+    const {
+      firstName,
+      lastName,
+      phone,
+      dateOfBirth,
+      gender,
+    }: UpdateProfileDto = dto;
 
     await this.commandBus.execute(
-      new UpdateUserCommand(user.id, firstName, lastName),
+      new UpdateUserCommand(
+        user.id,
+        firstName,
+        lastName,
+        phone ?? null,
+        dateOfBirth ? new Date(dateOfBirth) : null,
+        gender ?? null,
+      ),
     );
 
     return await this.queryBus.execute(new GetMeQuery(user.id));

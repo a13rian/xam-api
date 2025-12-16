@@ -13,7 +13,7 @@ export class WalletTransactionOrmEntity extends BaseOrmEntity {
   walletId: string;
 
   @ManyToOne('WalletOrmEntity', 'transactions')
-  @JoinColumn({ name: 'walletId' })
+  @JoinColumn({ name: 'wallet_id' })
   wallet: WalletOrmEntity;
 
   @Column({ type: 'enum', enum: TransactionTypeEnum })

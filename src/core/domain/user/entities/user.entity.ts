@@ -2,6 +2,7 @@ import { AggregateRoot } from '@nestjs/cqrs';
 import { createId } from '@paralleldrive/cuid2';
 import { Email } from '../value-objects/email.vo';
 import { Password } from '../value-objects/password.vo';
+import { Gender, GenderEnum } from '../value-objects/gender.vo';
 import { UserCreatedEvent } from '../events/user-created.event';
 import { UserUpdatedEvent } from '../events/user-updated.event';
 
@@ -14,6 +15,9 @@ export interface UserProps {
   firstName: string;
   lastName: string;
   avatarUrl?: string | null;
+  phone?: string | null;
+  dateOfBirth?: Date | null;
+  gender?: Gender | null;
   isActive?: boolean;
   emailVerifiedAt?: Date | null;
   roleIds?: string[];
@@ -39,6 +43,9 @@ export class User extends AggregateRoot {
   private _firstName: string;
   private _lastName: string;
   private _avatarUrl: string | null;
+  private _phone: string | null;
+  private _dateOfBirth: Date | null;
+  private _gender: Gender | null;
   private _isActive: boolean;
   private _emailVerifiedAt: Date | null;
   private _roleIds: string[];
@@ -56,6 +63,9 @@ export class User extends AggregateRoot {
     this._firstName = props.firstName;
     this._lastName = props.lastName;
     this._avatarUrl = props.avatarUrl ?? null;
+    this._phone = props.phone ?? null;
+    this._dateOfBirth = props.dateOfBirth ?? null;
+    this._gender = props.gender ?? null;
     this._isActive = props.isActive ?? true;
     this._emailVerifiedAt = props.emailVerifiedAt ?? null;
     this._roleIds = props.roleIds ?? [];
@@ -83,12 +93,27 @@ export class User extends AggregateRoot {
     return new User(props);
   }
 
-  public update(props: { firstName?: string; lastName?: string }): void {
+  public update(props: {
+    firstName?: string;
+    lastName?: string;
+    phone?: string | null;
+    dateOfBirth?: Date | null;
+    gender?: GenderEnum | null;
+  }): void {
     if (props.firstName !== undefined) {
       this._firstName = props.firstName;
     }
     if (props.lastName !== undefined) {
       this._lastName = props.lastName;
+    }
+    if (props.phone !== undefined) {
+      this._phone = props.phone;
+    }
+    if (props.dateOfBirth !== undefined) {
+      this._dateOfBirth = props.dateOfBirth;
+    }
+    if (props.gender !== undefined) {
+      this._gender = props.gender ? Gender.fromString(props.gender) : null;
     }
     this._updatedAt = new Date();
     this.apply(new UserUpdatedEvent(this._id));
@@ -194,6 +219,18 @@ export class User extends AggregateRoot {
   }
   get avatarUrl(): string | null {
     return this._avatarUrl;
+  }
+  get phone(): string | null {
+    return this._phone;
+  }
+  get dateOfBirth(): Date | null {
+    return this._dateOfBirth;
+  }
+  get gender(): Gender | null {
+    return this._gender;
+  }
+  get genderValue(): GenderEnum | null {
+    return this._gender?.value ?? null;
   }
   get isActive(): boolean {
     return this._isActive;

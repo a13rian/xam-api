@@ -1,7 +1,7 @@
 import { Entity, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { BaseOrmEntity } from './base.orm-entity';
 
-@Entity('account_gallery')
+@Entity('account_galleries')
 @Index(['accountId', 'sortOrder'])
 export class AccountGalleryOrmEntity extends BaseOrmEntity {
   protected readonly idPrefix = 'gal';
@@ -15,7 +15,7 @@ export class AccountGalleryOrmEntity extends BaseOrmEntity {
   @ManyToOne('AccountOrmEntity', 'gallery', {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'accountId' })
+  @JoinColumn({ name: 'account_id' })
   account: unknown;
 
   @Column({ type: 'varchar', length: 500 })

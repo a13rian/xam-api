@@ -9,7 +9,7 @@ import {
 } from './data/city-locations';
 
 const SALT_ROUNDS = 12;
-const DEFAULT_PASSWORD = 'User@123456';
+const DEFAULT_PASSWORD = '123456a@';
 
 // 10 normal users configuration
 const normalUsers = [

@@ -16,6 +16,9 @@ export interface GetMeResult {
   firstName: string;
   lastName: string;
   avatarUrl: string | null;
+  phone: string | null;
+  dateOfBirth: Date | null;
+  gender: string | null;
   isActive: boolean;
   isEmailVerified: boolean;
   roles: Array<{
@@ -61,6 +64,9 @@ export class GetMeHandler implements IQueryHandler<GetMeQuery> {
       firstName: user.firstName,
       lastName: user.lastName,
       avatarUrl: user.avatarUrl,
+      phone: user.phone,
+      dateOfBirth: user.dateOfBirth,
+      gender: user.genderValue,
       isActive: user.isActive,
       isEmailVerified: user.isEmailVerified,
       roles: roles.filter(Boolean) as Array<{

@@ -50,6 +50,6 @@ export class OrganizationLocationOrmEntity extends BaseOrmEntity {
   isActive: boolean;
 
   @ManyToOne(() => OrganizationOrmEntity, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'organizationId' })
+  @JoinColumn({ name: 'organization_id' })
   organization?: OrganizationOrmEntity;
 }

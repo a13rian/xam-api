@@ -1,7 +1,6 @@
 import { DataSource } from 'typeorm';
-import { RoleOrmEntity } from '../typeorm/entities/role.orm-entity';
 import { PermissionOrmEntity } from '../typeorm/entities/permission.orm-entity';
-import { v4 as uuidv4 } from 'uuid';
+import { RoleOrmEntity } from '../typeorm/entities/role.orm-entity';
 
 interface RoleSeedConfig {
   name: string;
@@ -81,7 +80,6 @@ export async function seedRoles(
 
   for (const roleConfig of roles) {
     const entity = new RoleOrmEntity();
-    entity.id = uuidv4();
     entity.name = roleConfig.name;
     entity.description = roleConfig.description;
     entity.isSystem = roleConfig.isSystem;

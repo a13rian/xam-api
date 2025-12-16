@@ -93,15 +93,15 @@ export class BookingOrmEntity extends BaseOrmEntity {
   cancelledAt?: Date;
 
   @ManyToOne(() => UserOrmEntity)
-  @JoinColumn({ name: 'customerId' })
+  @JoinColumn({ name: 'customer_id' })
   customer?: UserOrmEntity;
 
   @ManyToOne(() => OrganizationOrmEntity)
-  @JoinColumn({ name: 'organizationId' })
+  @JoinColumn({ name: 'organization_id' })
   organization?: OrganizationOrmEntity;
 
   @ManyToOne(() => OrganizationLocationOrmEntity)
-  @JoinColumn({ name: 'locationId' })
+  @JoinColumn({ name: 'location_id' })
   location?: OrganizationLocationOrmEntity;
 
   @OneToMany(() => BookingServiceOrmEntity, (bs) => bs.booking, {
@@ -134,6 +134,6 @@ export class BookingServiceOrmEntity extends BaseOrmEntity {
   durationMinutes: number;
 
   @ManyToOne(() => BookingOrmEntity, (b) => b.services, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'bookingId' })
+  @JoinColumn({ name: 'booking_id' })
   booking?: BookingOrmEntity;
 }

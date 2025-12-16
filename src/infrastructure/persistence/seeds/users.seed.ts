@@ -1,7 +1,6 @@
 import { DataSource } from 'typeorm';
 import { UserOrmEntity } from '../typeorm/entities/user.orm-entity';
 import { RoleOrmEntity } from '../typeorm/entities/role.orm-entity';
-import { v4 as uuidv4 } from 'uuid';
 import * as bcrypt from 'bcrypt';
 
 interface UserSeedConfig {
@@ -15,21 +14,21 @@ interface UserSeedConfig {
 const users: UserSeedConfig[] = [
   {
     email: 'superadmin@xam.com',
-    password: 'SuperAdmin@123',
+    password: '123456a@',
     firstName: 'Super',
     lastName: 'Admin',
     roleName: 'super_admin',
   },
   {
     email: 'admin@xam.com',
-    password: 'Admin@123456',
+    password: '123456a@',
     firstName: 'Admin',
     lastName: 'User',
     roleName: 'admin',
   },
   {
     email: 'member@xam.com',
-    password: 'Member@123456',
+    password: '123456a@',
     firstName: 'Member',
     lastName: 'User',
     roleName: 'member',
@@ -55,7 +54,6 @@ export async function seedUsers(
     const role = roles.find((r) => r.name === userConfig.roleName);
 
     const entity = new UserOrmEntity();
-    entity.id = uuidv4();
     entity.email = userConfig.email;
     entity.passwordHash = passwordHash;
     entity.firstName = userConfig.firstName;

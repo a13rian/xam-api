@@ -36,10 +36,19 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
 
     const userWithContext = this.eventPublisher.mergeObjectContext(user);
 
-    if (command.firstName !== undefined || command.lastName !== undefined) {
+    if (
+      command.firstName !== undefined ||
+      command.lastName !== undefined ||
+      command.phone !== undefined ||
+      command.dateOfBirth !== undefined ||
+      command.gender !== undefined
+    ) {
       userWithContext.update({
         firstName: command.firstName,
         lastName: command.lastName,
+        phone: command.phone,
+        dateOfBirth: command.dateOfBirth,
+        gender: command.gender,
       });
     }
 

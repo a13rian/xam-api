@@ -24,7 +24,7 @@ import { BaseOrmEntity } from './base.orm-entity';
 @Entity('accounts')
 @Index(['organizationId', 'userId'], {
   unique: true,
-  where: '"organizationId" IS NOT NULL AND "userId" IS NOT NULL',
+  where: '"organization_id" IS NOT NULL AND "user_id" IS NOT NULL',
 })
 export class AccountOrmEntity extends BaseOrmEntity {
   protected readonly idPrefix = 'acc';
@@ -34,7 +34,7 @@ export class AccountOrmEntity extends BaseOrmEntity {
   userId: string;
 
   @OneToOne(() => UserOrmEntity)
-  @JoinColumn({ name: 'userId' })
+  @JoinColumn({ name: 'user_id' })
   user: UserOrmEntity;
 
   @Column({ type: 'uuid', nullable: true })
@@ -42,7 +42,7 @@ export class AccountOrmEntity extends BaseOrmEntity {
   organizationId: string | null;
 
   @ManyToOne(() => OrganizationOrmEntity, { nullable: true })
-  @JoinColumn({ name: 'organizationId' })
+  @JoinColumn({ name: 'organization_id' })
   organization: OrganizationOrmEntity | null;
 
   @Column({ type: 'enum', enum: AccountTypeEnum })
@@ -85,7 +85,7 @@ export class AccountOrmEntity extends BaseOrmEntity {
   })
   invitationStatus: InvitationStatusEnum | null;
 
-  @Index({ unique: true, where: '"invitationToken" IS NOT NULL' })
+  @Index({ unique: true, where: '"invitation_token" IS NOT NULL' })
   @Column({ type: 'uuid', nullable: true })
   invitationToken: string | null;
 

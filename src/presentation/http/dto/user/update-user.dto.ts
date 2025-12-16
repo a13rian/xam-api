@@ -6,7 +6,10 @@ import {
   IsBoolean,
   IsArray,
   IsUUID,
+  IsDateString,
+  IsEnum,
 } from 'class-validator';
+import { GenderEnum } from '../../../../core/domain/user/value-objects/gender.vo';
 
 export class UpdateUserDto {
   @IsOptional()
@@ -20,6 +23,19 @@ export class UpdateUserDto {
   @MinLength(1)
   @MaxLength(100)
   lastName?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  phone?: string;
+
+  @IsOptional()
+  @IsDateString()
+  dateOfBirth?: string;
+
+  @IsOptional()
+  @IsEnum(GenderEnum)
+  gender?: GenderEnum;
 
   @IsOptional()
   @IsBoolean()

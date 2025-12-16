@@ -46,10 +46,10 @@ export class ServiceOrmEntity extends BaseOrmEntity {
   sortOrder: number;
 
   @ManyToOne(() => OrganizationOrmEntity, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'organizationId' })
+  @JoinColumn({ name: 'organization_id' })
   organization?: OrganizationOrmEntity;
 
   @ManyToOne(() => ServiceCategoryOrmEntity, { onDelete: 'RESTRICT' })
-  @JoinColumn({ name: 'categoryId' })
+  @JoinColumn({ name: 'category_id' })
   category?: ServiceCategoryOrmEntity;
 }

@@ -40,7 +40,7 @@ export class ServiceCategoryOrmEntity extends BaseOrmEntity {
     nullable: true,
     onDelete: 'SET NULL',
   })
-  @JoinColumn({ name: 'parentId' })
+  @JoinColumn({ name: 'parent_id' })
   parent?: ServiceCategoryOrmEntity;
 
   @OneToMany(() => ServiceCategoryOrmEntity, (category) => category.parent)

@@ -21,7 +21,7 @@ export class WalletOrmEntity extends BaseOrmEntity {
   userId: string;
 
   @OneToOne(() => UserOrmEntity)
-  @JoinColumn({ name: 'userId' })
+  @JoinColumn({ name: 'user_id' })
   user: UserOrmEntity;
 
   @Column({ type: 'decimal', precision: 15, scale: 2, default: 0 })

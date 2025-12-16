@@ -1,5 +1,10 @@
 import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
+import { SnakeNamingStrategy } from '../typeorm/naming-strategies/snake-naming.strategy';
+
+// Parse command line arguments
+const args = process.argv.slice(2);
+const forceRefresh = args.includes('--refresh') || args.includes('-r');
 import { UserOrmEntity } from '../typeorm/entities/user.orm-entity';
 import { RoleOrmEntity } from '../typeorm/entities/role.orm-entity';
 import { PermissionOrmEntity } from '../typeorm/entities/permission.orm-entity';
@@ -33,6 +38,7 @@ const dataSource = new DataSource({
   username: process.env.DB_USERNAME || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_DATABASE || 'xam_api',
+  namingStrategy: new SnakeNamingStrategy(),
   entities: [
     UserOrmEntity,
     RoleOrmEntity,
@@ -51,10 +57,51 @@ const dataSource = new DataSource({
   synchronize: false,
 });
 
+async function cleanupDatabase(ds: DataSource): Promise<void> {
+  console.log('Cleaning existing data...');
+
+  // Order matters: delete dependent tables first (respecting foreign keys)
+  const tables = [
+    'account_galleries',
+    'accounts',
+    'organization_locations',
+    'organizations',
+    'wallet_transactions',
+    'wallets',
+    'user_profiles',
+    'refresh_tokens',
+    'password_reset_tokens',
+    'email_verification_tokens',
+    'user_roles',
+    'users',
+    'wards',
+    'districts',
+    'provinces',
+    'role_permissions',
+    'roles',
+    'permissions',
+  ];
+
+  for (const table of tables) {
+    try {
+      await ds.query(`TRUNCATE TABLE "${table}" CASCADE`);
+      console.log(`  Truncated ${table}`);
+    } catch {
+      // Table might not exist, ignore
+    }
+  }
+
+  console.log('Cleanup complete');
+}
+
 async function runSeeds() {
   try {
     await dataSource.initialize();
     console.log('Data source initialized');
+
+    if (forceRefresh) {
+      await cleanupDatabase(dataSource);
+    }
 
     const permissions = await seedPermissions(dataSource);
     const roles = await seedRoles(dataSource, permissions);

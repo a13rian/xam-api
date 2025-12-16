@@ -25,6 +25,6 @@ export class OperatingHoursOrmEntity extends BaseOrmEntity {
   isClosed: boolean;
 
   @ManyToOne(() => OrganizationLocationOrmEntity, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'locationId' })
+  @JoinColumn({ name: 'location_id' })
   location?: OrganizationLocationOrmEntity;
 }

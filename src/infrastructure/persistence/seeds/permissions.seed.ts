@@ -1,6 +1,5 @@
 import { DataSource } from 'typeorm';
 import { PermissionOrmEntity } from '../typeorm/entities/permission.orm-entity';
-import { v4 as uuidv4 } from 'uuid';
 
 const permissions = [
   // User permissions
@@ -239,7 +238,6 @@ export async function seedPermissions(
 
   const permissionEntities = permissions.map((p) => {
     const entity = new PermissionOrmEntity();
-    entity.id = uuidv4();
     entity.code = p.code;
     entity.name = p.name;
     entity.description = p.description;
