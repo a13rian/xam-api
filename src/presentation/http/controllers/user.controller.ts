@@ -29,6 +29,8 @@ import {
   UserResponseDto,
   UserListResponseDto,
   ListUsersQueryDto,
+  NotificationSettingsDto,
+  UpdateNotificationSettingsDto,
 } from '../dto/user';
 import {
   CreateUserCommand,
@@ -37,10 +39,12 @@ import {
   UpdateUserAvatarCommand,
   RemoveUserAvatarCommand,
   UpdateAvatarResult,
+  UpdateNotificationSettingsCommand,
 } from '../../../core/application/user/commands';
 import {
   GetUserQuery,
   ListUsersQuery,
+  GetNotificationSettingsQuery,
 } from '../../../core/application/user/queries';
 
 @ApiTags('users')
@@ -167,5 +171,33 @@ export class UserController {
   @ApiOperation({ summary: 'Remove user avatar' })
   async removeAvatar(@CurrentUser() user: AuthenticatedUser): Promise<void> {
     await this.commandBus.execute(new RemoveUserAvatarCommand(user.id));
+  }
+
+  @Get('me/notifications')
+  @ApiOperation({ summary: 'Get current user notification settings' })
+  async getNotificationSettings(
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<NotificationSettingsDto> {
+    return await this.queryBus.execute(
+      new GetNotificationSettingsQuery(user.id),
+    );
+  }
+
+  @Patch('me/notifications')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update current user notification settings' })
+  async updateNotificationSettings(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: UpdateNotificationSettingsDto,
+  ): Promise<NotificationSettingsDto> {
+    return await this.commandBus.execute(
+      new UpdateNotificationSettingsCommand(
+        user.id,
+        dto.emailNotifications,
+        dto.pushNotifications,
+        dto.marketingEmails,
+        dto.bookingReminders,
+      ),
+    );
   }
 }

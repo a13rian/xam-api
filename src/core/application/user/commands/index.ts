@@ -3,3 +3,4 @@ export * from './update-user';
 export * from './delete-user';
 export * from './update-avatar';
 export * from './remove-avatar';
+export * from './update-notification-settings';

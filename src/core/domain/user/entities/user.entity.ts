@@ -3,6 +3,7 @@ import { createId } from '@paralleldrive/cuid2';
 import { Email } from '../value-objects/email.vo';
 import { Password } from '../value-objects/password.vo';
 import { Gender, GenderEnum } from '../value-objects/gender.vo';
+import { NotificationSettings } from '../value-objects/notification-settings.vo';
 import { UserCreatedEvent } from '../events/user-created.event';
 import { UserUpdatedEvent } from '../events/user-updated.event';
 
@@ -24,6 +25,7 @@ export interface UserProps {
   roleNames?: string[];
   failedLoginAttempts?: number;
   lockedUntil?: Date | null;
+  notificationSettings?: NotificationSettings;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -52,6 +54,7 @@ export class User extends AggregateRoot {
   private _roleNames: string[];
   private _failedLoginAttempts: number;
   private _lockedUntil: Date | null;
+  private _notificationSettings: NotificationSettings;
   private readonly _createdAt: Date;
   private _updatedAt: Date;
 
@@ -72,6 +75,8 @@ export class User extends AggregateRoot {
     this._roleNames = props.roleNames ?? [];
     this._failedLoginAttempts = props.failedLoginAttempts ?? 0;
     this._lockedUntil = props.lockedUntil ?? null;
+    this._notificationSettings =
+      props.notificationSettings ?? NotificationSettings.create();
     this._createdAt = props.createdAt ?? new Date();
     this._updatedAt = props.updatedAt ?? new Date();
   }
@@ -189,6 +194,18 @@ export class User extends AggregateRoot {
     this._updatedAt = new Date();
   }
 
+  public updateNotificationSettings(
+    updates: Partial<{
+      emailNotifications: boolean;
+      pushNotifications: boolean;
+      marketingEmails: boolean;
+      bookingReminders: boolean;
+    }>,
+  ): void {
+    this._notificationSettings = this._notificationSettings.update(updates);
+    this._updatedAt = new Date();
+  }
+
   public get isLocked(): boolean {
     if (!this._lockedUntil) return false;
     if (this._lockedUntil <= new Date()) {
@@ -258,5 +275,8 @@ export class User extends AggregateRoot {
   }
   get updatedAt(): Date {
     return this._updatedAt;
+  }
+  get notificationSettings(): NotificationSettings {
+    return this._notificationSettings;
   }
 }

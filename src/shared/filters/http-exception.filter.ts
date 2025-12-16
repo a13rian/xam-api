@@ -38,9 +38,18 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     // Only log server errors (5xx), skip client errors (4xx)
     if (errorResponse.statusCode >= 500) {
+      const errorMessage =
+        exception instanceof Error ? exception.message : String(exception);
       this.logger.error(
-        `${request.method} ${request.url} - ${errorResponse.statusCode} - ${errorResponse.message}`,
-        exception instanceof Error ? exception.stack : undefined,
+        {
+          method: request.method,
+          url: request.url,
+          statusCode: errorResponse.statusCode,
+          errorName: exception instanceof Error ? exception.name : 'Unknown',
+          errorMessage,
+          stack: exception instanceof Error ? exception.stack : undefined,
+        },
+        `${request.method} ${request.url} - ${errorResponse.statusCode} - ${errorMessage}`,
       );
     }
 

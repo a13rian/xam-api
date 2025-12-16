@@ -13,10 +13,12 @@ import {
   DeleteUserHandler,
   UpdateUserAvatarHandler,
   RemoveUserAvatarHandler,
+  UpdateNotificationSettingsHandler,
 } from '../../core/application/user/commands';
 import {
   GetUserHandler,
   ListUsersHandler,
+  GetNotificationSettingsHandler,
 } from '../../core/application/user/queries';
 import { RoleModule } from './role.module';
 import { StorageModule } from './storage.module';
@@ -27,9 +29,14 @@ const CommandHandlers = [
   DeleteUserHandler,
   UpdateUserAvatarHandler,
   RemoveUserAvatarHandler,
+  UpdateNotificationSettingsHandler,
 ];
 
-const QueryHandlers = [GetUserHandler, ListUsersHandler];
+const QueryHandlers = [
+  GetUserHandler,
+  ListUsersHandler,
+  GetNotificationSettingsHandler,
+];
 
 @Module({
   imports: [

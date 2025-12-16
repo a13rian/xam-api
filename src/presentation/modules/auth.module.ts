@@ -16,6 +16,7 @@ import {
   RefreshTokenHandler,
   ForgotPasswordHandler,
   ResetPasswordHandler,
+  ChangePasswordHandler,
   VerifyEmailHandler,
   LogoutHandler,
 } from '../../core/application/auth/commands/index.js';
@@ -33,6 +34,7 @@ const CommandHandlers = [
   RefreshTokenHandler,
   ForgotPasswordHandler,
   ResetPasswordHandler,
+  ChangePasswordHandler,
   VerifyEmailHandler,
   LogoutHandler,
 ];

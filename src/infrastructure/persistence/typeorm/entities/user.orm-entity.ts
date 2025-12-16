@@ -51,4 +51,21 @@ export class UserOrmEntity extends BaseOrmEntity {
 
   @Column({ type: 'timestamp', nullable: true })
   lockedUntil: Date | null;
+
+  @Column({
+    type: 'jsonb',
+    nullable: false,
+    default: {
+      emailNotifications: true,
+      pushNotifications: true,
+      marketingEmails: false,
+      bookingReminders: true,
+    },
+  })
+  notificationSettings: {
+    emailNotifications: boolean;
+    pushNotifications: boolean;
+    marketingEmails: boolean;
+    bookingReminders: boolean;
+  };
 }

@@ -60,8 +60,16 @@ async function bootstrap() {
 
   // Graceful shutdown handling
   const signals: NodeJS.Signals[] = ['SIGTERM', 'SIGINT'];
+  let isShuttingDown = false;
 
   const handleShutdown = (signal: NodeJS.Signals) => {
+    // Prevent multiple shutdown attempts
+    if (isShuttingDown) {
+      logger.warn(`Shutdown already in progress, ignoring ${signal}`);
+      return;
+    }
+
+    isShuttingDown = true;
     logger.log(`Received ${signal}, starting graceful shutdown...`);
 
     const shutdownTimeout = setTimeout(() => {

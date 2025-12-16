@@ -19,6 +19,7 @@ import {
   RefreshTokenDto,
   ForgotPasswordDto,
   ResetPasswordDto,
+  ChangePasswordDto,
   VerifyEmailDto,
   LoginResponseDto,
   RefreshTokenResponseDto,
@@ -32,6 +33,7 @@ import {
   RefreshTokenCommand,
   ForgotPasswordCommand,
   ResetPasswordCommand,
+  ChangePasswordCommand,
   VerifyEmailCommand,
   LogoutCommand,
 } from '../../../core/application/auth/commands';
@@ -114,6 +116,18 @@ export class AuthController {
     return await this.commandBus.execute(
       new ResetPasswordCommand(dto.token, dto.newPassword),
     );
+  }
+
+  @Post('change-password')
+  @HttpCode(HttpStatus.OK)
+  async changePassword(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: ChangePasswordDto,
+  ): Promise<MessageResponseDto> {
+    const result: { message: string } = await this.commandBus.execute(
+      new ChangePasswordCommand(user.id, dto.currentPassword, dto.newPassword),
+    );
+    return { message: result.message };
   }
 
   @Public()
