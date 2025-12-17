@@ -1,33 +1,32 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
+import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { CqrsModule } from '@nestjs/cqrs';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
 import type { IAppConfig } from './core/application/ports/config/app.config.port';
 import type { ILoggerConfig } from './core/application/ports/config/logger.config.port';
 import type { IThrottleConfig } from './core/application/ports/config/throttle.config.port';
 import { AppConfigModule, validateEnv } from './infrastructure/config';
-import {
-  APP_CONFIG,
-  LOGGER_CONFIG,
-  THROTTLE_CONFIG,
-} from './shared/constants/injection-tokens';
 import { PersistenceModule } from './infrastructure/persistence/persistence.module';
+import { AccountModule } from './presentation/modules/account.module';
 import { AuthModule } from './presentation/modules/auth.module';
 import { BookingModule } from './presentation/modules/booking.module';
 import { CategoryModule } from './presentation/modules/category.module';
 import { HealthModule } from './presentation/modules/health.module';
 import { LocationModule } from './presentation/modules/location.module';
-import { AccountModule } from './presentation/modules/account.module';
 import { OrganizationModule } from './presentation/modules/organization.module';
 import { RoleModule } from './presentation/modules/role.module';
 import { ScheduleModule } from './presentation/modules/schedule.module';
 import { ServiceModule } from './presentation/modules/service.module';
+import { StorageModule } from './presentation/modules/storage.module';
 import { UserModule } from './presentation/modules/user.module';
 import { WalletModule } from './presentation/modules/wallet.module';
-import { StorageModule } from './presentation/modules/storage.module';
-import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
+import {
+  APP_CONFIG,
+  LOGGER_CONFIG,
+  THROTTLE_CONFIG,
+} from './shared/constants/injection-tokens';
 import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 import { PermissionGuard } from './shared/guards/permission.guard';
 import { ValidationPipe } from './shared/pipes/validation.pipe';
@@ -112,10 +111,10 @@ import { ValidationPipe } from './shared/pipes/validation.pipe';
       provide: APP_GUARD,
       useClass: PermissionGuard,
     },
-    {
-      provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
-    },
+    // {
+    //   provide: APP_FILTER,
+    //   useClass: HttpExceptionFilter,
+    // },
     {
       provide: APP_PIPE,
       useClass: ValidationPipe,
