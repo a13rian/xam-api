@@ -44,6 +44,7 @@ import {
 import {
   RegisterAccountCommand,
   ApproveAccountCommand,
+  RejectAccountCommand,
   UpdateAccountProfileCommand,
   AddGalleryImageCommand,
   UpdateGalleryImageCommand,
@@ -55,8 +56,18 @@ import {
   GetMyAccountQuery,
   GetMyAccountResult,
 } from '../../../core/application/account/queries/get-my-account';
+import {
+  ListAccountsQuery,
+  ListAccountsResult,
+} from '../../../core/application/account/queries/list-accounts';
+import {
+  ListPendingAccountsQuery,
+  ListPendingAccountsResult,
+} from '../../../core/application/account/queries/list-pending-accounts';
 import { SearchAccountsByLocationQuery } from '../../../core/application/account/queries/search-accounts-by-location';
 import { GetAccountGalleryQuery } from '../../../core/application/account/queries/get-account-gallery';
+import { AccountStatusEnum } from '../../../core/domain/account/value-objects/account-status.vo';
+import { AccountTypeEnum } from '../../../core/domain/account/value-objects/account-type.vo';
 import { Account } from '../../../core/domain/account/entities/account.entity';
 import { AccountGallery } from '../../../core/domain/account/entities/account-gallery.entity';
 
@@ -398,13 +409,94 @@ export class AdminAccountController {
     private readonly queryBus: QueryBus,
   ) {}
 
+  @Get()
+  @RequirePermissions(PERMISSIONS.PARTNER.READ)
+  @ApiOperation({
+    summary: 'List all accounts',
+    description: 'Get a paginated list of all accounts with optional filters',
+  })
+  async list(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('status') status?: string,
+    @Query('type') type?: string,
+    @Query('search') search?: string,
+  ): Promise<ListAccountsResult> {
+    // Validate status if provided
+    let statusEnum: AccountStatusEnum | undefined;
+    if (status) {
+      const validStatuses = Object.values(AccountStatusEnum);
+      if (validStatuses.includes(status as AccountStatusEnum)) {
+        statusEnum = status as AccountStatusEnum;
+      }
+    }
+
+    // Validate type if provided
+    let typeEnum: AccountTypeEnum | undefined;
+    if (type) {
+      const validTypes = Object.values(AccountTypeEnum);
+      if (validTypes.includes(type as AccountTypeEnum)) {
+        typeEnum = type as AccountTypeEnum;
+      }
+    }
+
+    return this.queryBus.execute(
+      new ListAccountsQuery(
+        page ? parseInt(page, 10) : 1,
+        limit ? parseInt(limit, 10) : 20,
+        statusEnum,
+        typeEnum,
+        search,
+      ),
+    );
+  }
+
+  @Get('pending')
+  @RequirePermissions(PERMISSIONS.PARTNER.APPROVE)
+  @ApiOperation({
+    summary: 'List pending partner accounts',
+    description: 'Get a paginated list of accounts pending approval',
+  })
+  async listPending(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ): Promise<ListPendingAccountsResult> {
+    return this.queryBus.execute(
+      new ListPendingAccountsQuery(
+        page ? parseInt(page, 10) : 1,
+        limit ? parseInt(limit, 10) : 20,
+      ),
+    );
+  }
+
   @Post(':id/approve')
   @HttpCode(200)
   @RequirePermissions(PERMISSIONS.PARTNER.APPROVE)
+  @ApiOperation({
+    summary: 'Approve partner account',
+    description: 'Approve a pending partner account',
+  })
   async approve(
     @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<void> {
     await this.commandBus.execute(new ApproveAccountCommand(id, user.id));
+  }
+
+  @Post(':id/reject')
+  @HttpCode(200)
+  @RequirePermissions(PERMISSIONS.PARTNER.REJECT)
+  @ApiOperation({
+    summary: 'Reject partner account',
+    description: 'Reject a pending partner account with a reason',
+  })
+  async reject(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() body: { reason: string },
+  ): Promise<void> {
+    await this.commandBus.execute(
+      new RejectAccountCommand(id, user.id, body.reason),
+    );
   }
 }

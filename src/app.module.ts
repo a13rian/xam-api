@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -61,6 +61,9 @@ import { ValidationPipe } from './shared/pipes/validation.pipe';
           autoLogging: false,
           quietReqLogger: true,
         },
+        // Use named parameter syntax for NestJS 11+ compatibility with path-to-regexp v8+
+        forRoutes: [{ path: '{*path}', method: RequestMethod.ALL }],
+        exclude: [],
       }),
     }),
     CqrsModule.forRoot(),
