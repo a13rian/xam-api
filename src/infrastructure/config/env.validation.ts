@@ -21,14 +21,10 @@ const envSchema = z.object({
     .transform((val) => val.split(',').map((s) => s.trim())),
 
   // Database
-  DB_HOST: z.string().optional().default('localhost'),
-  DB_PORT: z.coerce.number().int().positive().default(5432),
-  DB_USERNAME: z.string().optional().default('postgres'),
-  DB_PASSWORD: z.string().optional().default('password'),
-  DB_NAME: z.string().optional().default('xam_api'),
-  DB_SYNCHRONIZE: booleanString,
-  DB_LOGGING: booleanString,
-  DB_SSL: booleanString,
+  DATABASE_URL: z.string().url(),
+  DATABASE_SYNCHRONIZE: booleanString,
+  DATABASE_LOGGING: booleanString,
+  DATABASE_SSL: booleanString,
 
   // JWT
   JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),

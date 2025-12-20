@@ -33,11 +33,7 @@ config({ path: '.env' });
 
 const dataSource = new DataSource({
   type: 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432', 10),
-  username: process.env.DB_USERNAME || 'postgres',
-  password: process.env.DB_PASSWORD || 'postgres',
-  database: process.env.DB_DATABASE || 'xam_api',
+  url: process.env.DATABASE_URL,
   namingStrategy: new SnakeNamingStrategy(),
   entities: [
     UserOrmEntity,
@@ -66,7 +62,7 @@ const dataSource = new DataSource({
   ],
   migrations: ['src/infrastructure/persistence/typeorm/migrations/*.ts'],
   synchronize: false,
-  logging: process.env.DB_LOGGING === 'true',
+  logging: process.env.DATABASE_LOGGING === 'true',
 });
 
 export default dataSource;

@@ -6,35 +6,19 @@ import type { IDatabaseConfig } from '@core/application/ports/config/database.co
 export class DatabaseConfigService implements IDatabaseConfig {
   constructor(private readonly configService: ConfigService) {}
 
-  get host(): string {
-    return this.configService.get<string>('DB_HOST') ?? 'localhost';
-  }
-
-  get port(): number {
-    return this.configService.get<number>('DB_PORT') ?? 5432;
-  }
-
-  get username(): string {
-    return this.configService.get<string>('DB_USERNAME') ?? 'postgres';
-  }
-
-  get password(): string {
-    return this.configService.get<string>('DB_PASSWORD') ?? 'password';
-  }
-
-  get name(): string {
-    return this.configService.get<string>('DB_NAME') ?? 'xam_api';
+  get url(): string {
+    return this.configService.getOrThrow<string>('DATABASE_URL');
   }
 
   get synchronize(): boolean {
-    return this.configService.get<string>('DB_SYNCHRONIZE') === 'true';
+    return this.configService.get<string>('DATABASE_SYNCHRONIZE') === 'true';
   }
 
   get logging(): boolean {
-    return this.configService.get<string>('DB_LOGGING') === 'true';
+    return this.configService.get<string>('DATABASE_LOGGING') === 'true';
   }
 
   get ssl(): boolean {
-    return this.configService.get<string>('DB_SSL') === 'true';
+    return this.configService.get<string>('DATABASE_SSL') === 'true';
   }
 }

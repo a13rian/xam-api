@@ -43,8 +43,9 @@ async function bootstrap() {
   // Swagger setup (conditionally enabled)
   setupSwagger(app, swaggerConfig, appConfig.apiPrefix);
 
-  // Enable graceful shutdown hooks
-  app.enableShutdownHooks();
+  if (appConfig.isProduction) {
+    app.enableShutdownHooks();
+  }
 
   await app.listen(appConfig.port);
 
@@ -58,41 +59,43 @@ async function bootstrap() {
     );
   }
 
-  // Graceful shutdown handling
-  const signals: NodeJS.Signals[] = ['SIGTERM', 'SIGINT'];
-  let isShuttingDown = false;
+  if (appConfig.isProduction) {
+    // Graceful shutdown handling
+    const signals: NodeJS.Signals[] = ['SIGTERM', 'SIGINT'];
+    let isShuttingDown = false;
 
-  const handleShutdown = (signal: NodeJS.Signals) => {
-    // Prevent multiple shutdown attempts
-    if (isShuttingDown) {
-      logger.warn(`Shutdown already in progress, ignoring ${signal}`);
-      return;
-    }
+    const handleShutdown = (signal: NodeJS.Signals) => {
+      // Prevent multiple shutdown attempts
+      if (isShuttingDown) {
+        logger.warn(`Shutdown already in progress, ignoring ${signal}`);
+        return;
+      }
 
-    isShuttingDown = true;
-    logger.log(`Received ${signal}, starting graceful shutdown...`);
+      isShuttingDown = true;
+      logger.log(`Received ${signal}, starting graceful shutdown...`);
 
-    const shutdownTimeout = setTimeout(() => {
-      logger.error('Graceful shutdown timed out, forcing exit');
-      process.exit(1);
-    }, appConfig.shutdownTimeout);
-
-    app
-      .close()
-      .then(() => {
-        clearTimeout(shutdownTimeout);
-        logger.log('Graceful shutdown completed');
-        process.exit(0);
-      })
-      .catch((error: unknown) => {
-        clearTimeout(shutdownTimeout);
-        logger.error('Error during graceful shutdown', error);
+      const shutdownTimeout = setTimeout(() => {
+        logger.error('Graceful shutdown timed out, forcing exit');
         process.exit(1);
-      });
-  };
+      }, appConfig.shutdownTimeout);
 
-  for (const signal of signals) {
-    process.on(signal, () => handleShutdown(signal));
+      app
+        .close()
+        .then(() => {
+          clearTimeout(shutdownTimeout);
+          logger.log('Graceful shutdown completed');
+          process.exit(0);
+        })
+        .catch((error: unknown) => {
+          clearTimeout(shutdownTimeout);
+          logger.error('Error during graceful shutdown', error);
+          process.exit(1);
+        });
+    };
+
+    for (const signal of signals) {
+      process.on(signal, () => handleShutdown(signal));
+    }
   }
 }
 
