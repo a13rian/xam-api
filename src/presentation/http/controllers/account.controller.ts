@@ -36,6 +36,7 @@ import {
   ReorderGalleryDto,
   GalleryItemResponseDto,
   UploadGalleryImageDto,
+  PublicAccountResponseDto,
 } from '../dto/account';
 import {
   UploadFileCommand,
@@ -66,6 +67,10 @@ import {
 } from '../../../core/application/account/queries/list-pending-accounts';
 import { SearchAccountsByLocationQuery } from '../../../core/application/account/queries/search-accounts-by-location';
 import { GetAccountGalleryQuery } from '../../../core/application/account/queries/get-account-gallery';
+import {
+  GetAccountQuery,
+  GetAccountResult,
+} from '../../../core/application/account/queries/get-account';
 import { AccountStatusEnum } from '../../../core/domain/account/value-objects/account-status.vo';
 import { AccountTypeEnum } from '../../../core/domain/account/value-objects/account-type.vo';
 import { Account } from '../../../core/domain/account/entities/account.entity';
@@ -380,6 +385,24 @@ export class AccountController {
     await this.commandBus.execute(
       new ReorderGalleryImagesCommand(myAccount.id, dto.items),
     );
+  }
+
+  @Get(':id')
+  @Public()
+  @ApiOperation({
+    summary: 'Get public account details',
+    description:
+      'Get publicly visible account information for SEO and profile pages',
+  })
+  async getAccount(
+    @Param('id') accountId: string,
+  ): Promise<PublicAccountResponseDto> {
+    const result = await this.queryBus.execute<
+      GetAccountQuery,
+      GetAccountResult
+    >(new GetAccountQuery(accountId));
+
+    return result as PublicAccountResponseDto;
   }
 
   @Get(':id/gallery')

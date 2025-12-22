@@ -169,17 +169,33 @@ export class AccountRepository implements IAccountRepository {
         'account.displayName',
         'account.type',
         'account.status',
+        // Location
         'account.street',
         'account.ward',
         'account.district',
         'account.city',
         'account.latitude',
         'account.longitude',
+        // Profile
+        'account.avatarUrl',
+        'account.tagline',
+        'account.personalBio',
+        // Trust & rating
+        'account.isVerified',
+        'account.rating',
+        'account.totalReviews',
+        'account.completedBookings',
+        'account.badges',
+        // Additional info
+        'account.languages',
+        'account.priceRange',
       ])
       .addSelect(
         `ST_Distance(account.location, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography) / 1000`,
         'distance_km',
       )
+      // Join gallery
+      .leftJoinAndSelect('account.gallery', 'gallery')
       .where('account.location IS NOT NULL')
       .andWhere('account.isActive = true')
       .andWhere(
@@ -203,8 +219,8 @@ export class AccountRepository implements IAccountRepository {
       query.andWhere('account.ward = :ward', { ward });
     }
 
-    // Order by distance
-    query.orderBy('distance_km', 'ASC');
+    // Order by distance and gallery sort order
+    query.orderBy('distance_km', 'ASC').addOrderBy('gallery.sortOrder', 'ASC');
 
     // Get total count (need separate query for count with spatial filter)
     const countQuery = this.ormRepository
@@ -233,35 +249,59 @@ export class AccountRepository implements IAccountRepository {
 
     const total = await countQuery.getCount();
 
-    // Get paginated results
-    const rawResults = await query.offset(skip).limit(limit).getRawMany<{
-      account_id: string;
-      account_displayName: string;
-      account_type: string;
-      account_status: string;
-      account_street: string | null;
-      account_ward: string | null;
-      account_district: string | null;
-      account_city: string | null;
-      account_latitude: string | null;
-      account_longitude: string | null;
-      distance_km: string;
-    }>();
+    // Get paginated results with entities and raw fields (for distance)
+    const rawAndEntities = await query
+      .offset(skip)
+      .limit(limit)
+      .getRawAndEntities();
 
-    const items = rawResults.map((row) => ({
-      id: row.account_id,
-      displayName: row.account_displayName,
-      type: row.account_type,
-      status: row.account_status,
-      street: row.account_street,
-      ward: row.account_ward,
-      district: row.account_district,
-      city: row.account_city,
-      latitude: row.account_latitude ? parseFloat(row.account_latitude) : null,
-      longitude: row.account_longitude
-        ? parseFloat(row.account_longitude)
+    // Create a map of account id to distance
+    const distanceMap = new Map<string, number>();
+    for (const raw of rawAndEntities.raw as {
+      account_id: string;
+      distance_km: string;
+    }[]) {
+      distanceMap.set(raw.account_id, parseFloat(raw.distance_km));
+    }
+
+    const items = rawAndEntities.entities.map((entity) => ({
+      id: entity.id,
+      displayName: entity.displayName,
+      type: entity.type,
+      status: entity.status,
+      // Location
+      street: entity.street,
+      ward: entity.ward,
+      district: entity.district,
+      city: entity.city,
+      latitude: entity.latitude ? parseFloat(String(entity.latitude)) : null,
+      longitude: entity.longitude ? parseFloat(String(entity.longitude)) : null,
+      distanceKm: distanceMap.get(entity.id) ?? 0,
+      // Profile
+      avatarUrl: entity.avatarUrl,
+      tagline: entity.tagline,
+      personalBio: entity.personalBio,
+      // Trust & rating
+      isVerified: entity.isVerified,
+      rating: entity.rating ? parseFloat(String(entity.rating)) : null,
+      totalReviews: entity.totalReviews,
+      completedBookings: entity.completedBookings,
+      badges: entity.badges ?? [],
+      // Additional info
+      languages: entity.languages ?? [],
+      priceRange: entity.priceRange
+        ? {
+            min: entity.priceRange.min,
+            max: entity.priceRange.max,
+            currency: entity.priceRange.currency,
+          }
         : null,
-      distanceKm: parseFloat(row.distance_km),
+      // Gallery
+      gallery: (entity.gallery ?? []).map((g) => ({
+        id: g.id,
+        imageUrl: g.imageUrl,
+        caption: g.caption,
+      })),
     }));
 
     return { items, total, page, limit };

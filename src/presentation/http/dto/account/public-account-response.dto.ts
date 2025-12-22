@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class AccountSearchGalleryImageDto {
+export class PublicAccountGalleryImageDto {
   @ApiProperty({ example: 'gal_xxx' })
   id: string;
 
@@ -9,9 +9,12 @@ export class AccountSearchGalleryImageDto {
 
   @ApiPropertyOptional({ example: 'Ảnh profile' })
   caption: string | null;
+
+  @ApiProperty({ example: 0 })
+  sortOrder: number;
 }
 
-export class AccountSearchPriceRangeDto {
+export class PublicAccountPriceRangeDto {
   @ApiProperty({ example: 100000 })
   min: number;
 
@@ -22,7 +25,7 @@ export class AccountSearchPriceRangeDto {
   currency: string;
 }
 
-export class AccountSearchItemDto {
+export class PublicAccountResponseDto {
   @ApiProperty({ example: 'acc_xxx' })
   id: string;
 
@@ -35,40 +38,30 @@ export class AccountSearchItemDto {
   @ApiProperty({ example: 'active' })
   status: string;
 
-  // Location fields
-  @ApiPropertyOptional({ example: '123 Nguyễn Huệ' })
-  street: string | null;
-
-  @ApiPropertyOptional({ example: 'Bến Nghé' })
-  ward: string | null;
-
-  @ApiPropertyOptional({ example: 'Quận 1' })
-  district: string | null;
-
-  @ApiPropertyOptional({ example: 'Thành phố Hồ Chí Minh' })
-  city: string | null;
-
-  @ApiPropertyOptional({ example: 10.7769 })
-  latitude: number | null;
-
-  @ApiPropertyOptional({ example: 106.7009 })
-  longitude: number | null;
-
-  @ApiProperty({
-    description: 'Distance from search point in kilometers',
-    example: 0.5,
-  })
-  distanceKm: number;
-
   // Profile fields
   @ApiPropertyOptional({ example: 'https://example.com/avatar.jpg' })
   avatarUrl: string | null;
+
+  @ApiPropertyOptional({ example: 'https://example.com/cover.jpg' })
+  coverImageUrl: string | null;
+
+  @ApiPropertyOptional({ example: 'https://example.com/intro.mp4' })
+  videoIntroUrl: string | null;
 
   @ApiPropertyOptional({ example: 'Chuyên gia tư vấn tâm lý' })
   tagline: string | null;
 
   @ApiPropertyOptional({ example: 'Tôi là người có 5 năm kinh nghiệm...' })
   personalBio: string | null;
+
+  @ApiPropertyOptional({ example: 'Tư vấn tâm lý' })
+  specialization: string | null;
+
+  @ApiPropertyOptional({ example: 5 })
+  yearsExperience: number | null;
+
+  @ApiProperty({ example: ['Chứng chỉ A', 'Chứng chỉ B'], type: [String] })
+  certifications: string[];
 
   // Trust & rating fields
   @ApiProperty({ example: true })
@@ -90,27 +83,10 @@ export class AccountSearchItemDto {
   @ApiProperty({ example: ['Vietnamese', 'English'], type: [String] })
   languages: string[];
 
-  @ApiPropertyOptional({ type: AccountSearchPriceRangeDto })
-  priceRange: AccountSearchPriceRangeDto | null;
+  @ApiPropertyOptional({ type: PublicAccountPriceRangeDto })
+  priceRange: PublicAccountPriceRangeDto | null;
 
   // Gallery
-  @ApiProperty({ type: [AccountSearchGalleryImageDto] })
-  gallery: AccountSearchGalleryImageDto[];
-}
-
-export class SearchAccountsResponseDto {
-  @ApiProperty({ type: [AccountSearchItemDto] })
-  items: AccountSearchItemDto[];
-
-  @ApiProperty({ example: 150 })
-  total: number;
-
-  @ApiProperty({ example: 1 })
-  page: number;
-
-  @ApiProperty({ example: 20 })
-  limit: number;
-
-  @ApiProperty({ example: 8 })
-  totalPages: number;
+  @ApiProperty({ type: [PublicAccountGalleryImageDto] })
+  gallery: PublicAccountGalleryImageDto[];
 }

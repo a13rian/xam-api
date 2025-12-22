@@ -17,11 +17,24 @@ export interface AccountSearchOptions {
   limit: number;
 }
 
+export interface GalleryImageResult {
+  id: string;
+  imageUrl: string;
+  caption: string | null;
+}
+
+export interface PriceRangeResult {
+  min: number;
+  max: number;
+  currency: string;
+}
+
 export interface AccountSearchResultItem {
   id: string;
   displayName: string;
   type: string;
   status: string;
+  // Location
   street: string | null;
   ward: string | null;
   district: string | null;
@@ -29,6 +42,21 @@ export interface AccountSearchResultItem {
   latitude: number | null;
   longitude: number | null;
   distanceKm: number;
+  // Profile
+  avatarUrl: string | null;
+  tagline: string | null;
+  personalBio: string | null;
+  // Trust & rating
+  isVerified: boolean;
+  rating: number | null;
+  totalReviews: number;
+  completedBookings: number;
+  badges: string[];
+  // Additional info
+  languages: string[];
+  priceRange: PriceRangeResult | null;
+  // Gallery
+  gallery: GalleryImageResult[];
 }
 
 export interface AccountSearchResult {
