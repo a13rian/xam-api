@@ -7,8 +7,6 @@ export class RegisterAccountCommand {
     public readonly displayName: string,
     // Individual fields
     public readonly specialization?: string,
-    public readonly yearsExperience?: number,
-    public readonly certifications?: string[],
     public readonly portfolio?: string,
     public readonly personalBio?: string,
     // Business fields (for creating organization)

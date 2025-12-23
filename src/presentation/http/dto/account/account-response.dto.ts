@@ -30,8 +30,6 @@ export class AccountResponseDto {
   role: AccountRoleEnum | null;
   displayName: string;
   specialization: string | null;
-  yearsExperience: number | null;
-  certifications: string[];
   portfolio: string | null;
   personalBio: string | null;
   status: AccountStatusEnum;
@@ -72,4 +70,32 @@ export class RegisterAccountResponseDto {
   status: string;
   organizationId?: string;
   businessName?: string;
+}
+
+export class MyAccountServiceDto {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  currency: string;
+  durationMinutes: number;
+  categoryId: string;
+  isActive: boolean;
+  sortOrder: number;
+}
+
+export class MyAccountResponseDto {
+  id: string;
+  userId: string;
+  type: string;
+  role: string | null;
+  displayName: string;
+  specialization: string | null;
+  portfolio: string | null;
+  personalBio: string | null;
+  status: string;
+  isActive: boolean;
+  createdAt: Date;
+  organization?: OrganizationSummaryDto;
+  services: MyAccountServiceDto[];
 }

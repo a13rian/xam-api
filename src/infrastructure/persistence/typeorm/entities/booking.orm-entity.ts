@@ -23,14 +23,18 @@ export class BookingOrmEntity extends BaseOrmEntity {
   customerId: string;
 
   @Index()
-  @Column('uuid')
-  organizationId: string;
+  @Column('varchar', { length: 255, nullable: true })
+  organizationId?: string;
 
   @Index()
-  @Column('uuid')
-  locationId: string;
+  @Column('varchar', { length: 255, nullable: true })
+  accountId?: string;
 
-  @Column('uuid', { nullable: true })
+  @Index()
+  @Column('varchar', { length: 255, nullable: true })
+  locationId?: string;
+
+  @Column('varchar', { length: 255, nullable: true })
   staffId?: string;
 
   @Column({
@@ -115,11 +119,14 @@ export class BookingServiceOrmEntity extends BaseOrmEntity {
   protected readonly idPrefix = 'bsv';
 
   @Index()
-  @Column('uuid')
+  @Column('varchar', { length: 255 })
   bookingId: string;
 
-  @Column('uuid')
-  serviceId: string;
+  @Column('varchar', { length: 255, nullable: true })
+  serviceId?: string;
+
+  @Column('varchar', { length: 255, nullable: true })
+  accountServiceId?: string;
 
   @Column({ length: 200 })
   serviceName: string;

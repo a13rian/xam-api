@@ -4,14 +4,11 @@ import {
   MinLength,
   MaxLength,
   IsOptional,
-  IsNumber,
-  IsArray,
   IsUrl,
   IsObject,
   IsDateString,
   ValidateIf,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 import { AccountTypeEnum } from '../../../../core/domain/account/value-objects/account-type.vo';
 
 export class RegisterAccountDto {
@@ -28,16 +25,6 @@ export class RegisterAccountDto {
   @IsString()
   @MaxLength(100)
   specialization?: string;
-
-  @IsOptional()
-  @IsNumber()
-  @Type(() => Number)
-  yearsExperience?: number;
-
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  certifications?: string[];
 
   @IsOptional()
   @IsString()

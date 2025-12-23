@@ -2,7 +2,6 @@ import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
 import { SnakeNamingStrategy } from '../../src/infrastructure/persistence/typeorm/naming-strategies/snake-naming.strategy';
 import { UserOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/user.orm-entity';
-import { UserProfileOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/user-profile.orm-entity';
 import { RoleOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/role.orm-entity';
 import { PermissionOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/permission.orm-entity';
 import { RefreshTokenOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/refresh-token.orm-entity';
@@ -42,7 +41,6 @@ export default async function globalSetup(): Promise<void> {
     namingStrategy: new SnakeNamingStrategy(),
     entities: [
       UserOrmEntity,
-      UserProfileOrmEntity,
       RoleOrmEntity,
       PermissionOrmEntity,
       RefreshTokenOrmEntity,

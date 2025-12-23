@@ -21,8 +21,6 @@ export class AccountMapper {
       role: entity.role ? AccountRole.fromString(entity.role) : null,
       displayName: entity.displayName,
       specialization: entity.specialization,
-      yearsExperience: entity.yearsExperience,
-      certifications: entity.certifications,
       portfolio: entity.portfolio,
       personalBio: entity.personalBio,
       status: AccountStatus.fromString(entity.status),
@@ -76,8 +74,6 @@ export class AccountMapper {
     entity.role = domain.roleValue;
     entity.displayName = domain.displayName;
     entity.specialization = domain.specialization;
-    entity.yearsExperience = domain.yearsExperience;
-    entity.certifications = domain.certifications;
     entity.portfolio = domain.portfolio;
     entity.personalBio = domain.personalBio;
     entity.status = domain.statusValue;

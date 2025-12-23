@@ -25,6 +25,29 @@ export class PublicAccountPriceRangeDto {
   currency: string;
 }
 
+export class PublicAccountServiceDto {
+  @ApiProperty({ example: 'asv_xxx' })
+  id: string;
+
+  @ApiProperty({ example: 'Cắt tóc nam' })
+  name: string;
+
+  @ApiPropertyOptional({ example: 'Cắt tóc theo yêu cầu, tạo kiểu hiện đại' })
+  description: string | null;
+
+  @ApiProperty({ example: 150000 })
+  price: number;
+
+  @ApiProperty({ example: 'VND' })
+  currency: string;
+
+  @ApiProperty({ example: 45 })
+  durationMinutes: number;
+
+  @ApiProperty({ example: 'cat_xxx' })
+  categoryId: string;
+}
+
 export class PublicAccountResponseDto {
   @ApiProperty({ example: 'acc_xxx' })
   id: string;
@@ -57,12 +80,6 @@ export class PublicAccountResponseDto {
   @ApiPropertyOptional({ example: 'Tư vấn tâm lý' })
   specialization: string | null;
 
-  @ApiPropertyOptional({ example: 5 })
-  yearsExperience: number | null;
-
-  @ApiProperty({ example: ['Chứng chỉ A', 'Chứng chỉ B'], type: [String] })
-  certifications: string[];
-
   // Trust & rating fields
   @ApiProperty({ example: true })
   isVerified: boolean;
@@ -86,7 +103,18 @@ export class PublicAccountResponseDto {
   @ApiPropertyOptional({ type: PublicAccountPriceRangeDto })
   priceRange: PublicAccountPriceRangeDto | null;
 
-  // Gallery
+  // Organization info (for booking)
+  @ApiPropertyOptional({ example: 'org_xxx' })
+  organizationId?: string | null;
+
+  @ApiPropertyOptional({ example: 'loc_xxx' })
+  primaryLocationId?: string | null;
+
+  // Galleries
   @ApiProperty({ type: [PublicAccountGalleryImageDto] })
-  gallery: PublicAccountGalleryImageDto[];
+  galleries: PublicAccountGalleryImageDto[];
+
+  // Services
+  @ApiProperty({ type: [PublicAccountServiceDto] })
+  services: PublicAccountServiceDto[];
 }

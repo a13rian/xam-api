@@ -1,5 +1,4 @@
 export * from './user.orm-entity';
-export * from './user-profile.orm-entity';
 export * from './role.orm-entity';
 export * from './permission.orm-entity';
 export * from './refresh-token.orm-entity';
@@ -12,3 +11,4 @@ export * from './organization-location.orm-entity';
 // Export gallery before account to avoid circular dependency
 export * from './account-gallery.orm-entity';
 export * from './account.orm-entity';
+export * from './account-service.orm-entity';

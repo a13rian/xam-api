@@ -30,8 +30,6 @@ export interface AccountProps {
   role?: AccountRole | null;
   displayName: string;
   specialization?: string | null;
-  yearsExperience?: number | null;
-  certifications?: string[];
   portfolio?: string | null;
   personalBio?: string | null;
   status: AccountStatus;
@@ -73,8 +71,6 @@ export interface CreateIndividualAccountProps {
   userId: string;
   displayName: string;
   specialization?: string;
-  yearsExperience?: number;
-  certifications?: string[];
   portfolio?: string;
   personalBio?: string;
 }
@@ -100,8 +96,6 @@ export class Account extends AggregateRoot {
   private _role: AccountRole | null;
   private _displayName: string;
   private _specialization: string | null;
-  private _yearsExperience: number | null;
-  private _certifications: string[];
   private _portfolio: string | null;
   private _personalBio: string | null;
   private _status: AccountStatus;
@@ -147,8 +141,6 @@ export class Account extends AggregateRoot {
     this._role = props.role ?? null;
     this._displayName = props.displayName;
     this._specialization = props.specialization ?? null;
-    this._yearsExperience = props.yearsExperience ?? null;
-    this._certifications = props.certifications ?? [];
     this._portfolio = props.portfolio ?? null;
     this._personalBio = props.personalBio ?? null;
     this._status = props.status;
@@ -196,8 +188,6 @@ export class Account extends AggregateRoot {
       role: null,
       displayName: props.displayName,
       specialization: props.specialization,
-      yearsExperience: props.yearsExperience,
-      certifications: props.certifications ?? [],
       portfolio: props.portfolio,
       personalBio: props.personalBio,
       status: AccountStatus.pending(),
@@ -257,8 +247,6 @@ export class Account extends AggregateRoot {
       role: AccountRole.owner(),
       displayName: props.displayName,
       specialization: null,
-      yearsExperience: null,
-      certifications: [],
       portfolio: null,
       personalBio: null,
       status: AccountStatus.pending(),
@@ -324,8 +312,6 @@ export class Account extends AggregateRoot {
       role: AccountRole.fromString(props.role),
       displayName: props.displayName,
       specialization: null,
-      yearsExperience: null,
-      certifications: [],
       portfolio: null,
       personalBio: null,
       status: AccountStatus.pending(),
@@ -486,8 +472,6 @@ export class Account extends AggregateRoot {
   updateProfile(props: {
     displayName?: string;
     specialization?: string;
-    yearsExperience?: number;
-    certifications?: string[];
     portfolio?: string;
     personalBio?: string;
   }): void {
@@ -496,12 +480,6 @@ export class Account extends AggregateRoot {
     }
     if (props.specialization !== undefined) {
       this._specialization = props.specialization;
-    }
-    if (props.yearsExperience !== undefined) {
-      this._yearsExperience = props.yearsExperience;
-    }
-    if (props.certifications !== undefined) {
-      this._certifications = props.certifications;
     }
     if (props.portfolio !== undefined) {
       this._portfolio = props.portfolio;
@@ -679,14 +657,6 @@ export class Account extends AggregateRoot {
     return this._specialization;
   }
 
-  get yearsExperience(): number | null {
-    return this._yearsExperience;
-  }
-
-  get certifications(): string[] {
-    return this._certifications;
-  }
-
   get portfolio(): string | null {
     return this._portfolio;
   }
@@ -832,8 +802,6 @@ export class Account extends AggregateRoot {
       role: this._role?.value ?? null,
       displayName: this._displayName,
       specialization: this._specialization,
-      yearsExperience: this._yearsExperience,
-      certifications: this._certifications,
       portfolio: this._portfolio,
       personalBio: this._personalBio,
       status: this._status.value,

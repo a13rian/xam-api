@@ -16,6 +16,7 @@ export class BookingMapper {
           id: s.id,
           bookingId: s.bookingId,
           serviceId: s.serviceId,
+          accountServiceId: s.accountServiceId,
           serviceName: s.serviceName,
           price: Number(s.price),
           currency: s.currency,
@@ -27,6 +28,7 @@ export class BookingMapper {
       id: ormEntity.id,
       customerId: ormEntity.customerId,
       organizationId: ormEntity.organizationId,
+      accountId: ormEntity.accountId,
       locationId: ormEntity.locationId,
       staffId: ormEntity.staffId,
       status: BookingStatus.fromString(ormEntity.status),
@@ -59,6 +61,7 @@ export class BookingMapper {
     ormEntity.id = props.id;
     ormEntity.customerId = props.customerId;
     ormEntity.organizationId = props.organizationId;
+    ormEntity.accountId = props.accountId;
     ormEntity.locationId = props.locationId;
     ormEntity.staffId = props.staffId;
     ormEntity.status = props.status as any;
@@ -87,6 +90,7 @@ export class BookingMapper {
       serviceOrm.id = s.id;
       serviceOrm.bookingId = s.bookingId;
       serviceOrm.serviceId = s.serviceId;
+      serviceOrm.accountServiceId = s.accountServiceId;
       serviceOrm.serviceName = s.serviceName;
       serviceOrm.price = s.price;
       serviceOrm.currency = s.currency;

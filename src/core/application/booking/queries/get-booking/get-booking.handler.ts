@@ -8,7 +8,8 @@ import {
 
 export interface BookingServiceResponseDto {
   id: string;
-  serviceId: string;
+  serviceId?: string;
+  accountServiceId?: string;
   serviceName: string;
   price: number;
   currency: string;
@@ -18,8 +19,9 @@ export interface BookingServiceResponseDto {
 export interface BookingResponseDto {
   id: string;
   customerId: string;
-  organizationId: string;
-  locationId: string;
+  organizationId?: string;
+  accountId?: string;
+  locationId?: string;
   staffId?: string;
   status: string;
   scheduledDate: Date;
@@ -61,6 +63,7 @@ export class GetBookingHandler implements IQueryHandler<GetBookingQuery> {
       id: props.id,
       customerId: props.customerId,
       organizationId: props.organizationId,
+      accountId: props.accountId,
       locationId: props.locationId,
       staffId: props.staffId,
       status: props.status,
@@ -85,6 +88,7 @@ export class GetBookingHandler implements IQueryHandler<GetBookingQuery> {
       services: props.services.map((s) => ({
         id: s.id,
         serviceId: s.serviceId,
+        accountServiceId: s.accountServiceId,
         serviceName: s.serviceName,
         price: s.price,
         currency: s.currency,

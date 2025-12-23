@@ -28,6 +28,7 @@ import {
   RegisterAccountDto,
   RegisterAccountResponseDto,
   AccountResponseDto,
+  MyAccountResponseDto,
   SearchAccountsDto,
   SearchAccountsResponseDto,
   UpdateAccountProfileDto,
@@ -71,10 +72,16 @@ import {
   GetAccountQuery,
   GetAccountResult,
 } from '../../../core/application/account/queries/get-account';
+import { ListServicesQuery } from '../../../core/application/service/queries/list-services/list-services.query';
+import { ServicesListResponseDto } from '../dto/service/service-response.dto';
 import { AccountStatusEnum } from '../../../core/domain/account/value-objects/account-status.vo';
 import { AccountTypeEnum } from '../../../core/domain/account/value-objects/account-type.vo';
 import { Account } from '../../../core/domain/account/entities/account.entity';
 import { AccountGallery } from '../../../core/domain/account/entities/account-gallery.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { OrganizationLocationOrmEntity } from '../../../infrastructure/persistence/typeorm/entities/organization-location.orm-entity';
+import { NotFoundException } from '@nestjs/common';
 
 @ApiTags('accounts')
 @Controller('accounts')
@@ -82,6 +89,8 @@ export class AccountController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
+    @InjectRepository(OrganizationLocationOrmEntity)
+    private readonly locationRepository: Repository<OrganizationLocationOrmEntity>,
   ) {}
 
   @Get('search')
@@ -124,8 +133,6 @@ export class AccountController {
         dto.displayName,
         // Individual fields
         dto.specialization,
-        dto.yearsExperience,
-        dto.certifications,
         dto.portfolio,
         dto.personalBio,
         // Business fields
@@ -146,13 +153,13 @@ export class AccountController {
   @Get('me')
   async getMyAccount(
     @CurrentUser() user: AuthenticatedUser,
-  ): Promise<AccountResponseDto> {
+  ): Promise<MyAccountResponseDto> {
     const result = await this.queryBus.execute<
       GetMyAccountQuery,
       GetMyAccountResult
     >(new GetMyAccountQuery(user.id));
 
-    return result as AccountResponseDto;
+    return result as MyAccountResponseDto;
   }
 
   @Patch('me/profile')
@@ -422,6 +429,94 @@ export class AccountController {
     return gallery.map(
       (item) => item.toObject() as unknown as GalleryItemResponseDto,
     );
+  }
+
+  @Get(':id/services')
+  @Public()
+  @ApiOperation({
+    summary: 'Get account services',
+    description: 'Get all active services for an account (via organization)',
+  })
+  async getAccountServices(
+    @Param('id') accountId: string,
+  ): Promise<ServicesListResponseDto> {
+    // Get account to find organizationId
+    const accountResult = await this.queryBus.execute<
+      GetAccountQuery,
+      GetAccountResult
+    >(new GetAccountQuery(accountId));
+
+    if (!accountResult.organizationId) {
+      throw new NotFoundException('Account does not belong to an organization');
+    }
+
+    // Get services for the organization
+    return this.queryBus.execute<ListServicesQuery, ServicesListResponseDto>(
+      new ListServicesQuery(
+        accountResult.organizationId,
+        undefined, // categoryId
+        true, // isActive
+        undefined, // search
+        1, // page
+        100, // limit
+      ),
+    );
+  }
+
+  @Get(':id/locations')
+  @Public()
+  @ApiOperation({
+    summary: 'Get account locations',
+    description: 'Get all active locations for an account (via organization)',
+  })
+  async getAccountLocations(@Param('id') accountId: string): Promise<
+    Array<{
+      id: string;
+      name: string;
+      street: string;
+      ward?: string;
+      district: string;
+      city: string;
+      latitude?: number;
+      longitude?: number;
+      phone?: string;
+      isPrimary: boolean;
+    }>
+  > {
+    // Get account to find organizationId
+    const accountResult = await this.queryBus.execute<
+      GetAccountQuery,
+      GetAccountResult
+    >(new GetAccountQuery(accountId));
+
+    if (!accountResult.organizationId) {
+      throw new NotFoundException('Account does not belong to an organization');
+    }
+
+    // Get locations for the organization
+    const locations = await this.locationRepository.find({
+      where: {
+        organizationId: accountResult.organizationId,
+        isActive: true,
+      },
+      order: {
+        isPrimary: 'DESC',
+        name: 'ASC',
+      },
+    });
+
+    return locations.map((loc) => ({
+      id: loc.id,
+      name: loc.name,
+      street: loc.street,
+      ward: loc.ward ?? undefined,
+      district: loc.district,
+      city: loc.city,
+      latitude: loc.latitude ?? undefined,
+      longitude: loc.longitude ?? undefined,
+      phone: loc.phone ?? undefined,
+      isPrimary: loc.isPrimary,
+    }));
   }
 }
 

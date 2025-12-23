@@ -7,8 +7,6 @@ export interface UpdateAccountProfileData {
   // Basic profile
   displayName?: string;
   specialization?: string;
-  yearsExperience?: number;
-  certifications?: string[];
   portfolio?: string;
   personalBio?: string;
   // Media

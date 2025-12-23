@@ -62,12 +62,6 @@ export class AccountOrmEntity extends BaseOrmEntity {
   @Column({ type: 'varchar', length: 100, nullable: true })
   specialization: string | null;
 
-  @Column({ type: 'smallint', nullable: true })
-  yearsExperience: number | null;
-
-  @Column({ type: 'jsonb', default: '[]' })
-  certifications: string[];
-
   @Column({ type: 'text', nullable: true })
   portfolio: string | null;
 

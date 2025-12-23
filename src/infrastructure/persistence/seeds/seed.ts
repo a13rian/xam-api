@@ -18,6 +18,8 @@ import { OrganizationOrmEntity } from '../typeorm/entities/organization.orm-enti
 import { OrganizationLocationOrmEntity } from '../typeorm/entities/organization-location.orm-entity';
 import { AccountOrmEntity } from '../typeorm/entities/account.orm-entity';
 import { AccountGalleryOrmEntity } from '../typeorm/entities/account-gallery.orm-entity';
+import { ServiceCategoryOrmEntity } from '../typeorm/entities/service-category.orm-entity';
+import { AccountServiceOrmEntity } from '../typeorm/entities/account-service.orm-entity';
 import { seedPermissions } from './permissions.seed';
 import { seedRoles } from './roles.seed';
 import { seedUsers } from './users.seed';
@@ -27,6 +29,8 @@ import { seedWards } from './wards.seed';
 import { seedNormalUsers, seedBulkUsers } from './seed-users.seed';
 import { seedOrganizations } from './seed-organizations.seed';
 import { seedAccountsWithLocations } from './seed-accounts.seed';
+import { seedServiceCategories } from './seed-categories.seed';
+import { seedAccountServices } from './seed-account-services.seed';
 
 config({ path: '.env.local' });
 config({ path: '.env' });
@@ -53,6 +57,8 @@ const dataSource = new DataSource({
     OrganizationLocationOrmEntity,
     AccountOrmEntity,
     AccountGalleryOrmEntity,
+    ServiceCategoryOrmEntity,
+    AccountServiceOrmEntity,
   ],
   synchronize: false,
 });
@@ -62,13 +68,14 @@ async function cleanupDatabase(ds: DataSource): Promise<void> {
 
   // Order matters: delete dependent tables first (respecting foreign keys)
   const tables = [
+    'account_services',
     'account_galleries',
     'accounts',
     'organization_locations',
     'organizations',
+    'service_categories',
     'wallet_transactions',
     'wallets',
-    'user_profiles',
     'refresh_tokens',
     'password_reset_tokens',
     'email_verification_tokens',
@@ -116,7 +123,15 @@ async function runSeeds() {
     await seedNormalUsers(dataSource, roles);
     const bulkUsers = await seedBulkUsers(dataSource, roles, 1000);
     const { orgs } = await seedOrganizations(dataSource);
-    await seedAccountsWithLocations(dataSource, bulkUsers, orgs);
+    const accounts = await seedAccountsWithLocations(
+      dataSource,
+      bulkUsers,
+      orgs,
+    );
+
+    // Service categories and account services
+    const categories = await seedServiceCategories(dataSource);
+    await seedAccountServices(dataSource, accounts, categories);
 
     console.log('All seeds completed successfully');
   } catch (error) {

@@ -13,10 +13,8 @@ export interface AccountListItem {
   type: string;
   displayName: string;
   specialization: string | null;
-  yearsExperience: number | null;
   personalBio: string | null;
   portfolio: string | null;
-  certifications: string[];
   status: string;
   isActive: boolean;
   createdAt: Date;
@@ -88,10 +86,8 @@ export class ListAccountsHandler implements IQueryHandler<ListAccountsQuery> {
       type: account.typeValue,
       displayName: account.displayName,
       specialization: account.specialization,
-      yearsExperience: account.yearsExperience,
       personalBio: account.personalBio,
       portfolio: account.portfolio,
-      certifications: account.certifications,
       status: account.statusValue,
       isActive: account.isActive,
       createdAt: account.createdAt,

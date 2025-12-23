@@ -13,10 +13,8 @@ export interface PendingAccountItem {
   type: string;
   displayName: string;
   specialization: string | null;
-  yearsExperience: number | null;
   personalBio: string | null;
   portfolio: string | null;
-  certifications: string[];
   status: string;
   createdAt: Date;
   rejectionReason: string | null;
@@ -57,10 +55,8 @@ export class ListPendingAccountsHandler implements IQueryHandler<ListPendingAcco
       type: account.typeValue,
       displayName: account.displayName,
       specialization: account.specialization,
-      yearsExperience: account.yearsExperience,
       personalBio: account.personalBio,
       portfolio: account.portfolio,
-      certifications: account.certifications,
       status: account.statusValue,
       createdAt: account.createdAt,
       rejectionReason: account.rejectionReason,

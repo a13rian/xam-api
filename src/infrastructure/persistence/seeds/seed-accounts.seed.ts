@@ -137,6 +137,84 @@ function generateCoverImageUrl(index: number): string | null {
   return `https://picsum.photos/seed/cover${index}/800/300`;
 }
 
+// ===== Professional Profile Data =====
+
+// Staff specializations (professional titles)
+const staffSpecializations = [
+  'Chuyên viên Makeup cao cấp',
+  'Chuyên gia tạo mẫu tóc',
+  'Nail Artist chuyên nghiệp',
+  'Chuyên viên Spa & Wellness',
+  'Senior Barber',
+  'Chuyên gia chăm sóc da',
+  'Massage Therapist cao cấp',
+  'Chuyên viên phun xăm thẩm mỹ',
+  'Senior Hair Colorist',
+  'Bridal Makeup Artist',
+];
+
+// Personal/Freelance specializations
+const personalSpecializations = [
+  'Freelance Makeup Artist',
+  'Independent Hair Stylist',
+  'Nail Artist tự do',
+  'Mobile Spa Therapist',
+  'Freelance Barber',
+  'Chuyên viên skincare tự do',
+  'Mobile Massage Therapist',
+  'Freelance Beauty Artist',
+  'Independent Lash Artist',
+  'Freelance Brow Artist',
+];
+
+// Vietnamese bios for staff accounts
+const staffBios = [
+  'Với hơn {years} năm kinh nghiệm trong ngành làm đẹp, tôi cam kết mang đến dịch vụ chất lượng cao nhất cho khách hàng.',
+  'Được đào tạo bài bản tại các học viện hàng đầu, tôi luôn cập nhật xu hướng mới nhất để phục vụ khách hàng.',
+  'Đam mê với nghề và sự hài lòng của khách hàng là động lực để tôi không ngừng phát triển bản thân.',
+  'Chuyên môn cao trong lĩnh vực làm đẹp, tôi đã phục vụ hàng ngàn khách hàng với sự hài lòng tuyệt đối.',
+  'Từng làm việc tại nhiều salon danh tiếng, tôi mang đến kinh nghiệm và kỹ năng chuyên nghiệp cho mọi khách hàng.',
+  'Tận tâm với từng chi tiết, tôi luôn lắng nghe và tư vấn để mang đến kết quả tốt nhất cho khách hàng.',
+  'Với triết lý "Khách hàng là trung tâm", tôi cam kết dịch vụ chất lượng và trải nghiệm tuyệt vời.',
+  'Được nhiều khách hàng tin tưởng và giới thiệu, tôi tự hào về uy tín đã xây dựng trong suốt {years} năm.',
+];
+
+// Vietnamese bios for personal accounts
+const personalBios = [
+  'Yêu thích làm đẹp và luôn muốn thử những xu hướng mới. Đang tìm kiếm stylist tâm đầu ý hợp!',
+  'Người thích chăm sóc bản thân và trải nghiệm các dịch vụ spa thư giãn.',
+  'Freelancer trong ngành làm đẹp, sẵn sàng phục vụ tại nhà khách hàng.',
+  'Đam mê nail art và luôn tìm kiếm những mẫu thiết kế độc đáo.',
+  'Quan tâm đến skincare và các phương pháp chăm sóc da tự nhiên.',
+  'Thích thử nghiệm kiểu tóc mới và luôn cập nhật trend.',
+  'Tự học makeup và muốn phát triển thêm kỹ năng trong lĩnh vực này.',
+  'Người yêu thích vẻ đẹp tự nhiên và các sản phẩm organic.',
+  'Thường xuyên đến spa và salon, đánh giá cao dịch vụ chất lượng.',
+  'Đang build portfolio cá nhân trong ngành làm đẹp.',
+];
+
+function generateSpecialization(isStaff: boolean): string {
+  return isStaff
+    ? getRandomElement(staffSpecializations)
+    : getRandomElement(personalSpecializations);
+}
+
+function generatePortfolio(index: number, isStaff: boolean): string | null {
+  const chance = isStaff ? 0.8 : 0.5;
+  if (Math.random() > chance) return null;
+
+  return `https://portfolio.example.com/artist-${index}`;
+}
+
+function generatePersonalBio(isStaff: boolean): string {
+  if (isStaff) {
+    const bio = getRandomElement(staffBios);
+    const randomYears = Math.floor(Math.random() * 13) + 3; // 3-15 years for bio text only
+    return bio.replace('{years}', String(randomYears));
+  }
+  return getRandomElement(personalBios);
+}
+
 // Gallery captions for variety
 const galleryCaptions = [
   'Không gian làm việc',
@@ -370,12 +448,12 @@ function createStaffAccount(
     coordinates: [longitude, latitude],
   };
 
-  // Optional fields
-  account.specialization = null;
-  account.yearsExperience = null;
-  account.certifications = [];
-  account.portfolio = null;
-  account.personalBio = null;
+  // ===== Professional Profile Fields =====
+  account.specialization = generateSpecialization(true);
+  account.portfolio = generatePortfolio(staffAccountIndex, true);
+  account.personalBio = generatePersonalBio(true);
+
+  // Invitation fields (not used for seeded accounts)
   account.invitationStatus = null;
   account.invitationToken = null;
   account.invitedAt = null;
@@ -383,9 +461,7 @@ function createStaffAccount(
   account.approvedBy = null;
   account.rejectionReason = null;
 
-  // ===== New Profile Fields =====
-
-  // Media fields
+  // ===== Media Fields =====
   account.avatarUrl = generateAvatarUrl(staffAccountIndex);
   account.coverImageUrl = generateCoverImageUrl(staffAccountIndex);
   account.videoIntroUrl = null;
@@ -457,12 +533,12 @@ function createPersonalAccount(
     coordinates: [longitude, latitude],
   };
 
-  // Optional fields
-  account.specialization = null;
-  account.yearsExperience = null;
-  account.certifications = [];
-  account.portfolio = null;
-  account.personalBio = null;
+  // ===== Professional Profile Fields =====
+  account.specialization = generateSpecialization(false);
+  account.portfolio = generatePortfolio(1000 + personalAccountIndex, false);
+  account.personalBio = generatePersonalBio(false);
+
+  // Invitation fields (not used for seeded accounts)
   account.invitationStatus = null;
   account.invitationToken = null;
   account.invitedAt = null;
@@ -470,33 +546,40 @@ function createPersonalAccount(
   account.approvedBy = null;
   account.rejectionReason = null;
 
-  // ===== New Profile Fields (Minimal for Personal Accounts) =====
-
-  // Media fields - avatar only
+  // ===== Media Fields =====
   account.avatarUrl = generateAvatarUrl(1000 + personalAccountIndex); // Offset to avoid collision
-  account.coverImageUrl = null;
+  account.coverImageUrl = generateCoverImageUrl(1000 + personalAccountIndex);
   account.videoIntroUrl = null;
 
-  // Contact & Social fields - minimal
-  account.phone = Math.random() > 0.5 ? generatePhone() : null;
-  account.businessEmail = null;
-  account.website = null;
-  account.socialLinks = Math.random() > 0.8 ? generateSocialLinks(false) : null;
+  // ===== Contact & Social Fields =====
+  account.phone = generatePhone();
+  account.businessEmail = generateBusinessEmail(
+    account.displayName,
+    1000 + personalAccountIndex,
+  );
+  account.website =
+    Math.random() > 0.8
+      ? `https://www.portfolio-${1000 + personalAccountIndex}.com`
+      : null;
+  account.socialLinks = generateSocialLinks(false);
 
-  // Professional/Service fields - minimal
-  account.tagline = null;
-  account.serviceAreas = [];
-  account.languages = ['vi'];
-  account.workingHours = null;
-  account.priceRange = null;
+  // ===== Professional/Service Fields =====
+  account.tagline = getRandomElement(taglines);
+  account.serviceAreas = generateServiceAreas(district, city);
+  account.languages = Math.random() > 0.7 ? ['vi', 'en'] : ['vi'];
+  account.workingHours = generateWorkingHours();
+  account.priceRange = generatePriceRange();
 
-  // Trust & Verification fields - not verified
-  account.isVerified = false;
-  account.verifiedAt = null;
-  account.badges = [];
-  account.rating = null;
-  account.totalReviews = 0;
-  account.completedBookings = 0;
+  // ===== Trust & Verification Fields =====
+  // 10% verified for personal accounts
+  account.isVerified = Math.random() < 0.1;
+  account.verifiedAt = account.isVerified
+    ? new Date(Date.now() - Math.random() * 180 * 24 * 60 * 60 * 1000)
+    : null;
+  account.badges = generateBadges(account.isVerified);
+  account.rating = generateRating();
+  account.totalReviews = Math.floor(Math.random() * 200);
+  account.completedBookings = Math.floor(Math.random() * 300);
 
   return account;
 }

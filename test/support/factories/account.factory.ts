@@ -22,8 +22,6 @@ export interface CreateAccountOptions {
   latitude?: number | null;
   longitude?: number | null;
   specialization?: string | null;
-  yearsExperience?: number | null;
-  certifications?: string[];
   userOptions?: CreateUserOptions;
   // Media fields
   avatarUrl?: string | null;
@@ -124,8 +122,6 @@ export class AccountFactory {
       latitude,
       longitude,
       specialization: options.specialization ?? null,
-      yearsExperience: options.yearsExperience ?? null,
-      certifications: options.certifications ?? [],
       // Media fields
       avatarUrl: options.avatarUrl ?? null,
       coverImageUrl: options.coverImageUrl ?? null,

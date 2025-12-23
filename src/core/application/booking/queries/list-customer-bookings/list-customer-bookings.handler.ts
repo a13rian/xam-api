@@ -38,6 +38,7 @@ export class ListCustomerBookingsHandler implements IQueryHandler<ListCustomerBo
           id: props.id,
           customerId: props.customerId,
           organizationId: props.organizationId,
+          accountId: props.accountId,
           locationId: props.locationId,
           staffId: props.staffId,
           status: props.status,
@@ -62,6 +63,7 @@ export class ListCustomerBookingsHandler implements IQueryHandler<ListCustomerBo
           services: props.services.map((s) => ({
             id: s.id,
             serviceId: s.serviceId,
+            accountServiceId: s.accountServiceId,
             serviceName: s.serviceName,
             price: s.price,
             currency: s.currency,

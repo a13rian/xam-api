@@ -11,7 +11,6 @@ import {
   MaxLength,
   IsNumber,
   Min,
-  Max,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -149,19 +148,6 @@ export class UpdateAccountProfileDto {
   @IsString()
   @MaxLength(100)
   specialization?: string;
-
-  @ApiPropertyOptional({ description: 'Years of experience' })
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  @Max(100)
-  yearsExperience?: number;
-
-  @ApiPropertyOptional({ description: 'Certifications list' })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  certifications?: string[];
 
   @ApiPropertyOptional({ description: 'Portfolio URL or text' })
   @IsOptional()

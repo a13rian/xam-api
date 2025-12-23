@@ -30,16 +30,12 @@ export class UpdateAccountProfileHandler implements ICommandHandler<UpdateAccoun
     if (
       data.displayName !== undefined ||
       data.specialization !== undefined ||
-      data.yearsExperience !== undefined ||
-      data.certifications !== undefined ||
       data.portfolio !== undefined ||
       data.personalBio !== undefined
     ) {
       account.updateProfile({
         displayName: data.displayName,
         specialization: data.specialization,
-        yearsExperience: data.yearsExperience,
-        certifications: data.certifications,
         portfolio: data.portfolio,
         personalBio: data.personalBio,
       });

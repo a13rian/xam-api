@@ -72,15 +72,17 @@ export class CancelBookingHandler implements ICommandHandler<CancelBookingComman
 
     await this.bookingRepository.save(booking);
 
-    // Release any booked time slots
-    const slots = await this.slotRepository.findByLocationIdAndDate(
-      booking.locationId,
-      booking.scheduledDate,
-    );
-    for (const slot of slots) {
-      if (slot.bookingId === booking.id) {
-        slot.release();
-        await this.slotRepository.save(slot);
+    // Release any booked time slots (only for organization bookings with location)
+    if (booking.locationId) {
+      const slots = await this.slotRepository.findByLocationIdAndDate(
+        booking.locationId,
+        booking.scheduledDate,
+      );
+      for (const slot of slots) {
+        if (slot.bookingId === booking.id) {
+          slot.release();
+          await this.slotRepository.save(slot);
+        }
       }
     }
 

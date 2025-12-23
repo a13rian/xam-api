@@ -6,8 +6,9 @@ import { ValidationException } from '../../../../shared/exceptions/domain.except
 export interface BookingProps {
   id: string;
   customerId: string;
-  organizationId: string;
-  locationId: string;
+  organizationId?: string;
+  accountId?: string;
+  locationId?: string;
   staffId?: string;
   status: BookingStatus;
   scheduledDate: Date;
@@ -35,8 +36,9 @@ export interface BookingProps {
 export class Booking extends AggregateRoot {
   private readonly _id: string;
   private readonly _customerId: string;
-  private readonly _organizationId: string;
-  private readonly _locationId: string;
+  private readonly _organizationId?: string;
+  private readonly _accountId?: string;
+  private readonly _locationId?: string;
   private readonly _staffId?: string;
   private _status: BookingStatus;
   private _scheduledDate: Date;
@@ -65,6 +67,7 @@ export class Booking extends AggregateRoot {
     this._id = props.id;
     this._customerId = props.customerId;
     this._organizationId = props.organizationId;
+    this._accountId = props.accountId;
     this._locationId = props.locationId;
     this._staffId = props.staffId;
     this._status = props.status;
@@ -97,10 +100,13 @@ export class Booking extends AggregateRoot {
   get customerId(): string {
     return this._customerId;
   }
-  get organizationId(): string {
+  get organizationId(): string | undefined {
     return this._organizationId;
   }
-  get locationId(): string {
+  get accountId(): string | undefined {
+    return this._accountId;
+  }
+  get locationId(): string | undefined {
     return this._locationId;
   }
   get staffId(): string | undefined {
@@ -173,8 +179,9 @@ export class Booking extends AggregateRoot {
   static create(props: {
     id: string;
     customerId: string;
-    organizationId: string;
-    locationId: string;
+    organizationId?: string;
+    accountId?: string;
+    locationId?: string;
     staffId?: string;
     scheduledDate: Date;
     startTime: string;
@@ -298,8 +305,9 @@ export class Booking extends AggregateRoot {
   toObject(): {
     id: string;
     customerId: string;
-    organizationId: string;
-    locationId: string;
+    organizationId?: string;
+    accountId?: string;
+    locationId?: string;
     staffId?: string;
     status: string;
     scheduledDate: Date;
@@ -327,6 +335,7 @@ export class Booking extends AggregateRoot {
       id: this._id,
       customerId: this._customerId,
       organizationId: this._organizationId,
+      accountId: this._accountId,
       locationId: this._locationId,
       staffId: this._staffId,
       status: this._status.value,

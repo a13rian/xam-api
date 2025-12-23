@@ -9,6 +9,22 @@ import {
   IOrganizationRepository,
   ORGANIZATION_REPOSITORY,
 } from '../../../../domain/organization/repositories/organization.repository.interface';
+import {
+  IAccountServiceRepository,
+  ACCOUNT_SERVICE_REPOSITORY,
+} from '../../../../domain/account-service/repositories/account-service.repository.interface';
+
+export interface MyAccountServiceResult {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  currency: string;
+  durationMinutes: number;
+  categoryId: string;
+  isActive: boolean;
+  sortOrder: number;
+}
 
 export interface GetMyAccountResult {
   id: string;
@@ -17,8 +33,6 @@ export interface GetMyAccountResult {
   role: string | null;
   displayName: string;
   specialization: string | null;
-  yearsExperience: number | null;
-  certifications: string[];
   portfolio: string | null;
   personalBio: string | null;
   status: string;
@@ -32,6 +46,7 @@ export interface GetMyAccountResult {
     rating: number;
     reviewCount: number;
   };
+  services: MyAccountServiceResult[];
 }
 
 @QueryHandler(GetMyAccountQuery)
@@ -41,6 +56,8 @@ export class GetMyAccountHandler implements IQueryHandler<GetMyAccountQuery> {
     private readonly accountRepository: IAccountRepository,
     @Inject(ORGANIZATION_REPOSITORY)
     private readonly organizationRepository: IOrganizationRepository,
+    @Inject(ACCOUNT_SERVICE_REPOSITORY)
+    private readonly accountServiceRepository: IAccountServiceRepository,
   ) {}
 
   async execute(query: GetMyAccountQuery): Promise<GetMyAccountResult> {
@@ -66,6 +83,23 @@ export class GetMyAccountHandler implements IQueryHandler<GetMyAccountQuery> {
       }
     }
 
+    // Get all services (including inactive for owner to manage)
+    const serviceEntities = await this.accountServiceRepository.findByAccountId(
+      account.id,
+      false, // include inactive
+    );
+    const services: MyAccountServiceResult[] = serviceEntities.map((s) => ({
+      id: s.id,
+      name: s.name,
+      description: s.description ?? null,
+      price: s.price.amount,
+      currency: s.price.currency,
+      durationMinutes: s.durationMinutes,
+      categoryId: s.categoryId,
+      isActive: s.isActive,
+      sortOrder: s.sortOrder,
+    }));
+
     return {
       id: account.id,
       userId: account.userId,
@@ -73,14 +107,13 @@ export class GetMyAccountHandler implements IQueryHandler<GetMyAccountQuery> {
       role: account.roleValue,
       displayName: account.displayName,
       specialization: account.specialization,
-      yearsExperience: account.yearsExperience,
-      certifications: account.certifications,
       portfolio: account.portfolio,
       personalBio: account.personalBio,
       status: account.statusValue,
       isActive: account.isActive,
       createdAt: account.createdAt,
       organization,
+      services,
     };
   }
 }

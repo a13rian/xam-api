@@ -72,8 +72,6 @@ export class DatabaseHelper {
       // Wallet related
       'wallet_transactions',
       'wallets',
-      // User related
-      'user_profiles',
       // Auth/User related
       'refresh_tokens',
       'password_reset_tokens',

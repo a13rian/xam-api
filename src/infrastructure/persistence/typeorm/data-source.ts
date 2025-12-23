@@ -16,12 +16,12 @@ import { ServiceCategoryOrmEntity } from './entities/service-category.orm-entity
 import { ServiceOrmEntity } from './entities/service.orm-entity';
 import { StaffServiceOrmEntity } from './entities/staff-service.orm-entity';
 import { TimeSlotOrmEntity } from './entities/time-slot.orm-entity';
-import { UserProfileOrmEntity } from './entities/user-profile.orm-entity';
 import { UserOrmEntity } from './entities/user.orm-entity';
 import { WalletTransactionOrmEntity } from './entities/wallet-transaction.orm-entity';
 import { WalletOrmEntity } from './entities/wallet.orm-entity';
 import { AccountOrmEntity } from './entities/account.orm-entity';
 import { AccountGalleryOrmEntity } from './entities/account-gallery.orm-entity';
+import { AccountServiceOrmEntity } from './entities/account-service.orm-entity';
 import { OrganizationOrmEntity } from './entities/organization.orm-entity';
 import { OrganizationLocationOrmEntity } from './entities/organization-location.orm-entity';
 import { ProvinceOrmEntity } from './entities/province.orm-entity';
@@ -37,7 +37,6 @@ const dataSource = new DataSource({
   namingStrategy: new SnakeNamingStrategy(),
   entities: [
     UserOrmEntity,
-    UserProfileOrmEntity,
     RoleOrmEntity,
     PermissionOrmEntity,
     RefreshTokenOrmEntity,
@@ -55,6 +54,7 @@ const dataSource = new DataSource({
     StaffServiceOrmEntity,
     AccountOrmEntity,
     AccountGalleryOrmEntity,
+    AccountServiceOrmEntity,
     OrganizationOrmEntity,
     ProvinceOrmEntity,
     DistrictOrmEntity,

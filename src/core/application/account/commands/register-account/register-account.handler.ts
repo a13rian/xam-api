@@ -78,8 +78,6 @@ export class RegisterAccountHandler implements ICommandHandler<RegisterAccountCo
           userId: command.userId,
           displayName: command.displayName,
           specialization: command.specialization,
-          yearsExperience: command.yearsExperience,
-          certifications: command.certifications,
           portfolio: command.portfolio,
           personalBio: command.personalBio,
         }),

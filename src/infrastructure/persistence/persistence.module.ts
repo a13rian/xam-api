@@ -10,7 +10,6 @@ import { PasswordResetTokenOrmEntity } from './typeorm/entities/password-reset-t
 import { EmailVerificationTokenOrmEntity } from './typeorm/entities/email-verification-token.orm-entity';
 import { WalletOrmEntity } from './typeorm/entities/wallet.orm-entity';
 import { WalletTransactionOrmEntity } from './typeorm/entities/wallet-transaction.orm-entity';
-import { UserProfileOrmEntity } from './typeorm/entities/user-profile.orm-entity';
 import { ServiceCategoryOrmEntity } from './typeorm/entities/service-category.orm-entity';
 import { ServiceOrmEntity } from './typeorm/entities/service.orm-entity';
 import { OperatingHoursOrmEntity } from './typeorm/entities/operating-hours.orm-entity';
@@ -22,6 +21,7 @@ import {
 import { StaffServiceOrmEntity } from './typeorm/entities/staff-service.orm-entity';
 import { AccountOrmEntity } from './typeorm/entities/account.orm-entity';
 import { AccountGalleryOrmEntity } from './typeorm/entities/account-gallery.orm-entity';
+import { AccountServiceOrmEntity } from './typeorm/entities/account-service.orm-entity';
 import { OrganizationOrmEntity } from './typeorm/entities/organization.orm-entity';
 import { OrganizationLocationOrmEntity } from './typeorm/entities/organization-location.orm-entity';
 import { ProvinceOrmEntity } from './typeorm/entities/province.orm-entity';
@@ -30,7 +30,6 @@ import { WardOrmEntity } from './typeorm/entities/ward.orm-entity';
 
 const entities = [
   UserOrmEntity,
-  UserProfileOrmEntity,
   RoleOrmEntity,
   PermissionOrmEntity,
   RefreshTokenOrmEntity,
@@ -48,6 +47,7 @@ const entities = [
   StaffServiceOrmEntity,
   AccountOrmEntity,
   AccountGalleryOrmEntity,
+  AccountServiceOrmEntity,
   OrganizationOrmEntity,
   ProvinceOrmEntity,
   DistrictOrmEntity,

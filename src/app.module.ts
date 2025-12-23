@@ -10,6 +10,7 @@ import type { IThrottleConfig } from './core/application/ports/config/throttle.c
 import { AppConfigModule, validateEnv } from './infrastructure/config';
 import { PersistenceModule } from './infrastructure/persistence/persistence.module';
 import { AccountModule } from './presentation/modules/account.module';
+import { AccountServiceModule } from './presentation/modules/account-service.module';
 import { AuthModule } from './presentation/modules/auth.module';
 import { BookingModule } from './presentation/modules/booking.module';
 import { CategoryModule } from './presentation/modules/category.module';
@@ -98,6 +99,7 @@ import { ValidationPipe } from './shared/pipes/validation.pipe';
     ScheduleModule,
     BookingModule,
     AccountModule,
+    AccountServiceModule,
     OrganizationModule,
     StorageModule,
   ],

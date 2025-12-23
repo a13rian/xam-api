@@ -1,7 +1,8 @@
 export interface BookingServiceProps {
   id: string;
   bookingId: string;
-  serviceId: string;
+  serviceId?: string;
+  accountServiceId?: string;
   serviceName: string;
   price: number;
   currency: string;
@@ -11,7 +12,8 @@ export interface BookingServiceProps {
 export class BookingService {
   private readonly _id: string;
   private readonly _bookingId: string;
-  private readonly _serviceId: string;
+  private readonly _serviceId?: string;
+  private readonly _accountServiceId?: string;
   private readonly _serviceName: string;
   private readonly _price: number;
   private readonly _currency: string;
@@ -21,6 +23,7 @@ export class BookingService {
     this._id = props.id;
     this._bookingId = props.bookingId;
     this._serviceId = props.serviceId;
+    this._accountServiceId = props.accountServiceId;
     this._serviceName = props.serviceName;
     this._price = props.price;
     this._currency = props.currency;
@@ -35,8 +38,12 @@ export class BookingService {
     return this._bookingId;
   }
 
-  get serviceId(): string {
+  get serviceId(): string | undefined {
     return this._serviceId;
+  }
+
+  get accountServiceId(): string | undefined {
+    return this._accountServiceId;
   }
 
   get serviceName(): string {
@@ -58,7 +65,8 @@ export class BookingService {
   static create(props: {
     id: string;
     bookingId: string;
-    serviceId: string;
+    serviceId?: string;
+    accountServiceId?: string;
     serviceName: string;
     price: number;
     currency: string;
@@ -72,6 +80,7 @@ export class BookingService {
       id: this._id,
       bookingId: this._bookingId,
       serviceId: this._serviceId,
+      accountServiceId: this._accountServiceId,
       serviceName: this._serviceName,
       price: this._price,
       currency: this._currency,
