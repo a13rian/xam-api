@@ -1,0 +1,38 @@
+name: Run Database Migrations
+
+on:
+  workflow_dispatch:
+
+env:
+  CONTAINER_NAME: xam-api
+
+jobs:
+  migrate:
+    name: Run Migrations
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Run migrations via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          CONTAINER_NAME: xam-api
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT }}
+          envs: CONTAINER_NAME
+          script: |
+            set -e
+
+            echo "=== Checking container status ==="
+            if ! docker ps -f name="$CONTAINER_NAME" --format "{{.Status}}" | grep -q "Up"; then
+              echo "Container $CONTAINER_NAME is not running!"
+              exit 1
+            fi
+
+            echo "=== Running database migrations ==="
+            docker exec "$CONTAINER_NAME" bun run db:migrate
+
+            echo "=== Migrations complete ==="
