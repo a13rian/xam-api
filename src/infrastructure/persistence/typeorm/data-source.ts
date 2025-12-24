@@ -31,6 +31,8 @@ import { WardOrmEntity } from './entities/ward.orm-entity';
 config({ path: '.env.local' });
 config({ path: '.env' });
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 const dataSource = new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_URL,
@@ -60,7 +62,11 @@ const dataSource = new DataSource({
     DistrictOrmEntity,
     WardOrmEntity,
   ],
-  migrations: ['src/infrastructure/persistence/typeorm/migrations/*.ts'],
+  migrations: [
+    isProduction
+      ? 'dist/infrastructure/persistence/typeorm/migrations/*.js'
+      : 'src/infrastructure/persistence/typeorm/migrations/*.ts',
+  ],
   synchronize: false,
   logging: process.env.DATABASE_LOGGING === 'true',
 });

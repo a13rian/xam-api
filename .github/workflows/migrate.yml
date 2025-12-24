@@ -33,6 +33,6 @@ jobs:
             fi
 
             echo "=== Running database migrations ==="
-            docker exec "$CONTAINER_NAME" bun run db:migrate
+            docker exec "$CONTAINER_NAME" bun run db:migrate:prod
 
             echo "=== Migrations complete ==="

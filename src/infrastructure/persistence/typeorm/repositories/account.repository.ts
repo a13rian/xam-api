@@ -13,6 +13,11 @@ import { PaginationOptions } from '../../../../shared/interfaces/pagination.inte
 import { AccountOrmEntity } from '../entities/account.orm-entity';
 import { AccountMapper } from '../mappers/account.mapper';
 
+interface AccountDistanceRow {
+  account_id: string;
+  distance_km: string;
+}
+
 @Injectable()
 export class AccountRepository implements IAccountRepository {
   constructor(
@@ -162,114 +167,101 @@ export class AccountRepository implements IAccountRepository {
     const skip = (page - 1) * limit;
     const radiusMeters = radiusKm * 1000;
 
+    // Build base query conditions
+    const baseConditions = (qb: typeof query) => {
+      qb.where('account.location IS NOT NULL')
+        .andWhere('account.isActive = true')
+        .andWhere(
+          `ST_DWithin(account.location, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography, :radius)`,
+        )
+        .setParameters({ lng: longitude, lat: latitude, radius: radiusMeters });
+
+      if (search) {
+        qb.andWhere('account.displayName ILIKE :search', {
+          search: `%${search}%`,
+        });
+      }
+      if (city) {
+        qb.andWhere('account.city = :city', { city });
+      }
+      if (district) {
+        qb.andWhere('account.district = :district', { district });
+      }
+      if (ward) {
+        qb.andWhere('account.ward = :ward', { ward });
+      }
+    };
+
+    // Query 1: Get total count
+    const countQuery = this.ormRepository.createQueryBuilder('account');
+    baseConditions(countQuery);
+    const total = await countQuery.getCount();
+
+    // Query 2: Get account IDs with pagination (WITHOUT gallery join to get correct pagination)
     const query = this.ormRepository
+      .createQueryBuilder('account')
+      .select(['account.id'])
+      .addSelect(
+        `ST_Distance(account.location, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography) / 1000`,
+        'distance_km',
+      );
+    baseConditions(query);
+    query.orderBy('distance_km', 'ASC').offset(skip).limit(limit);
+
+    const rawResults = await query.getRawMany<AccountDistanceRow>();
+
+    if (rawResults.length === 0) {
+      return { items: [], total, page, limit };
+    }
+
+    // Create distance map from raw results
+    const accountIds = rawResults.map((r) => r.account_id);
+    const distanceMap = new Map<string, number>();
+    for (const raw of rawResults) {
+      distanceMap.set(raw.account_id, parseFloat(raw.distance_km));
+    }
+
+    // Query 3: Load full account data with gallery for the paginated IDs
+    const accounts = await this.ormRepository
       .createQueryBuilder('account')
       .select([
         'account.id',
         'account.displayName',
         'account.type',
         'account.status',
-        // Location
         'account.street',
         'account.ward',
         'account.district',
         'account.city',
         'account.latitude',
         'account.longitude',
-        // Profile
         'account.avatarUrl',
         'account.tagline',
         'account.personalBio',
-        // Trust & rating
         'account.isVerified',
         'account.rating',
         'account.totalReviews',
         'account.completedBookings',
         'account.badges',
-        // Additional info
         'account.languages',
         'account.priceRange',
       ])
-      .addSelect(
-        `ST_Distance(account.location, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography) / 1000`,
-        'distance_km',
-      )
-      // Join gallery
       .leftJoinAndSelect('account.gallery', 'gallery')
-      .where('account.location IS NOT NULL')
-      .andWhere('account.isActive = true')
-      .andWhere(
-        `ST_DWithin(account.location, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography, :radius)`,
-      )
-      .setParameters({ lng: longitude, lat: latitude, radius: radiusMeters });
+      .where('account.id IN (:...ids)', { ids: accountIds })
+      .orderBy('gallery.sortOrder', 'ASC')
+      .getMany();
 
-    // Optional filters
-    if (search) {
-      query.andWhere('account.displayName ILIKE :search', {
-        search: `%${search}%`,
-      });
-    }
-    if (city) {
-      query.andWhere('account.city = :city', { city });
-    }
-    if (district) {
-      query.andWhere('account.district = :district', { district });
-    }
-    if (ward) {
-      query.andWhere('account.ward = :ward', { ward });
-    }
+    // Sort accounts by distance (maintain order from first query)
+    const accountMap = new Map(accounts.map((a) => [a.id, a]));
+    const sortedAccounts = accountIds
+      .map((id) => accountMap.get(id))
+      .filter((a): a is AccountOrmEntity => a !== undefined);
 
-    // Order by distance and gallery sort order
-    query.orderBy('distance_km', 'ASC').addOrderBy('gallery.sortOrder', 'ASC');
-
-    // Get total count (need separate query for count with spatial filter)
-    const countQuery = this.ormRepository
-      .createQueryBuilder('account')
-      .where('account.location IS NOT NULL')
-      .andWhere('account.isActive = true')
-      .andWhere(
-        `ST_DWithin(account.location, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography, :radius)`,
-      )
-      .setParameters({ lng: longitude, lat: latitude, radius: radiusMeters });
-
-    if (search) {
-      countQuery.andWhere('account.displayName ILIKE :search', {
-        search: `%${search}%`,
-      });
-    }
-    if (city) {
-      countQuery.andWhere('account.city = :city', { city });
-    }
-    if (district) {
-      countQuery.andWhere('account.district = :district', { district });
-    }
-    if (ward) {
-      countQuery.andWhere('account.ward = :ward', { ward });
-    }
-
-    const total = await countQuery.getCount();
-
-    // Get paginated results with entities and raw fields (for distance)
-    const rawAndEntities = await query
-      .offset(skip)
-      .limit(limit)
-      .getRawAndEntities();
-
-    // Create a map of account id to distance
-    const distanceMap = new Map<string, number>();
-    for (const raw of rawAndEntities.raw as {
-      account_id: string;
-      distance_km: string;
-    }[]) {
-      distanceMap.set(raw.account_id, parseFloat(raw.distance_km));
-    }
-
-    const items = rawAndEntities.entities.map((entity) => ({
+    const items = sortedAccounts.map((entity) => ({
       id: entity.id,
       displayName: entity.displayName,
       type: entity.type,
       status: entity.status,
-      // Location
       street: entity.street,
       ward: entity.ward,
       district: entity.district,
@@ -277,17 +269,14 @@ export class AccountRepository implements IAccountRepository {
       latitude: entity.latitude ? parseFloat(String(entity.latitude)) : null,
       longitude: entity.longitude ? parseFloat(String(entity.longitude)) : null,
       distanceKm: distanceMap.get(entity.id) ?? 0,
-      // Profile
       avatarUrl: entity.avatarUrl,
       tagline: entity.tagline,
       personalBio: entity.personalBio,
-      // Trust & rating
       isVerified: entity.isVerified,
       rating: entity.rating ? parseFloat(String(entity.rating)) : null,
       totalReviews: entity.totalReviews,
       completedBookings: entity.completedBookings,
       badges: entity.badges ?? [],
-      // Additional info
       languages: entity.languages ?? [],
       priceRange: entity.priceRange
         ? {
@@ -296,7 +285,6 @@ export class AccountRepository implements IAccountRepository {
             currency: entity.priceRange.currency,
           }
         : null,
-      // Gallery
       gallery: (entity.gallery ?? []).map((g) => ({
         id: g.id,
         imageUrl: g.imageUrl,

@@ -33,6 +33,7 @@
     "db:generate": "bun run typeorm migration:generate -d src/infrastructure/persistence/typeorm/data-source.ts -p src/infrastructure/persistence/typeorm/migrations/migration",
     "db:create": "bun run typeorm migration:create",
     "db:migrate": "bun run typeorm migration:run -d src/infrastructure/persistence/typeorm/data-source.ts",
+    "db:migrate:prod": "node ./node_modules/typeorm/cli.js migration:run -d dist/infrastructure/persistence/typeorm/data-source.js",
     "db:revert": "bun run typeorm migration:revert -d src/infrastructure/persistence/typeorm/data-source.ts",
     "db:show": "bun run typeorm migration:show -d src/infrastructure/persistence/typeorm/data-source.ts",
     "schema:drop": "bun run typeorm schema:drop -d src/infrastructure/persistence/typeorm/data-source.ts",
