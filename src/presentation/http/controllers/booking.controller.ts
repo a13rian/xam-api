@@ -20,6 +20,8 @@ import {
   BookingResponseDto,
   BookingsListResponseDto,
   RescheduleBookingDto,
+  CustomerBookingStatsQueryDto,
+  CustomerBookingStatsResponseDto,
 } from '../dto/booking';
 import {
   CreateBookingCommand,
@@ -33,7 +35,9 @@ import {
   GetBookingQuery,
   ListCustomerBookingsQuery,
   ListPartnerBookingsQuery,
+  GetCustomerBookingStatsQuery,
 } from '../../../core/application/booking/queries';
+import { CustomerStatsResult } from '../../../core/domain/booking/repositories/booking.repository.interface';
 import { GetMyAccountQuery } from '../../../core/application/account/queries';
 import { AccountResponseDto } from '../dto/account';
 
@@ -82,8 +86,27 @@ export class CustomerBookingController {
       new ListCustomerBookingsQuery(
         user.id,
         query.status,
+        query.startDate ? new Date(query.startDate) : undefined,
+        query.endDate ? new Date(query.endDate) : undefined,
         query.page,
         query.limit,
+      ),
+    );
+  }
+
+  @Get('me/stats')
+  async getMyBookingStats(
+    @CurrentUser() user: AuthenticatedUser,
+    @Query() query: CustomerBookingStatsQueryDto,
+  ): Promise<CustomerBookingStatsResponseDto> {
+    return await this.queryBus.execute<
+      GetCustomerBookingStatsQuery,
+      CustomerStatsResult
+    >(
+      new GetCustomerBookingStatsQuery(
+        user.id,
+        query.startDate ? new Date(query.startDate) : undefined,
+        query.endDate ? new Date(query.endDate) : undefined,
       ),
     );
   }

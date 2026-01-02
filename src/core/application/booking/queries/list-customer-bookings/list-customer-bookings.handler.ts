@@ -27,6 +27,8 @@ export class ListCustomerBookingsHandler implements IQueryHandler<ListCustomerBo
     const result = await this.bookingRepository.search({
       customerId: query.customerId,
       status: query.status,
+      startDate: query.startDate,
+      endDate: query.endDate,
       page: query.page,
       limit: query.limit,
     });

@@ -21,6 +21,41 @@ export interface BookingSearchResult {
   limit: number;
 }
 
+// Stats interfaces
+export interface BookingStatsOptions {
+  customerId: string;
+  startDate?: Date;
+  endDate?: Date;
+}
+
+export interface BookingsByStatusResult {
+  status: BookingStatusEnum;
+  count: number;
+}
+
+export interface ServiceUsageResult {
+  serviceId: string;
+  serviceName: string;
+  count: number;
+  totalSpent: number;
+}
+
+export interface MonthlyTrendResult {
+  month: string; // Format: "YYYY-MM"
+  bookingCount: number;
+  totalSpent: number;
+}
+
+export interface CustomerStatsResult {
+  totalBookings: number;
+  totalSpent: number;
+  currency: string;
+  bookingsByStatus: BookingsByStatusResult[];
+  topServices: ServiceUsageResult[];
+  monthlyTrends: MonthlyTrendResult[];
+  averageBookingValue: number;
+}
+
 export interface IBookingRepository {
   findById(id: string): Promise<Booking | null>;
   findByCustomerId(customerId: string): Promise<Booking[]>;
@@ -28,4 +63,5 @@ export interface IBookingRepository {
   search(options: BookingSearchOptions): Promise<BookingSearchResult>;
   save(booking: Booking): Promise<void>;
   delete(id: string): Promise<void>;
+  getCustomerStats(options: BookingStatsOptions): Promise<CustomerStatsResult>;
 }

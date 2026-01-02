@@ -6,7 +6,13 @@ import {
   IBookingRepository,
   BookingSearchOptions,
   BookingSearchResult,
+  BookingStatsOptions,
+  CustomerStatsResult,
+  BookingsByStatusResult,
+  ServiceUsageResult,
+  MonthlyTrendResult,
 } from '../../../../core/domain/booking/repositories/booking.repository.interface';
+import { BookingStatusEnum } from '../../../../core/domain/booking/value-objects/booking-status.vo';
 import { BookingOrmEntity } from '../entities/booking.orm-entity';
 import { BookingMapper } from '../mappers/booking.mapper';
 
@@ -114,5 +120,138 @@ export class BookingRepository implements IBookingRepository {
 
   async delete(id: string): Promise<void> {
     await this.repository.delete(id);
+  }
+
+  async getCustomerStats(
+    options: BookingStatsOptions,
+  ): Promise<CustomerStatsResult> {
+    const query = this.repository
+      .createQueryBuilder('booking')
+      .leftJoinAndSelect('booking.services', 'services')
+      .where('booking.customerId = :customerId', {
+        customerId: options.customerId,
+      });
+
+    if (options.startDate) {
+      query.andWhere('booking.scheduledDate >= :startDate', {
+        startDate: options.startDate,
+      });
+    }
+
+    if (options.endDate) {
+      query.andWhere('booking.scheduledDate <= :endDate', {
+        endDate: options.endDate,
+      });
+    }
+
+    const entities = await query
+      .orderBy('booking.scheduledDate', 'DESC')
+      .getMany();
+
+    // Calculate totals
+    const totalBookings = entities.length;
+    let totalSpent = 0;
+    const currency = 'VND';
+
+    // Count by status
+    const statusCounts = new Map<BookingStatusEnum, number>();
+    Object.values(BookingStatusEnum).forEach((status) => {
+      statusCounts.set(status, 0);
+    });
+
+    // Service usage tracking
+    const serviceUsage = new Map<
+      string,
+      { serviceName: string; count: number; totalSpent: number }
+    >();
+
+    // Monthly trends
+    const monthlyData = new Map<
+      string,
+      { bookingCount: number; totalSpent: number }
+    >();
+
+    for (const booking of entities) {
+      // Total spent (only count completed bookings)
+      if (booking.status === BookingStatusEnum.COMPLETED) {
+        totalSpent += Number(booking.totalAmount);
+      }
+
+      // Status counts
+      statusCounts.set(
+        booking.status,
+        (statusCounts.get(booking.status) || 0) + 1,
+      );
+
+      // Service usage
+      for (const service of booking.services || []) {
+        const serviceKey = service.serviceId || service.serviceName;
+        const existing = serviceUsage.get(serviceKey);
+        if (existing) {
+          existing.count += 1;
+          existing.totalSpent += Number(service.price);
+        } else {
+          serviceUsage.set(serviceKey, {
+            serviceName: service.serviceName,
+            count: 1,
+            totalSpent: Number(service.price),
+          });
+        }
+      }
+
+      // Monthly trends
+      const scheduledDate = new Date(booking.scheduledDate);
+      const monthKey = `${scheduledDate.getFullYear()}-${String(scheduledDate.getMonth() + 1).padStart(2, '0')}`;
+      const monthData = monthlyData.get(monthKey) || {
+        bookingCount: 0,
+        totalSpent: 0,
+      };
+      monthData.bookingCount += 1;
+      if (booking.status === BookingStatusEnum.COMPLETED) {
+        monthData.totalSpent += Number(booking.totalAmount);
+      }
+      monthlyData.set(monthKey, monthData);
+    }
+
+    // Convert to arrays
+    const bookingsByStatus: BookingsByStatusResult[] = Array.from(
+      statusCounts.entries(),
+    )
+      .map(([status, count]) => ({ status, count }))
+      .filter((item) => item.count > 0);
+
+    const topServices: ServiceUsageResult[] = Array.from(serviceUsage.entries())
+      .map(([serviceId, data]) => ({
+        serviceId,
+        serviceName: data.serviceName,
+        count: data.count,
+        totalSpent: data.totalSpent,
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+
+    const monthlyTrends: MonthlyTrendResult[] = Array.from(
+      monthlyData.entries(),
+    )
+      .map(([month, data]) => ({
+        month,
+        bookingCount: data.bookingCount,
+        totalSpent: data.totalSpent,
+      }))
+      .sort((a, b) => a.month.localeCompare(b.month));
+
+    const completedCount = statusCounts.get(BookingStatusEnum.COMPLETED) || 0;
+    const averageBookingValue =
+      completedCount > 0 ? totalSpent / completedCount : 0;
+
+    return {
+      totalBookings,
+      totalSpent,
+      currency,
+      bookingsByStatus,
+      topServices,
+      monthlyTrends,
+      averageBookingValue,
+    };
   }
 }

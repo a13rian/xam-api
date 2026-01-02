@@ -4,3 +4,4 @@ export * from './list-partner-bookings-query.dto';
 export * from './cancel-booking.dto';
 export * from './booking-response.dto';
 export * from './reschedule-booking.dto';
+export * from './customer-booking-stats.dto';
