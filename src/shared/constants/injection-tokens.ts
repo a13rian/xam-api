@@ -9,3 +9,4 @@ export const STORAGE_CONFIG = 'STORAGE_CONFIG';
 
 // Service tokens
 export const STORAGE_SERVICE = 'STORAGE_SERVICE';
+export { LOGGER_SERVICE } from '@core/application/ports/logging/logger.port.js';

@@ -8,6 +8,7 @@ import type { IAppConfig } from './core/application/ports/config/app.config.port
 import type { ILoggerConfig } from './core/application/ports/config/logger.config.port';
 import type { IThrottleConfig } from './core/application/ports/config/throttle.config.port';
 import { AppConfigModule, validateEnv } from './infrastructure/config';
+import { LoggingModule } from './infrastructure/logging';
 import { PersistenceModule } from './infrastructure/persistence/persistence.module';
 import { AccountModule } from './presentation/modules/account.module';
 import { AccountServiceModule } from './presentation/modules/account-service.module';
@@ -49,6 +50,10 @@ import { ValidationPipe } from './shared/pipes/validation.pipe';
       useFactory: (appConfig: IAppConfig, loggerConfig: ILoggerConfig) => ({
         pinoHttp: {
           level: loggerConfig.level,
+          redact: {
+            paths: loggerConfig.redactPaths,
+            censor: '[REDACTED]',
+          },
           transport: appConfig.isProduction
             ? undefined
             : {
@@ -67,6 +72,7 @@ import { ValidationPipe } from './shared/pipes/validation.pipe';
         exclude: [],
       }),
     }),
+    LoggingModule,
     CqrsModule.forRoot(),
     ThrottlerModule.forRootAsync({
       imports: [AppConfigModule],
