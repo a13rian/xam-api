@@ -178,6 +178,63 @@ export class Wallet extends AggregateRoot {
     return transaction;
   }
 
+  public adjust(amount: Money, description: string): WalletTransaction {
+    if (amount.isZero()) {
+      throw new ValidationException('Adjustment amount must not be zero');
+    }
+
+    // For adjustment, positive amount = credit, negative amount = debit
+    const adjustmentAmount = Money.create(
+      Math.abs(amount.amount),
+      amount.currency,
+    );
+    const isCredit = amount.amount > 0;
+
+    const newBalance = isCredit
+      ? this._balance.add(adjustmentAmount)
+      : this._balance.subtract(adjustmentAmount);
+
+    // Prevent negative balance for debit adjustments
+    if (!isCredit && newBalance.amount < 0) {
+      throw new ValidationException(
+        'Adjustment would result in negative balance',
+      );
+    }
+
+    this._balance = newBalance;
+    this._updatedAt = new Date();
+
+    const transaction = WalletTransaction.create({
+      walletId: this._id,
+      type: TransactionType.adjustment(),
+      amount: adjustmentAmount,
+      balanceAfter: newBalance,
+      referenceType: 'admin_adjustment',
+      description,
+    });
+
+    if (isCredit) {
+      this.apply(
+        new WalletCreditedEvent(
+          this._id,
+          this._userId,
+          adjustmentAmount.amount,
+          adjustmentAmount.currency,
+        ),
+      );
+    } else {
+      this.apply(
+        new WalletDebitedEvent(
+          this._id,
+          this._userId,
+          adjustmentAmount.amount,
+          adjustmentAmount.currency,
+        ),
+      );
+    }
+    return transaction;
+  }
+
   public hasSufficientBalance(amount: Money): boolean {
     return this._balance.isGreaterThanOrEqual(amount);
   }
@@ -200,5 +257,16 @@ export class Wallet extends AggregateRoot {
 
   get updatedAt(): Date {
     return this._updatedAt;
+  }
+
+  public toObject() {
+    return {
+      id: this._id,
+      userId: this._userId,
+      balance: this._balance.amount,
+      currency: this._balance.currency,
+      createdAt: this._createdAt,
+      updatedAt: this._updatedAt,
+    };
   }
 }

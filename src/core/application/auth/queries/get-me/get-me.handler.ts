@@ -10,9 +10,22 @@ import {
   ROLE_REPOSITORY,
 } from '../../../../domain/role/repositories/role.repository.interface';
 import {
+  IPermissionRepository,
+  PERMISSION_REPOSITORY,
+} from '../../../../domain/role/repositories/permission.repository.interface';
+import {
   IWalletRepository,
   WALLET_REPOSITORY,
 } from '../../../../domain/wallet/repositories/wallet.repository.interface';
+
+export interface PermissionInfo {
+  id: string;
+  code: string;
+  name: string;
+  description: string | null;
+  resource: string;
+  action: string;
+}
 
 export interface GetMeResult {
   id: string;
@@ -28,7 +41,7 @@ export interface GetMeResult {
   roles: Array<{
     id: string;
     name: string;
-    permissions: string[];
+    permissions: PermissionInfo[];
   }>;
   wallet: {
     id: string;
@@ -45,6 +58,8 @@ export class GetMeHandler implements IQueryHandler<GetMeQuery> {
     private readonly userRepository: IUserRepository,
     @Inject(ROLE_REPOSITORY)
     private readonly roleRepository: IRoleRepository,
+    @Inject(PERMISSION_REPOSITORY)
+    private readonly permissionRepository: IPermissionRepository,
     @Inject(WALLET_REPOSITORY)
     private readonly walletRepository: IWalletRepository,
   ) {}
@@ -55,22 +70,51 @@ export class GetMeHandler implements IQueryHandler<GetMeQuery> {
       throw new NotFoundException('User not found');
     }
 
-    const [roles, wallet] = await Promise.all([
-      Promise.all(
-        [...user.roleIds].map(async (roleId) => {
-          const role = await this.roleRepository.findById(roleId);
-          if (role) {
-            return {
-              id: role.id,
-              name: role.name,
-              permissions: [...role.permissionIds],
-            };
-          }
-          return null;
-        }),
-      ),
+    // Collect all permission IDs from all roles
+    const roleDataPromises = [...user.roleIds].map(async (roleId) => {
+      const role = await this.roleRepository.findById(roleId);
+      return role ? { role, permissionIds: [...role.permissionIds] } : null;
+    });
+
+    const [roleDataResults, wallet] = await Promise.all([
+      Promise.all(roleDataPromises),
       this.walletRepository.findByUserId(query.userId),
     ]);
+
+    const validRoleData = roleDataResults.filter(Boolean) as Array<{
+      role: NonNullable<Awaited<ReturnType<IRoleRepository['findById']>>>;
+      permissionIds: string[];
+    }>;
+
+    // Collect all unique permission IDs
+    const allPermissionIds = [
+      ...new Set(validRoleData.flatMap((rd) => rd.permissionIds)),
+    ];
+
+    // Fetch all permissions in one query
+    const permissions =
+      await this.permissionRepository.findByIds(allPermissionIds);
+    const permissionMap = new Map(permissions.map((p) => [p.id, p]));
+
+    // Build roles with detailed permissions
+    const roles = validRoleData.map(({ role, permissionIds }) => ({
+      id: role.id,
+      name: role.name,
+      permissions: permissionIds
+        .map((id) => {
+          const p = permissionMap.get(id);
+          if (!p) return null;
+          return {
+            id: p.id,
+            code: p.code,
+            name: p.name,
+            description: p.description,
+            resource: p.resource,
+            action: p.action,
+          };
+        })
+        .filter(Boolean) as PermissionInfo[],
+    }));
 
     return {
       id: user.id,
@@ -83,11 +127,7 @@ export class GetMeHandler implements IQueryHandler<GetMeQuery> {
       gender: user.genderValue,
       isActive: user.isActive,
       isEmailVerified: user.isEmailVerified,
-      roles: roles.filter(Boolean) as Array<{
-        id: string;
-        name: string;
-        permissions: string[];
-      }>,
+      roles,
       wallet: wallet
         ? {
             id: wallet.id,

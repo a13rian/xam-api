@@ -5,6 +5,7 @@ import {
   CustomerBookingController,
   PartnerBookingController,
 } from '../http/controllers/booking.controller';
+import { AdminBookingController } from '../http/controllers/admin-booking.controller';
 import {
   BookingOrmEntity,
   BookingServiceOrmEntity,
@@ -30,7 +31,11 @@ import { OrganizationModule } from './organization.module';
     ScheduleModule,
     OrganizationModule,
   ],
-  controllers: [CustomerBookingController, PartnerBookingController],
+  controllers: [
+    CustomerBookingController,
+    PartnerBookingController,
+    AdminBookingController,
+  ],
   providers: [
     BookingMapper,
     {

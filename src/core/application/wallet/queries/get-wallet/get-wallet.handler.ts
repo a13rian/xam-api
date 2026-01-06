@@ -23,7 +23,10 @@ export class GetWalletHandler implements IQueryHandler<GetWalletQuery> {
   ) {}
 
   async execute(query: GetWalletQuery): Promise<GetWalletResult> {
-    const wallet = await this.walletRepository.findByUserId(query.userId);
+    const wallet = query.byWalletId
+      ? await this.walletRepository.findById(query.id)
+      : await this.walletRepository.findByUserId(query.id);
+
     if (!wallet) {
       throw new NotFoundException('Wallet not found');
     }

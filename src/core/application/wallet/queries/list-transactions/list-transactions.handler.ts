@@ -41,7 +41,10 @@ export class ListTransactionsHandler implements IQueryHandler<ListTransactionsQu
   ) {}
 
   async execute(query: ListTransactionsQuery): Promise<ListTransactionsResult> {
-    const wallet = await this.walletRepository.findByUserId(query.userId);
+    const wallet = query.byWalletId
+      ? await this.walletRepository.findById(query.id)
+      : await this.walletRepository.findByUserId(query.id);
+
     if (!wallet) {
       throw new NotFoundException('Wallet not found');
     }

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { WalletController } from '../http/controllers/wallet.controller';
+import { AdminWalletController } from '../http/controllers/admin-wallet.controller';
 import { WalletRepository } from '../../infrastructure/persistence/typeorm/repositories/wallet.repository';
 import { WalletTransactionRepository } from '../../infrastructure/persistence/typeorm/repositories/wallet-transaction.repository';
 import { WalletMapper } from '../../infrastructure/persistence/typeorm/mappers/wallet.mapper';
@@ -19,7 +20,7 @@ import { WalletEventHandlers } from '../../core/application/wallet/event-handler
     CqrsModule,
     TypeOrmModule.forFeature([WalletOrmEntity, WalletTransactionOrmEntity]),
   ],
-  controllers: [WalletController],
+  controllers: [WalletController, AdminWalletController],
   providers: [
     WalletMapper,
     WalletTransactionMapper,

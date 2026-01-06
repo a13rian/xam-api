@@ -39,6 +39,18 @@ export const PERMISSIONS = {
     DELETE: 'category:delete',
     LIST: 'category:list',
   },
+  BOOKING: {
+    CREATE: 'booking:create',
+    READ: 'booking:read',
+    UPDATE: 'booking:update',
+    DELETE: 'booking:delete',
+    LIST: 'booking:list',
+  },
+  WALLET: {
+    READ: 'wallet:read',
+    UPDATE: 'wallet:update',
+    LIST: 'wallet:list',
+  },
 } as const;
 
 export type PermissionCode =

@@ -6,15 +6,19 @@ export * from './list-partner-bookings/list-partner-bookings.query';
 export * from './list-partner-bookings/list-partner-bookings.handler';
 export * from './get-customer-booking-stats/get-customer-booking-stats.query';
 export * from './get-customer-booking-stats/get-customer-booking-stats.handler';
+export * from './list-all-bookings/list-all-bookings.query';
+export * from './list-all-bookings/list-all-bookings.handler';
 
 import { GetBookingHandler } from './get-booking/get-booking.handler';
 import { ListCustomerBookingsHandler } from './list-customer-bookings/list-customer-bookings.handler';
 import { ListPartnerBookingsHandler } from './list-partner-bookings/list-partner-bookings.handler';
 import { GetCustomerBookingStatsHandler } from './get-customer-booking-stats/get-customer-booking-stats.handler';
+import { ListAllBookingsHandler } from './list-all-bookings/list-all-bookings.handler';
 
 export const BookingQueryHandlers = [
   GetBookingHandler,
   ListCustomerBookingsHandler,
   ListPartnerBookingsHandler,
   GetCustomerBookingStatsHandler,
+  ListAllBookingsHandler,
 ];
