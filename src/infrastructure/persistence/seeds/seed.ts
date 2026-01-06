@@ -31,6 +31,7 @@ import { seedOrganizations } from './seed-organizations.seed';
 import { seedAccountsWithLocations } from './seed-accounts.seed';
 import { seedServiceCategories } from './seed-categories.seed';
 import { seedAccountServices } from './seed-account-services.seed';
+import { seedWallets } from './seed-wallets.seed';
 
 config({ path: '.env.local' });
 config({ path: '.env' });
@@ -128,6 +129,9 @@ async function runSeeds() {
     // Service categories and account services
     const categories = await seedServiceCategories(dataSource);
     await seedAccountServices(dataSource, accounts, categories);
+
+    // Wallets for all users
+    await seedWallets(dataSource);
 
     console.log('All seeds completed successfully');
   } catch (error) {

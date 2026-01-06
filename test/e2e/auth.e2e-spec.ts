@@ -4,19 +4,23 @@ import { v4 as uuidv4 } from 'uuid';
 import { TestContext, createTestApp, closeTestApp } from '../support/test-app';
 import { AuthHelper } from '../support/auth/auth.helper';
 import { UserFactory } from '../support/factories/user.factory';
+import { WalletFactory } from '../support/factories/wallet.factory';
 import { UserOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/user.orm-entity';
 import { EmailVerificationTokenOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/email-verification-token.orm-entity';
 import { PasswordResetTokenOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/password-reset-token.orm-entity';
+import { WalletOrmEntity } from '../../src/infrastructure/persistence/typeorm/entities/wallet.orm-entity';
 
 describe('Auth E2E', () => {
   let ctx: TestContext;
   let authHelper: AuthHelper;
   let userFactory: UserFactory;
+  let walletFactory: WalletFactory;
 
   beforeAll(async () => {
     ctx = await createTestApp();
     authHelper = new AuthHelper(ctx);
     userFactory = new UserFactory(ctx.db);
+    walletFactory = new WalletFactory(ctx.db);
   });
 
   afterAll(async () => {
@@ -277,6 +281,31 @@ describe('Auth E2E', () => {
           firstName: 'John',
           lastName: 'Doe',
         });
+      });
+
+      it('should create a default wallet for new user', async () => {
+        const response = await request(ctx.server)
+          .post('/api/auth/register')
+          .send({
+            email: 'walletuser@test.com',
+            password: 'SecurePass123!',
+            firstName: 'Wallet',
+            lastName: 'User',
+          })
+          .expect(201);
+
+        const userId = response.body.id;
+
+        // Wait for async event handler to complete
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        // Verify wallet was created in database
+        const walletRepo = ctx.db.getRepository(WalletOrmEntity);
+        const wallet = await walletRepo.findOne({ where: { userId } });
+
+        expect(wallet).not.toBeNull();
+        expect(wallet?.balance).toBe('0.00');
+        expect(wallet?.currency).toBe('VND');
       });
     });
 
@@ -559,6 +588,36 @@ describe('Auth E2E', () => {
           .expect(200);
 
         expect(response.body.id).toBe(user.user.id);
+      });
+
+      it('should return user with wallet info when wallet exists', async () => {
+        const user = await authHelper.createAuthenticatedUser();
+        const wallet = await walletFactory.createWithBalance(
+          user.user.id,
+          500000,
+        );
+
+        const response = await request(ctx.server)
+          .get('/api/auth/me')
+          .set(authHelper.authHeader(user))
+          .expect(200);
+
+        expect(response.body.wallet).toMatchObject({
+          id: wallet.id,
+          balance: 500000,
+          currency: 'VND',
+        });
+      });
+
+      it('should return null wallet when user has no wallet', async () => {
+        const user = await authHelper.createAuthenticatedUser();
+
+        const response = await request(ctx.server)
+          .get('/api/auth/me')
+          .set(authHelper.authHeader(user))
+          .expect(200);
+
+        expect(response.body.wallet).toBeNull();
       });
     });
 

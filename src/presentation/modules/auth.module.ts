@@ -3,13 +3,13 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthController } from '../http/controllers/auth.controller.js';
-import { JwtStrategy } from '../../infrastructure/auth/strategies/jwt.strategy.js';
-import { TokenService } from '../../infrastructure/auth/services/token.service.js';
-import { TOKEN_SERVICE } from '../../core/domain/auth/services/token.service.interface.js';
-import { RefreshTokenOrmEntity } from '../../infrastructure/persistence/typeorm/entities/refresh-token.orm-entity.js';
-import { PasswordResetTokenOrmEntity } from '../../infrastructure/persistence/typeorm/entities/password-reset-token.orm-entity.js';
-import { EmailVerificationTokenOrmEntity } from '../../infrastructure/persistence/typeorm/entities/email-verification-token.orm-entity.js';
+import { AuthController } from '../http/controllers/auth.controller';
+import { JwtStrategy } from '../../infrastructure/auth/strategies/jwt.strategy';
+import { TokenService } from '../../infrastructure/auth/services/token.service';
+import { TOKEN_SERVICE } from '../../core/domain/auth/services/token.service.interface';
+import { RefreshTokenOrmEntity } from '../../infrastructure/persistence/typeorm/entities/refresh-token.orm-entity';
+import { PasswordResetTokenOrmEntity } from '../../infrastructure/persistence/typeorm/entities/password-reset-token.orm-entity';
+import { EmailVerificationTokenOrmEntity } from '../../infrastructure/persistence/typeorm/entities/email-verification-token.orm-entity';
 import {
   RegisterHandler,
   LoginHandler,
@@ -19,14 +19,15 @@ import {
   ChangePasswordHandler,
   VerifyEmailHandler,
   LogoutHandler,
-} from '../../core/application/auth/commands/index.js';
-import { GetMeHandler } from '../../core/application/auth/queries/index.js';
-import { UserModule } from './user.module.js';
-import { RoleModule } from './role.module.js';
+} from '../../core/application/auth/commands/index';
+import { GetMeHandler } from '../../core/application/auth/queries/index';
+import { UserModule } from './user.module';
+import { RoleModule } from './role.module';
+import { WalletModule } from './wallet.module';
 import {
   AppConfigModule,
   JwtConfigService,
-} from '../../infrastructure/config/index.js';
+} from '../../infrastructure/config/index';
 
 const CommandHandlers = [
   RegisterHandler,
@@ -62,6 +63,7 @@ const QueryHandlers = [GetMeHandler];
     ]),
     forwardRef(() => UserModule),
     forwardRef(() => RoleModule),
+    WalletModule,
   ],
   controllers: [AuthController],
   providers: [

@@ -12,6 +12,7 @@ import { WalletOrmEntity } from '../../infrastructure/persistence/typeorm/entiti
 import { WalletTransactionOrmEntity } from '../../infrastructure/persistence/typeorm/entities/wallet-transaction.orm-entity';
 import { WalletCommandHandlers } from '../../core/application/wallet/commands';
 import { WalletQueryHandlers } from '../../core/application/wallet/queries';
+import { WalletEventHandlers } from '../../core/application/wallet/event-handlers';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { WalletQueryHandlers } from '../../core/application/wallet/queries';
     },
     ...WalletCommandHandlers,
     ...WalletQueryHandlers,
+    ...WalletEventHandlers,
   ],
   exports: [WALLET_REPOSITORY, WALLET_TRANSACTION_REPOSITORY],
 })

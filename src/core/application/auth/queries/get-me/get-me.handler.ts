@@ -9,6 +9,10 @@ import {
   IRoleRepository,
   ROLE_REPOSITORY,
 } from '../../../../domain/role/repositories/role.repository.interface';
+import {
+  IWalletRepository,
+  WALLET_REPOSITORY,
+} from '../../../../domain/wallet/repositories/wallet.repository.interface';
 
 export interface GetMeResult {
   id: string;
@@ -26,6 +30,11 @@ export interface GetMeResult {
     name: string;
     permissions: string[];
   }>;
+  wallet: {
+    id: string;
+    balance: number;
+    currency: string;
+  } | null;
   createdAt: Date;
 }
 
@@ -36,6 +45,8 @@ export class GetMeHandler implements IQueryHandler<GetMeQuery> {
     private readonly userRepository: IUserRepository,
     @Inject(ROLE_REPOSITORY)
     private readonly roleRepository: IRoleRepository,
+    @Inject(WALLET_REPOSITORY)
+    private readonly walletRepository: IWalletRepository,
   ) {}
 
   async execute(query: GetMeQuery): Promise<GetMeResult> {
@@ -44,19 +55,22 @@ export class GetMeHandler implements IQueryHandler<GetMeQuery> {
       throw new NotFoundException('User not found');
     }
 
-    const roles = await Promise.all(
-      [...user.roleIds].map(async (roleId) => {
-        const role = await this.roleRepository.findById(roleId);
-        if (role) {
-          return {
-            id: role.id,
-            name: role.name,
-            permissions: [...role.permissionIds],
-          };
-        }
-        return null;
-      }),
-    );
+    const [roles, wallet] = await Promise.all([
+      Promise.all(
+        [...user.roleIds].map(async (roleId) => {
+          const role = await this.roleRepository.findById(roleId);
+          if (role) {
+            return {
+              id: role.id,
+              name: role.name,
+              permissions: [...role.permissionIds],
+            };
+          }
+          return null;
+        }),
+      ),
+      this.walletRepository.findByUserId(query.userId),
+    ]);
 
     return {
       id: user.id,
@@ -74,6 +88,13 @@ export class GetMeHandler implements IQueryHandler<GetMeQuery> {
         name: string;
         permissions: string[];
       }>,
+      wallet: wallet
+        ? {
+            id: wallet.id,
+            balance: wallet.balance.amount,
+            currency: wallet.balance.currency,
+          }
+        : null,
       createdAt: user.createdAt,
     };
   }
