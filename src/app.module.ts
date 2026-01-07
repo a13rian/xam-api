@@ -24,6 +24,7 @@ import { ServiceModule } from './presentation/modules/service.module';
 import { StorageModule } from './presentation/modules/storage.module';
 import { UserModule } from './presentation/modules/user.module';
 import { WalletModule } from './presentation/modules/wallet.module';
+import { AdminModule } from './presentation/modules/admin.module';
 import {
   APP_CONFIG,
   LOGGER_CONFIG,
@@ -108,6 +109,7 @@ import { ValidationPipe } from './shared/pipes/validation.pipe';
     AccountServiceModule,
     OrganizationModule,
     StorageModule,
+    AdminModule,
   ],
   providers: [
     {

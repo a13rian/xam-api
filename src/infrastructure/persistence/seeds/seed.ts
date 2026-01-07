@@ -20,6 +20,8 @@ import { AccountOrmEntity } from '../typeorm/entities/account.orm-entity';
 import { AccountGalleryOrmEntity } from '../typeorm/entities/account-gallery.orm-entity';
 import { ServiceCategoryOrmEntity } from '../typeorm/entities/service-category.orm-entity';
 import { AccountServiceOrmEntity } from '../typeorm/entities/account-service.orm-entity';
+import { WalletOrmEntity } from '../typeorm/entities/wallet.orm-entity';
+import { WalletTransactionOrmEntity } from '../typeorm/entities/wallet-transaction.orm-entity';
 import { seedPermissions } from './permissions.seed';
 import { seedRoles } from './roles.seed';
 import { seedUsers } from './users.seed';
@@ -56,6 +58,8 @@ const dataSource = new DataSource({
     AccountGalleryOrmEntity,
     ServiceCategoryOrmEntity,
     AccountServiceOrmEntity,
+    WalletOrmEntity,
+    WalletTransactionOrmEntity,
   ],
   synchronize: false,
 });

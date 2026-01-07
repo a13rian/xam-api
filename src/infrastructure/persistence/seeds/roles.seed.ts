@@ -48,6 +48,16 @@ const roles: RoleSeedConfig[] = [
       'category:update',
       'category:delete',
       'category:list',
+      // Booking permissions
+      'booking:create',
+      'booking:read',
+      'booking:update',
+      'booking:delete',
+      'booking:list',
+      // Wallet permissions
+      'wallet:read',
+      'wallet:update',
+      'wallet:list',
     ],
   },
   {

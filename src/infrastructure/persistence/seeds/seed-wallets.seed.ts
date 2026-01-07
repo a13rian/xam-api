@@ -12,7 +12,7 @@ export async function seedWallets(dataSource: DataSource): Promise<void> {
   // Find all users who don't have a wallet yet
   const usersWithoutWallet = await userRepository
     .createQueryBuilder('user')
-    .leftJoin(WalletOrmEntity, 'wallet', 'wallet.user_id = user.id')
+    .leftJoin('wallets', 'wallet', 'wallet.user_id = user.id')
     .where('wallet.id IS NULL')
     .getMany();
 

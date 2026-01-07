@@ -11,6 +11,7 @@ export interface CreateBookingOptions {
   organizationId: string;
   locationId: string;
   staffId?: string;
+  accountId?: string;
   status?: BookingStatusEnum;
   scheduledDate?: Date;
   startTime?: string;
@@ -23,6 +24,10 @@ export interface CreateBookingOptions {
   customerPhone?: string;
   customerName?: string;
   notes?: string;
+  confirmedAt?: Date;
+  startedAt?: Date;
+  completedAt?: Date;
+  cancelledAt?: Date;
   services?: Array<{
     serviceId: string;
     serviceName: string;
@@ -62,6 +67,7 @@ export class BookingFactory {
       customerId: options.customerId,
       organizationId: options.organizationId,
       locationId: options.locationId,
+      accountId: options.accountId ?? null,
       staffId: options.staffId ?? null,
       status: options.status ?? BookingStatusEnum.PENDING,
       scheduledDate: options.scheduledDate ?? tomorrow,
@@ -75,6 +81,10 @@ export class BookingFactory {
       customerPhone: options.customerPhone ?? '0901234567',
       customerName: options.customerName ?? `Customer ${bookingCounter}`,
       notes: options.notes ?? null,
+      confirmedAt: options.confirmedAt ?? null,
+      startedAt: options.startedAt ?? null,
+      completedAt: options.completedAt ?? null,
+      cancelledAt: options.cancelledAt ?? null,
     });
 
     await bookingRepo.save(booking);
@@ -115,6 +125,43 @@ export class BookingFactory {
       ...options,
       status: BookingStatusEnum.CONFIRMED,
       paidAmount: options.totalAmount ?? 100000,
+      confirmedAt: new Date(),
+    });
+  }
+
+  async createCompleted(
+    options: CreateBookingOptions,
+    completedAt?: Date,
+  ): Promise<CreatedBooking> {
+    const completedDate = completedAt ?? new Date();
+    return this.create({
+      ...options,
+      status: BookingStatusEnum.COMPLETED,
+      paidAmount: options.totalAmount ?? 100000,
+      confirmedAt: new Date(completedDate.getTime() - 3600000), // 1 hour before completed
+      startedAt: new Date(completedDate.getTime() - 1800000), // 30 min before completed
+      completedAt: completedDate,
+    });
+  }
+
+  async createCancelled(
+    options: CreateBookingOptions,
+  ): Promise<CreatedBooking> {
+    return this.create({
+      ...options,
+      status: BookingStatusEnum.CANCELLED,
+      cancelledAt: new Date(),
+    });
+  }
+
+  async createInProgress(
+    options: CreateBookingOptions,
+  ): Promise<CreatedBooking> {
+    return this.create({
+      ...options,
+      status: BookingStatusEnum.IN_PROGRESS,
+      confirmedAt: new Date(),
+      startedAt: new Date(),
     });
   }
 }

@@ -223,6 +223,66 @@ const permissions = [
     resource: 'category',
     action: 'list',
   },
+
+  // Booking permissions
+  {
+    code: 'booking:create',
+    name: 'Create Booking',
+    description: 'Create new bookings',
+    resource: 'booking',
+    action: 'create',
+  },
+  {
+    code: 'booking:read',
+    name: 'Read Booking',
+    description: 'View booking details',
+    resource: 'booking',
+    action: 'read',
+  },
+  {
+    code: 'booking:update',
+    name: 'Update Booking',
+    description: 'Update booking information',
+    resource: 'booking',
+    action: 'update',
+  },
+  {
+    code: 'booking:delete',
+    name: 'Delete Booking',
+    description: 'Delete bookings',
+    resource: 'booking',
+    action: 'delete',
+  },
+  {
+    code: 'booking:list',
+    name: 'List Bookings',
+    description: 'View list of bookings',
+    resource: 'booking',
+    action: 'list',
+  },
+
+  // Wallet permissions
+  {
+    code: 'wallet:read',
+    name: 'Read Wallet',
+    description: 'View wallet details',
+    resource: 'wallet',
+    action: 'read',
+  },
+  {
+    code: 'wallet:update',
+    name: 'Update Wallet',
+    description: 'Update wallet balance',
+    resource: 'wallet',
+    action: 'update',
+  },
+  {
+    code: 'wallet:list',
+    name: 'List Wallets',
+    description: 'View list of wallets',
+    resource: 'wallet',
+    action: 'list',
+  },
 ];
 
 export async function seedPermissions(
