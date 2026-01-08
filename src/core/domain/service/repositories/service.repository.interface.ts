@@ -20,6 +20,7 @@ export interface ServiceSearchResult {
 
 export interface IServiceRepository {
   findById(id: string): Promise<Service | null>;
+  findByIds(ids: string[]): Promise<Service[]>;
   findByOrganizationId(organizationId: string): Promise<Service[]>;
   findByCategoryId(categoryId: string): Promise<Service[]>;
   search(options: ServiceSearchOptions): Promise<ServiceSearchResult>;

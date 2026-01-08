@@ -23,6 +23,17 @@ export class ServiceRepository implements IServiceRepository {
     return entity ? this.mapper.toDomain(entity) : null;
   }
 
+  async findByIds(ids: string[]): Promise<Service[]> {
+    if (ids.length === 0) {
+      return [];
+    }
+    const entities = await this.repository
+      .createQueryBuilder('service')
+      .where('service.id IN (:...ids)', { ids })
+      .getMany();
+    return entities.map((e) => this.mapper.toDomain(e));
+  }
+
   async findByOrganizationId(organizationId: string): Promise<Service[]> {
     const entities = await this.repository.find({
       where: { organizationId },

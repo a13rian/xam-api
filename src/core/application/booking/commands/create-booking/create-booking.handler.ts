@@ -16,6 +16,10 @@ import {
   SERVICE_REPOSITORY,
   IServiceRepository,
 } from '../../../../domain/service/repositories/service.repository.interface';
+import {
+  PARTNER_LOCATION_REPOSITORY,
+  IPartnerLocationRepository,
+} from '../../../../domain/location/repositories/partner-location.repository.interface';
 
 @CommandHandler(CreateBookingCommand)
 export class CreateBookingHandler implements ICommandHandler<CreateBookingCommand> {
@@ -26,6 +30,8 @@ export class CreateBookingHandler implements ICommandHandler<CreateBookingComman
     private readonly organizationRepository: IOrganizationRepository,
     @Inject(SERVICE_REPOSITORY)
     private readonly serviceRepository: IServiceRepository,
+    @Inject(PARTNER_LOCATION_REPOSITORY)
+    private readonly locationRepository: IPartnerLocationRepository,
   ) {}
 
   async execute(command: CreateBookingCommand) {
@@ -54,9 +60,45 @@ export class CreateBookingHandler implements ICommandHandler<CreateBookingComman
       }
     }
 
+    // Validate location
+    const location = await this.locationRepository.findById(command.locationId);
+    if (!location) {
+      throw new NotFoundException('Location not found');
+    }
+    if (location.organizationId !== command.organizationId) {
+      throw new BadRequestException(
+        'Location does not belong to this organization',
+      );
+    }
+    if (!location.isActive) {
+      throw new BadRequestException('Location is not active');
+    }
+
+    // Validate scheduledDate is not in the past
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const scheduledDate = new Date(command.scheduledDate);
+    scheduledDate.setHours(0, 0, 0, 0);
+    if (scheduledDate < today) {
+      throw new BadRequestException('Cannot book for past dates');
+    }
+
     // Validate services and calculate totals
     if (command.services.length === 0) {
       throw new BadRequestException('At least one service is required');
+    }
+
+    // Batch load all services in a single query (fix N+1)
+    const serviceIds = command.services.map((s) => s.serviceId);
+    const services = await this.serviceRepository.findByIds(serviceIds);
+    const serviceMap = new Map(services.map((s) => [s.id, s]));
+
+    // Validate all services exist
+    const missingServiceIds = serviceIds.filter((id) => !serviceMap.has(id));
+    if (missingServiceIds.length > 0) {
+      throw new NotFoundException(
+        `Services not found: ${missingServiceIds.join(', ')}`,
+      );
     }
 
     let totalAmount = 0;
@@ -65,17 +107,11 @@ export class CreateBookingHandler implements ICommandHandler<CreateBookingComman
     const bookingId = uuidv4();
 
     for (const serviceInput of command.services) {
-      const service = await this.serviceRepository.findById(
-        serviceInput.serviceId,
-      );
-      if (!service) {
-        throw new NotFoundException(
-          `Service ${serviceInput.serviceId} not found`,
-        );
-      }
+      const service = serviceMap.get(serviceInput.serviceId)!;
+
       if (service.organizationId !== command.organizationId) {
         throw new BadRequestException(
-          'Service does not belong to this organization',
+          `Service ${service.name} does not belong to this organization`,
         );
       }
       if (!service.isActive) {
