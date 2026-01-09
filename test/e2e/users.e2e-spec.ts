@@ -334,14 +334,14 @@ describe('Users E2E', () => {
       });
     });
 
-    describe('Validation', () => {
-      it('should return 400 for invalid UUID', async () => {
+    describe('Not Found', () => {
+      it('should return 404 for non-existent user', async () => {
         const superAdmin = await authHelper.createSuperAdmin();
 
         await request(ctx.server)
-          .get('/api/users/not-a-uuid')
+          .get('/api/users/not-a-valid-id')
           .set(authHelper.authHeader(superAdmin))
-          .expect(400);
+          .expect(404);
       });
     });
 
@@ -549,14 +549,14 @@ describe('Users E2E', () => {
       });
     });
 
-    describe('Validation', () => {
-      it('should return 400 for invalid UUID', async () => {
+    describe('Not Found', () => {
+      it('should return 404 for non-existent user', async () => {
         const superAdmin = await authHelper.createSuperAdmin();
 
         await request(ctx.server)
-          .delete('/api/users/not-a-uuid')
+          .delete('/api/users/not-a-valid-id')
           .set(authHelper.authHeader(superAdmin))
-          .expect(400);
+          .expect(404);
       });
     });
 

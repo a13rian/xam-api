@@ -3,9 +3,17 @@ export class UserResponseDto {
   email: string;
   firstName: string;
   lastName: string;
+  phone: string | null;
+  dateOfBirth: Date | null;
+  gender: string | null;
+  avatarUrl: string | null;
   isActive: boolean;
   isEmailVerified: boolean;
   roleIds: string[];
+  roleNames: string[];
+  failedLoginAttempts: number;
+  lockedUntil: Date | null;
+  lastLoginAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -15,8 +23,14 @@ export class UserListItemDto {
   email: string;
   firstName: string;
   lastName: string;
+  phone: string | null;
+  avatarUrl: string | null;
   isActive: boolean;
   isEmailVerified: boolean;
+  roleNames: string[];
+  failedLoginAttempts: number;
+  lockedUntil: Date | null;
+  lastLoginAt: Date | null;
   createdAt: Date;
 }
 

@@ -5,7 +5,6 @@ import {
   IsOptional,
   IsBoolean,
   IsArray,
-  IsUUID,
   IsDateString,
   IsEnum,
 } from 'class-validator';
@@ -43,6 +42,6 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsArray()
-  @IsUUID('4', { each: true })
+  @IsString({ each: true })
   roleIds?: string[];
 }

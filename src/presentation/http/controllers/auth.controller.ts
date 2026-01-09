@@ -24,9 +24,9 @@ import {
   LoginResponseDto,
   RefreshTokenResponseDto,
   RegisterResponseDto,
-  MessageResponseDto,
   UpdateProfileDto,
 } from '../dto/auth';
+import { MessageResponseDto } from '../dto/common';
 import {
   RegisterCommand,
   LoginCommand,

@@ -4,7 +4,6 @@ import {
   MaxLength,
   IsOptional,
   IsArray,
-  IsUUID,
 } from 'class-validator';
 
 export class UpdateRoleDto {
@@ -22,6 +21,6 @@ export class UpdateRoleDto {
 
   @IsOptional()
   @IsArray()
-  @IsUUID('4', { each: true })
+  @IsString({ each: true })
   permissionIds?: string[];
 }

@@ -6,9 +6,11 @@ export * from './password-reset-token.orm-entity';
 export * from './email-verification-token.orm-entity';
 export * from './wallet.orm-entity';
 export * from './wallet-transaction.orm-entity';
+export * from './booking.orm-entity';
 export * from './organization.orm-entity';
 export * from './organization-location.orm-entity';
 // Export gallery before account to avoid circular dependency
 export * from './account-gallery.orm-entity';
 export * from './account.orm-entity';
 export * from './account-service.orm-entity';
+export * from './audit-log.orm-entity';

@@ -4,7 +4,6 @@ import {
   MinLength,
   MaxLength,
   IsOptional,
-  IsUUID,
   IsArray,
 } from 'class-validator';
 
@@ -29,6 +28,6 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsArray()
-  @IsUUID('4', { each: true })
+  @IsString({ each: true })
   roleIds?: string[];
 }

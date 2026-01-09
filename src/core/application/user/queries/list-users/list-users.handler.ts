@@ -11,8 +11,14 @@ export interface UserListItem {
   email: string;
   firstName: string;
   lastName: string;
+  phone: string | null;
+  avatarUrl: string | null;
   isActive: boolean;
   isEmailVerified: boolean;
+  roleNames: readonly string[];
+  failedLoginAttempts: number;
+  lockedUntil: Date | null;
+  lastLoginAt: Date | null;
   createdAt: Date;
 }
 
@@ -32,18 +38,54 @@ export class ListUsersHandler implements IQueryHandler<ListUsersQuery> {
   ) {}
 
   async execute(query: ListUsersQuery): Promise<ListUsersResult> {
-    const { page, limit } = query;
+    const {
+      page,
+      limit,
+      search,
+      isActive,
+      roleId,
+      isEmailVerified,
+      createdFrom,
+      createdTo,
+      lastLoginFrom,
+      lastLoginTo,
+      sortBy,
+      sortOrder,
+    } = query;
 
-    const users = await this.userRepository.findAll({ page, limit });
-    const total = await this.userRepository.countAll();
+    const filterOptions = {
+      search,
+      isActive,
+      roleId,
+      isEmailVerified,
+      createdFrom,
+      createdTo,
+      lastLoginFrom,
+      lastLoginTo,
+    };
+
+    const users = await this.userRepository.findAll({
+      page,
+      limit,
+      ...filterOptions,
+      sortBy,
+      sortOrder,
+    });
+    const total = await this.userRepository.countAll(filterOptions);
 
     const items: UserListItem[] = users.map((user) => ({
       id: user.id,
       email: user.email.value,
       firstName: user.firstName,
       lastName: user.lastName,
+      phone: user.phone,
+      avatarUrl: user.avatarUrl,
       isActive: user.isActive,
       isEmailVerified: user.isEmailVerified,
+      roleNames: [...user.roleNames],
+      failedLoginAttempts: user.failedLoginAttempts,
+      lockedUntil: user.lockedUntil,
+      lastLoginAt: user.lastLoginAt,
       createdAt: user.createdAt,
     }));
 

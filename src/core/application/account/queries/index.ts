@@ -4,6 +4,7 @@ export * from './list-pending-accounts';
 export * from './search-accounts-by-location';
 export * from './get-account-gallery';
 export * from './get-account';
+export * from './get-admin-account';
 
 import { GetMyAccountHandler } from './get-my-account/get-my-account.handler';
 import { ListAccountsHandler } from './list-accounts/list-accounts.handler';
@@ -11,6 +12,7 @@ import { ListPendingAccountsHandler } from './list-pending-accounts/list-pending
 import { SearchAccountsByLocationHandler } from './search-accounts-by-location/search-accounts-by-location.handler';
 import { GetAccountGalleryHandler } from './get-account-gallery/get-account-gallery.handler';
 import { GetAccountHandler } from './get-account/get-account.handler';
+import { GetAdminAccountHandler } from './get-admin-account/get-admin-account.handler';
 
 export const AccountQueryHandlers = [
   GetMyAccountHandler,
@@ -19,4 +21,5 @@ export const AccountQueryHandlers = [
   SearchAccountsByLocationHandler,
   GetAccountGalleryHandler,
   GetAccountHandler,
+  GetAdminAccountHandler,
 ];

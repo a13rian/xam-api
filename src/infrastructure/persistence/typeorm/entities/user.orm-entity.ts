@@ -52,6 +52,9 @@ export class UserOrmEntity extends BaseOrmEntity {
   @Column({ type: 'timestamp', nullable: true })
   lockedUntil: Date | null;
 
+  @Column({ type: 'timestamp with time zone', nullable: true })
+  lastLoginAt: Date | null;
+
   @Column({
     type: 'jsonb',
     nullable: false,

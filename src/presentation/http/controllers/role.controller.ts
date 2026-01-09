@@ -6,7 +6,6 @@ import {
   HttpCode,
   HttpStatus,
   Param,
-  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -80,16 +79,14 @@ export class RoleController {
   }
 
   @Get(':id')
-  async findOne(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<RoleResponseDto> {
+  async findOne(@Param('id') id: string): Promise<RoleResponseDto> {
     return await this.queryBus.execute(new GetRoleQuery(id));
   }
 
   @Patch(':id')
   @RequirePermissions(PERMISSIONS.ROLE.UPDATE)
   async update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() dto: UpdateRoleDto,
   ): Promise<RoleResponseDto> {
     await this.commandBus.execute(
@@ -102,7 +99,7 @@ export class RoleController {
   @Delete(':id')
   @RequirePermissions(PERMISSIONS.ROLE.DELETE)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+  async remove(@Param('id') id: string): Promise<void> {
     await this.commandBus.execute(new DeleteRoleCommand(id));
   }
 }

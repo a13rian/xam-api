@@ -25,6 +25,7 @@ export interface UserProps {
   roleNames?: string[];
   failedLoginAttempts?: number;
   lockedUntil?: Date | null;
+  lastLoginAt?: Date | null;
   notificationSettings?: NotificationSettings;
   createdAt?: Date;
   updatedAt?: Date;
@@ -54,6 +55,7 @@ export class User extends AggregateRoot {
   private _roleNames: string[];
   private _failedLoginAttempts: number;
   private _lockedUntil: Date | null;
+  private _lastLoginAt: Date | null;
   private _notificationSettings: NotificationSettings;
   private readonly _createdAt: Date;
   private _updatedAt: Date;
@@ -75,6 +77,7 @@ export class User extends AggregateRoot {
     this._roleNames = props.roleNames ?? [];
     this._failedLoginAttempts = props.failedLoginAttempts ?? 0;
     this._lockedUntil = props.lockedUntil ?? null;
+    this._lastLoginAt = props.lastLoginAt ?? null;
     this._notificationSettings =
       props.notificationSettings ?? NotificationSettings.create();
     this._createdAt = props.createdAt ?? new Date();
@@ -181,6 +184,8 @@ export class User extends AggregateRoot {
 
   public recordSuccessfulLogin(): void {
     this.resetFailedLoginAttempts();
+    this._lastLoginAt = new Date();
+    this._updatedAt = new Date();
   }
 
   public unlock(): void {
@@ -269,6 +274,9 @@ export class User extends AggregateRoot {
   }
   get lockedUntil(): Date | null {
     return this._lockedUntil;
+  }
+  get lastLoginAt(): Date | null {
+    return this._lastLoginAt;
   }
   get createdAt(): Date {
     return this._createdAt;

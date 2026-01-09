@@ -4,7 +4,6 @@ import {
   MaxLength,
   IsOptional,
   IsArray,
-  IsUUID,
 } from 'class-validator';
 
 export class CreateRoleDto {
@@ -19,10 +18,10 @@ export class CreateRoleDto {
   description: string;
 
   @IsArray()
-  @IsUUID('4', { each: true })
+  @IsString({ each: true })
   permissionIds: string[];
 
   @IsOptional()
-  @IsUUID()
+  @IsString()
   organizationId?: string;
 }

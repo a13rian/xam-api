@@ -25,6 +25,7 @@ export class UserMapper {
       roleNames: entity.roles?.map((r) => r.name) ?? [],
       failedLoginAttempts: entity.failedLoginAttempts,
       lockedUntil: entity.lockedUntil,
+      lastLoginAt: entity.lastLoginAt,
       notificationSettings: NotificationSettings.fromJSON(
         entity.notificationSettings,
       ),
@@ -48,6 +49,7 @@ export class UserMapper {
     entity.emailVerifiedAt = domain.emailVerifiedAt;
     entity.failedLoginAttempts = domain.failedLoginAttempts;
     entity.lockedUntil = domain.lockedUntil;
+    entity.lastLoginAt = domain.lastLoginAt;
     entity.notificationSettings = domain.notificationSettings.toJSON();
     entity.createdAt = domain.createdAt;
     entity.updatedAt = domain.updatedAt;

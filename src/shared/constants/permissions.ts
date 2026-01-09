@@ -51,6 +51,10 @@ export const PERMISSIONS = {
     UPDATE: 'wallet:update',
     LIST: 'wallet:list',
   },
+  AUDIT: {
+    READ: 'audit:read',
+    LIST: 'audit:list',
+  },
 } as const;
 
 export type PermissionCode =

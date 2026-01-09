@@ -289,14 +289,14 @@ describe('Roles E2E', () => {
       });
     });
 
-    describe('Validation', () => {
-      it('should return 400 for invalid UUID', async () => {
+    describe('Not Found', () => {
+      it('should return 404 for non-existent role', async () => {
         const user = await authHelper.createAuthenticatedUser();
 
         await request(ctx.server)
-          .get('/api/roles/not-a-uuid')
+          .get('/api/roles/not-a-valid-id')
           .set(authHelper.authHeader(user))
-          .expect(400);
+          .expect(404);
       });
     });
 
@@ -524,14 +524,14 @@ describe('Roles E2E', () => {
       });
     });
 
-    describe('Validation', () => {
-      it('should return 400 for invalid UUID', async () => {
+    describe('Not Found', () => {
+      it('should return 404 for non-existent role', async () => {
         const superAdmin = await authHelper.createSuperAdmin();
 
         await request(ctx.server)
-          .delete('/api/roles/not-a-uuid')
+          .delete('/api/roles/not-a-valid-id')
           .set(authHelper.authHeader(superAdmin))
-          .expect(400);
+          .expect(404);
       });
     });
 

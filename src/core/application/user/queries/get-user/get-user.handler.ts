@@ -11,9 +11,17 @@ export interface GetUserResult {
   email: string;
   firstName: string;
   lastName: string;
+  phone: string | null;
+  dateOfBirth: Date | null;
+  gender: string | null;
+  avatarUrl: string | null;
   isActive: boolean;
   isEmailVerified: boolean;
   roleIds: string[];
+  roleNames: string[];
+  failedLoginAttempts: number;
+  lockedUntil: Date | null;
+  lastLoginAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -36,9 +44,17 @@ export class GetUserHandler implements IQueryHandler<GetUserQuery> {
       email: user.email.value,
       firstName: user.firstName,
       lastName: user.lastName,
+      phone: user.phone,
+      dateOfBirth: user.dateOfBirth,
+      gender: user.genderValue,
+      avatarUrl: user.avatarUrl,
       isActive: user.isActive,
       isEmailVerified: user.isEmailVerified,
       roleIds: [...user.roleIds],
+      roleNames: [...user.roleNames],
+      failedLoginAttempts: user.failedLoginAttempts,
+      lockedUntil: user.lockedUntil,
+      lastLoginAt: user.lastLoginAt,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };

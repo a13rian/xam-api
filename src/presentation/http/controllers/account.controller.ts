@@ -8,7 +8,6 @@ import {
   Body,
   Param,
   Query,
-  ParseUUIDPipe,
   HttpCode,
   UseInterceptors,
   UploadedFile,
@@ -38,6 +37,9 @@ import {
   GalleryItemResponseDto,
   UploadGalleryImageDto,
   PublicAccountResponseDto,
+  AdminUpdateAccountDto,
+  AdminAccountDetailDto,
+  SuspendAccountDto,
 } from '../dto/account';
 import {
   UploadFileCommand,
@@ -52,6 +54,10 @@ import {
   UpdateGalleryImageCommand,
   RemoveGalleryImageCommand,
   ReorderGalleryImagesCommand,
+  SuspendAccountCommand,
+  ActivateAccountCommand,
+  AdminUpdateAccountCommand,
+  DeleteAccountCommand,
 } from '../../../core/application/account/commands';
 import { RegisterAccountResult } from '../../../core/application/account/commands/register-account/register-account.handler';
 import {
@@ -72,6 +78,11 @@ import {
   GetAccountQuery,
   GetAccountResult,
 } from '../../../core/application/account/queries/get-account';
+import {
+  GetAdminAccountQuery,
+  GetAdminAccountResult,
+} from '../../../core/application/account/queries/get-admin-account';
+import { AccountRoleEnum } from '../../../core/domain/account/value-objects/account-role.vo';
 import { ListServicesQuery } from '../../../core/application/service/queries/list-services/list-services.query';
 import { ServicesListResponseDto } from '../dto/service/service-response.dto';
 import { AccountStatusEnum } from '../../../core/domain/account/value-objects/account-status.vo';
@@ -595,7 +606,7 @@ export class AdminAccountController {
     description: 'Approve a pending partner account',
   })
   async approve(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<void> {
     await this.commandBus.execute(new ApproveAccountCommand(id, user.id));
@@ -609,12 +620,154 @@ export class AdminAccountController {
     description: 'Reject a pending partner account with a reason',
   })
   async reject(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @CurrentUser() user: AuthenticatedUser,
     @Body() body: { reason: string },
   ): Promise<void> {
     await this.commandBus.execute(
       new RejectAccountCommand(id, user.id, body.reason),
     );
+  }
+
+  @Get(':id')
+  @RequirePermissions(PERMISSIONS.PARTNER.READ)
+  @ApiOperation({
+    summary: 'Get account details',
+    description: 'Get detailed information about a specific account',
+  })
+  async getDetail(@Param('id') id: string): Promise<AdminAccountDetailDto> {
+    const result = await this.queryBus.execute<
+      GetAdminAccountQuery,
+      GetAdminAccountResult
+    >(new GetAdminAccountQuery(id));
+
+    return {
+      id: result.id,
+      userId: result.userId,
+      type: result.type as AccountTypeEnum,
+      role: result.role as AccountRoleEnum | null,
+      displayName: result.displayName,
+      specialization: result.specialization,
+      portfolio: result.portfolio,
+      personalBio: result.personalBio,
+      status: result.status as AccountStatusEnum,
+      isActive: result.isActive,
+      approvedAt: result.approvedAt,
+      approvedBy: result.approvedBy,
+      rejectionReason: result.rejectionReason,
+      createdAt: result.createdAt,
+      updatedAt: result.updatedAt,
+      avatarUrl: result.avatarUrl,
+      coverImageUrl: result.coverImageUrl,
+      videoIntroUrl: result.videoIntroUrl,
+      phone: result.phone,
+      businessEmail: result.businessEmail,
+      website: result.website,
+      tagline: result.tagline,
+      languages: result.languages,
+      isVerified: result.isVerified,
+      verifiedAt: result.verifiedAt,
+      badges: result.badges,
+      rating: result.rating,
+      totalReviews: result.totalReviews,
+      completedBookings: result.completedBookings,
+      organizationId: result.organizationId,
+    };
+  }
+
+  @Patch(':id')
+  @RequirePermissions(PERMISSIONS.PARTNER.UPDATE)
+  @ApiOperation({
+    summary: 'Update account',
+    description: 'Update account information by admin',
+  })
+  async update(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: AdminUpdateAccountDto,
+  ): Promise<AdminAccountDetailDto> {
+    const account = await this.commandBus.execute<
+      AdminUpdateAccountCommand,
+      Account
+    >(new AdminUpdateAccountCommand(id, dto, user.id));
+
+    const obj = account.toObject();
+    return {
+      id: obj.id as string,
+      userId: obj.userId as string,
+      type: obj.type as AccountTypeEnum,
+      role: obj.role as AccountRoleEnum | null,
+      displayName: obj.displayName as string,
+      specialization: obj.specialization as string | null,
+      portfolio: obj.portfolio as string | null,
+      personalBio: obj.personalBio as string | null,
+      status: obj.status as AccountStatusEnum,
+      isActive: obj.isActive as boolean,
+      approvedAt: obj.approvedAt as Date | null,
+      approvedBy: obj.approvedBy as string | null,
+      rejectionReason: obj.rejectionReason as string | null,
+      createdAt: obj.createdAt as Date,
+      updatedAt: obj.updatedAt as Date,
+      avatarUrl: obj.avatarUrl as string | null,
+      coverImageUrl: obj.coverImageUrl as string | null,
+      videoIntroUrl: obj.videoIntroUrl as string | null,
+      phone: obj.phone as string | null,
+      businessEmail: obj.businessEmail as string | null,
+      website: obj.website as string | null,
+      tagline: obj.tagline as string | null,
+      languages: obj.languages as string[],
+      isVerified: obj.isVerified as boolean,
+      verifiedAt: obj.verifiedAt as Date | null,
+      badges: obj.badges as string[],
+      rating: obj.rating as number | null,
+      totalReviews: obj.totalReviews as number,
+      completedBookings: obj.completedBookings as number,
+      organizationId: obj.organizationId as string | null,
+    };
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  @RequirePermissions(PERMISSIONS.PARTNER.DELETE)
+  @ApiOperation({
+    summary: 'Delete account',
+    description: 'Permanently delete an account',
+  })
+  async delete(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<void> {
+    await this.commandBus.execute(new DeleteAccountCommand(id, user.id));
+  }
+
+  @Post(':id/suspend')
+  @HttpCode(200)
+  @RequirePermissions(PERMISSIONS.PARTNER.UPDATE)
+  @ApiOperation({
+    summary: 'Suspend account',
+    description: 'Suspend an active account with a reason',
+  })
+  async suspend(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: SuspendAccountDto,
+  ): Promise<void> {
+    await this.commandBus.execute(
+      new SuspendAccountCommand(id, user.id, dto.reason),
+    );
+  }
+
+  @Post(':id/activate')
+  @HttpCode(200)
+  @RequirePermissions(PERMISSIONS.PARTNER.UPDATE)
+  @ApiOperation({
+    summary: 'Activate account',
+    description: 'Reactivate a suspended account',
+  })
+  async activate(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<void> {
+    await this.commandBus.execute(new ActivateAccountCommand(id, user.id));
   }
 }

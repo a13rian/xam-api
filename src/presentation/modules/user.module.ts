@@ -5,8 +5,18 @@ import { UserController } from '../http/controllers/user.controller';
 import { UserRepository } from '../../infrastructure/persistence/typeorm/repositories/user.repository';
 import { UserMapper } from '../../infrastructure/persistence/typeorm/mappers/user.mapper';
 import { USER_REPOSITORY } from '../../core/domain/user/repositories/user.repository.interface';
-import { UserOrmEntity } from '../../infrastructure/persistence/typeorm/entities/user.orm-entity';
-import { RoleOrmEntity } from '../../infrastructure/persistence/typeorm/entities/role.orm-entity';
+import {
+  UserOrmEntity,
+  RoleOrmEntity,
+  AccountOrmEntity,
+  BookingOrmEntity,
+  WalletOrmEntity,
+  RefreshTokenOrmEntity,
+  EmailVerificationTokenOrmEntity,
+  PasswordResetTokenOrmEntity,
+} from '../../infrastructure/persistence/typeorm/entities';
+import { BcryptPasswordHasher } from '../../infrastructure/auth/bcrypt.password-hasher';
+import { PASSWORD_HASHER } from '../../core/domain/auth/services/password-hasher.interface';
 import {
   CreateUserHandler,
   UpdateUserHandler,
@@ -14,11 +24,15 @@ import {
   UpdateUserAvatarHandler,
   RemoveUserAvatarHandler,
   UpdateNotificationSettingsHandler,
+  AdminResetPasswordHandler,
+  BulkDeleteUsersHandler,
+  BulkUpdateStatusHandler,
 } from '../../core/application/user/commands';
 import {
   GetUserHandler,
   ListUsersHandler,
   GetNotificationSettingsHandler,
+  ExportUsersHandler,
 } from '../../core/application/user/queries';
 import { RoleModule } from './role.module';
 import { StorageModule } from './storage.module';
@@ -30,18 +44,31 @@ const CommandHandlers = [
   UpdateUserAvatarHandler,
   RemoveUserAvatarHandler,
   UpdateNotificationSettingsHandler,
+  AdminResetPasswordHandler,
+  BulkDeleteUsersHandler,
+  BulkUpdateStatusHandler,
 ];
 
 const QueryHandlers = [
   GetUserHandler,
   ListUsersHandler,
   GetNotificationSettingsHandler,
+  ExportUsersHandler,
 ];
 
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([UserOrmEntity, RoleOrmEntity]),
+    TypeOrmModule.forFeature([
+      UserOrmEntity,
+      RoleOrmEntity,
+      AccountOrmEntity,
+      BookingOrmEntity,
+      WalletOrmEntity,
+      RefreshTokenOrmEntity,
+      EmailVerificationTokenOrmEntity,
+      PasswordResetTokenOrmEntity,
+    ]),
     forwardRef(() => RoleModule),
     StorageModule,
   ],
@@ -51,6 +78,10 @@ const QueryHandlers = [
     {
       provide: USER_REPOSITORY,
       useClass: UserRepository,
+    },
+    {
+      provide: PASSWORD_HASHER,
+      useClass: BcryptPasswordHasher,
     },
     ...CommandHandlers,
     ...QueryHandlers,

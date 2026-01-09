@@ -26,7 +26,3 @@ export class RegisterResponseDto {
   lastName: string;
   message: string;
 }
-
-export class MessageResponseDto {
-  message: string;
-}

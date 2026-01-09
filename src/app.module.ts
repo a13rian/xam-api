@@ -1,6 +1,6 @@
 import { Module, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
@@ -25,11 +25,13 @@ import { StorageModule } from './presentation/modules/storage.module';
 import { UserModule } from './presentation/modules/user.module';
 import { WalletModule } from './presentation/modules/wallet.module';
 import { AdminModule } from './presentation/modules/admin.module';
+import { AuditModule } from './presentation/modules/audit.module';
 import {
   APP_CONFIG,
   LOGGER_CONFIG,
   THROTTLE_CONFIG,
 } from './shared/constants/injection-tokens';
+import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
 import { JwtAuthGuard } from './shared/guards/jwt-auth.guard';
 import { PermissionGuard } from './shared/guards/permission.guard';
 import { ValidationPipe } from './shared/pipes/validation.pipe';
@@ -110,6 +112,7 @@ import { ValidationPipe } from './shared/pipes/validation.pipe';
     OrganizationModule,
     StorageModule,
     AdminModule,
+    AuditModule,
   ],
   providers: [
     {
@@ -124,10 +127,10 @@ import { ValidationPipe } from './shared/pipes/validation.pipe';
       provide: APP_GUARD,
       useClass: PermissionGuard,
     },
-    // {
-    //   provide: APP_FILTER,
-    //   useClass: HttpExceptionFilter,
-    // },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
     {
       provide: APP_PIPE,
       useClass: ValidationPipe,
