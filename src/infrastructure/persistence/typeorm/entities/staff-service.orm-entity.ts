@@ -9,11 +9,11 @@ export class StaffServiceOrmEntity extends BaseOrmEntity {
   protected readonly idPrefix = 'ssv';
 
   @Index()
-  @Column('uuid')
+  @Column('varchar', { length: 255 })
   staffId: string;
 
   @Index()
-  @Column('uuid')
+  @Column('varchar', { length: 255 })
   serviceId: string;
 
   @ManyToOne(() => AccountOrmEntity, { onDelete: 'CASCADE' })

@@ -7,7 +7,6 @@ import {
   Body,
   Param,
   Query,
-  ParseUUIDPipe,
   NotFoundException,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -62,9 +61,7 @@ export class ServiceController {
 
   @Get(':id')
   @Public()
-  async getById(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<ServiceResponseDto> {
+  async getById(@Param('id') id: string): Promise<ServiceResponseDto> {
     return await this.queryBus.execute<GetServiceQuery, ServiceResponseDto>(
       new GetServiceQuery(id),
     );
@@ -132,7 +129,7 @@ export class PartnerServiceController {
   @Put(':id')
   async update(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() dto: UpdateServiceDto,
   ): Promise<ServiceResponseDto> {
     const organizationId = await this.getOrganizationId(user.id);
@@ -159,7 +156,7 @@ export class PartnerServiceController {
   @Post(':id/toggle')
   async toggle(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() dto: ToggleServiceDto,
   ): Promise<ServiceResponseDto> {
     const organizationId = await this.getOrganizationId(user.id);
@@ -174,7 +171,7 @@ export class PartnerServiceController {
   @Delete(':id')
   async delete(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
   ): Promise<void> {
     const organizationId = await this.getOrganizationId(user.id);
     await this.commandBus.execute(new DeleteServiceCommand(id, organizationId));

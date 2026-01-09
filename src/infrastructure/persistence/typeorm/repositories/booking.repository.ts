@@ -71,6 +71,12 @@ export class BookingRepository implements IBookingRepository {
       });
     }
 
+    if (options.accountId) {
+      query.andWhere('booking.accountId = :accountId', {
+        accountId: options.accountId,
+      });
+    }
+
     if (options.locationId) {
       query.andWhere('booking.locationId = :locationId', {
         locationId: options.locationId,

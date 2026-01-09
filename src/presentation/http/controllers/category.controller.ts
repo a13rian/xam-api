@@ -7,7 +7,6 @@ import {
   Body,
   Param,
   Query,
-  ParseUUIDPipe,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Public } from '../../../shared/decorators/public.decorator';
@@ -52,9 +51,7 @@ export class CategoryController {
 
   @Get(':id')
   @Public()
-  async getById(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<CategoryResponseDto> {
+  async getById(@Param('id') id: string): Promise<CategoryResponseDto> {
     return await this.queryBus.execute(new GetCategoryQuery(id));
   }
 }
@@ -79,9 +76,7 @@ export class AdminCategoryController {
 
   @Get(':id')
   @RequirePermissions(PERMISSIONS.CATEGORY.READ)
-  async getById(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<CategoryResponseDto> {
+  async getById(@Param('id') id: string): Promise<CategoryResponseDto> {
     return await this.queryBus.execute(new GetCategoryQuery(id));
   }
 
@@ -109,7 +104,7 @@ export class AdminCategoryController {
   @Put(':id')
   @RequirePermissions(PERMISSIONS.CATEGORY.UPDATE)
   async update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() dto: UpdateCategoryDto,
   ): Promise<CategoryResponseDto> {
     await this.commandBus.execute(
@@ -127,7 +122,7 @@ export class AdminCategoryController {
 
   @Delete(':id')
   @RequirePermissions(PERMISSIONS.CATEGORY.DELETE)
-  async delete(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+  async delete(@Param('id') id: string): Promise<void> {
     await this.commandBus.execute(new DeleteCategoryCommand(id));
   }
 }

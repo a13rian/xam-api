@@ -16,7 +16,7 @@ export class RoleOrmEntity extends BaseOrmEntity {
   @Column({ default: false })
   isSystem: boolean;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   @Index()
   organizationId: string | null;
 

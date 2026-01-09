@@ -1,7 +1,7 @@
 import {
   IsOptional,
   IsEnum,
-  IsUUID,
+  IsString,
   IsDateString,
   IsInt,
   Min,
@@ -19,7 +19,7 @@ export class ListAuditLogsQueryDto {
   entityType?: EntityType;
 
   @IsOptional()
-  @IsUUID()
+  @IsString()
   entityId?: string;
 
   @IsOptional()
@@ -27,7 +27,7 @@ export class ListAuditLogsQueryDto {
   action?: AuditAction;
 
   @IsOptional()
-  @IsUUID()
+  @IsString()
   performedById?: string;
 
   @IsOptional()

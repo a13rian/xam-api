@@ -19,7 +19,7 @@ export class BookingOrmEntity extends BaseOrmEntity {
   protected readonly idPrefix = 'bkg';
 
   @Index()
-  @Column('uuid')
+  @Column('varchar', { length: 255 })
   customerId: string;
 
   @Index()
@@ -81,7 +81,7 @@ export class BookingOrmEntity extends BaseOrmEntity {
   @Column({ type: 'text', nullable: true })
   cancellationReason?: string;
 
-  @Column('uuid', { nullable: true })
+  @Column('varchar', { length: 255, nullable: true })
   cancelledBy?: string;
 
   @Column({ type: 'timestamp', nullable: true })

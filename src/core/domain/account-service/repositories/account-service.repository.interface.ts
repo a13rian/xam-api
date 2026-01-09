@@ -20,6 +20,7 @@ export interface AccountServiceSearchResult {
 
 export interface IAccountServiceRepository {
   findById(id: string): Promise<AccountService | null>;
+  findByIds(ids: string[]): Promise<AccountService[]>;
   findByAccountId(
     accountId: string,
     activeOnly?: boolean,

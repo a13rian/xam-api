@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Inject, NotFoundException } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
+import { createId } from '@paralleldrive/cuid2';
 import { GenerateSlotsCommand } from './generate-slots.command';
 import { TimeSlot } from '../../../../domain/schedule/entities/time-slot.entity';
 import {
@@ -111,7 +111,7 @@ export class GenerateSlotsHandler implements ICommandHandler<GenerateSlotsComman
 
       slots.push(
         TimeSlot.create({
-          id: uuidv4(),
+          id: `slt_${createId()}`,
           locationId,
           staffId,
           date: new Date(date),

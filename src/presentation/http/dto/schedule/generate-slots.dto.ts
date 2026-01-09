@@ -4,7 +4,7 @@ import {
   Min,
   Max,
   IsOptional,
-  IsUUID,
+  IsString,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -22,6 +22,6 @@ export class GenerateSlotsDto {
   slotDurationMinutes: number;
 
   @IsOptional()
-  @IsUUID()
+  @IsString()
   staffId?: string;
 }

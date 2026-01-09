@@ -1,6 +1,5 @@
 import {
   IsString,
-  IsUUID,
   IsDateString,
   IsArray,
   ArrayMinSize,
@@ -12,20 +11,13 @@ import {
 import { Type } from 'class-transformer';
 
 export class BookingServiceItemDto {
-  @IsUUID()
-  serviceId: string;
+  @IsString()
+  serviceId: string; // Unified: accepts both srv_* and asv_*
 }
 
 export class CreateBookingDto {
-  @IsUUID()
-  organizationId: string;
-
-  @IsUUID()
-  locationId: string;
-
-  @IsOptional()
-  @IsUUID()
-  staffId?: string;
+  @IsString()
+  accountId: string; // Provider account ID
 
   @IsDateString()
   scheduledDate: string;
@@ -44,16 +36,6 @@ export class CreateBookingDto {
   @IsOptional()
   @IsBoolean()
   isHomeService?: boolean;
-
-  @IsOptional()
-  @IsString()
-  customerAddress?: string;
-
-  @IsString()
-  customerPhone: string;
-
-  @IsString()
-  customerName: string;
 
   @IsOptional()
   @IsString()

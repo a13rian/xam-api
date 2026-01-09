@@ -19,7 +19,13 @@ export class CompleteBookingHandler implements ICommandHandler<CompleteBookingCo
       throw new NotFoundException('Booking not found');
     }
 
-    if (booking.organizationId !== command.organizationId) {
+    // Validate booking belongs to the provider
+    const isOwner =
+      (command.organizationId &&
+        booking.organizationId === command.organizationId) ||
+      (command.accountId && booking.accountId === command.accountId);
+
+    if (!isOwner) {
       throw new NotFoundException('Booking not found');
     }
 

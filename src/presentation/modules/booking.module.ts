@@ -20,6 +20,8 @@ import { ServiceModule } from './service.module';
 import { WalletModule } from './wallet.module';
 import { ScheduleModule } from './schedule.module';
 import { OrganizationModule } from './organization.module';
+import { AccountModule } from './account.module';
+import { UserModule } from './user.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { OrganizationModule } from './organization.module';
     WalletModule,
     ScheduleModule,
     OrganizationModule,
+    AccountModule,
+    UserModule, // For customer info lookup
   ],
   controllers: [
     CustomerBookingController,

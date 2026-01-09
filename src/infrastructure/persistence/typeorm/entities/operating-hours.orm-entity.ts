@@ -9,7 +9,7 @@ export class OperatingHoursOrmEntity extends BaseOrmEntity {
   protected readonly idPrefix = 'hrs';
 
   @Index()
-  @Column('uuid')
+  @Column('varchar', { length: 255 })
   locationId: string;
 
   @Column({ type: 'smallint' })

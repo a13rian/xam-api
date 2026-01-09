@@ -1,20 +1,15 @@
 export interface BookingServiceInput {
-  serviceId: string;
+  serviceId: string; // Unified: srv_* for Organization, asv_* for Individual
 }
 
 export class CreateBookingCommand {
   constructor(
     public readonly customerId: string,
-    public readonly organizationId: string,
-    public readonly locationId: string,
+    public readonly accountId: string, // Provider account ID
     public readonly scheduledDate: Date,
     public readonly startTime: string,
     public readonly services: BookingServiceInput[],
-    public readonly customerPhone?: string,
-    public readonly customerName?: string,
-    public readonly staffId?: string,
-    public readonly isHomeService?: boolean,
-    public readonly customerAddress?: string,
+    public readonly isHomeService: boolean = false,
     public readonly notes?: string,
   ) {}
 }

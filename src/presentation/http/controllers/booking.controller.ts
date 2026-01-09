@@ -5,7 +5,6 @@ import {
   Body,
   Param,
   Query,
-  ParseUUIDPipe,
   NotFoundException,
   HttpCode,
 } from '@nestjs/common';
@@ -59,16 +58,11 @@ export class CustomerBookingController {
     >(
       new CreateBookingCommand(
         user.id,
-        dto.organizationId,
-        dto.locationId,
+        dto.accountId,
         new Date(dto.scheduledDate),
         dto.startTime,
         dto.services.map((s) => ({ serviceId: s.serviceId })),
-        dto.customerPhone,
-        dto.customerName,
-        dto.staffId,
         dto.isHomeService ?? false,
-        dto.customerAddress,
         dto.notes,
       ),
     );
@@ -114,7 +108,7 @@ export class CustomerBookingController {
   @Get(':id')
   async getBooking(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
   ): Promise<BookingResponseDto> {
     const booking = await this.queryBus.execute<
       GetBookingQuery,
@@ -134,7 +128,7 @@ export class CustomerBookingController {
   @HttpCode(200)
   async cancelBooking(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() dto: CancelBookingDto,
   ): Promise<BookingResponseDto> {
     return await this.commandBus.execute(
@@ -146,7 +140,7 @@ export class CustomerBookingController {
   @HttpCode(200)
   async rescheduleBooking(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() dto: RescheduleBookingDto,
   ): Promise<void> {
     await this.commandBus.execute(
@@ -161,6 +155,12 @@ export class CustomerBookingController {
   }
 }
 
+interface ProviderContext {
+  type: 'organization' | 'individual';
+  organizationId?: string;
+  accountId?: string;
+}
+
 @Controller('partners/me/bookings')
 export class PartnerBookingController {
   constructor(
@@ -168,15 +168,39 @@ export class PartnerBookingController {
     private readonly queryBus: QueryBus,
   ) {}
 
-  private async getOrganizationId(userId: string): Promise<string> {
+  /**
+   * Get provider context for the current user.
+   * Supports both Business (Organization) and Individual accounts.
+   */
+  private async getProviderContext(userId: string): Promise<ProviderContext> {
     const account = await this.queryBus.execute<
       GetMyAccountQuery,
       AccountResponseDto | null
     >(new GetMyAccountQuery(userId));
-    if (!account || !account.organization?.id) {
-      throw new NotFoundException('Organization not found');
+
+    if (!account) {
+      throw new NotFoundException('Account not found');
     }
-    return account.organization.id;
+
+    // Business account with organization
+    if (account.type === 'business' && account.organization?.id) {
+      return {
+        type: 'organization',
+        organizationId: account.organization.id,
+      };
+    }
+
+    // Individual account
+    if (account.type === 'individual') {
+      return {
+        type: 'individual',
+        accountId: account.id,
+      };
+    }
+
+    throw new NotFoundException(
+      'No valid provider context found. Account must be Business with Organization or Individual.',
+    );
   }
 
   @Get()
@@ -184,14 +208,15 @@ export class PartnerBookingController {
     @CurrentUser() user: AuthenticatedUser,
     @Query() query: ListPartnerBookingsQueryDto,
   ): Promise<BookingsListResponseDto> {
-    const organizationId = await this.getOrganizationId(user.id);
+    const context = await this.getProviderContext(user.id);
 
     return await this.queryBus.execute<
       ListPartnerBookingsQuery,
       BookingsListResponseDto
     >(
       new ListPartnerBookingsQuery(
-        organizationId,
+        context.organizationId,
+        context.accountId,
         query.status,
         query.startDate ? new Date(query.startDate) : undefined,
         query.endDate ? new Date(query.endDate) : undefined,
@@ -204,9 +229,9 @@ export class PartnerBookingController {
   @Get(':id')
   async getBooking(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
   ): Promise<BookingResponseDto> {
-    const organizationId = await this.getOrganizationId(user.id);
+    const context = await this.getProviderContext(user.id);
 
     const booking = await this.queryBus.execute<
       GetBookingQuery,
@@ -215,8 +240,15 @@ export class PartnerBookingController {
     if (!booking) {
       throw new NotFoundException('Booking not found');
     }
-    // Ensure organization can only see their own bookings
-    if (booking.organizationId !== organizationId) {
+
+    // Ensure provider can only see their own bookings
+    const isOwner =
+      (context.type === 'organization' &&
+        booking.organizationId === context.organizationId) ||
+      (context.type === 'individual' &&
+        booking.accountId === context.accountId);
+
+    if (!isOwner) {
       throw new NotFoundException('Booking not found');
     }
     return booking;
@@ -226,11 +258,11 @@ export class PartnerBookingController {
   @HttpCode(200)
   async confirmBooking(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
   ): Promise<BookingResponseDto> {
-    const organizationId = await this.getOrganizationId(user.id);
+    const context = await this.getProviderContext(user.id);
     return await this.commandBus.execute(
-      new ConfirmBookingCommand(id, organizationId),
+      new ConfirmBookingCommand(id, context.organizationId, context.accountId),
     );
   }
 
@@ -238,11 +270,11 @@ export class PartnerBookingController {
   @HttpCode(200)
   async startBooking(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
   ): Promise<BookingResponseDto> {
-    const organizationId = await this.getOrganizationId(user.id);
+    const context = await this.getProviderContext(user.id);
     return await this.commandBus.execute(
-      new StartBookingCommand(id, organizationId),
+      new StartBookingCommand(id, context.organizationId, context.accountId),
     );
   }
 
@@ -250,11 +282,11 @@ export class PartnerBookingController {
   @HttpCode(200)
   async completeBooking(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
   ): Promise<BookingResponseDto> {
-    const organizationId = await this.getOrganizationId(user.id);
+    const context = await this.getProviderContext(user.id);
     return await this.commandBus.execute(
-      new CompleteBookingCommand(id, organizationId),
+      new CompleteBookingCommand(id, context.organizationId, context.accountId),
     );
   }
 
@@ -262,12 +294,17 @@ export class PartnerBookingController {
   @HttpCode(200)
   async cancelBooking(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() dto: CancelBookingDto,
   ): Promise<BookingResponseDto> {
-    const organizationId = await this.getOrganizationId(user.id);
+    const context = await this.getProviderContext(user.id);
     return await this.commandBus.execute(
-      new CancelBookingCommand(id, organizationId, dto.reason, true),
+      new CancelBookingCommand(
+        id,
+        context.organizationId ?? context.accountId!,
+        dto.reason,
+        true,
+      ),
     );
   }
 
@@ -275,14 +312,14 @@ export class PartnerBookingController {
   @HttpCode(200)
   async rescheduleBooking(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() dto: RescheduleBookingDto,
   ): Promise<void> {
-    const organizationId = await this.getOrganizationId(user.id);
+    const context = await this.getProviderContext(user.id);
     await this.commandBus.execute(
       new RescheduleBookingCommand(
         id,
-        organizationId,
+        context.organizationId ?? context.accountId!,
         true,
         new Date(dto.newDate),
         dto.newStartTime,

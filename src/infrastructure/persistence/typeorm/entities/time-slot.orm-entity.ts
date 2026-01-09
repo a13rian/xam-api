@@ -10,11 +10,11 @@ export class TimeSlotOrmEntity extends BaseOrmEntity {
   protected readonly idPrefix = 'slt';
 
   @Index()
-  @Column('uuid')
+  @Column('varchar', { length: 255 })
   locationId: string;
 
   @Index()
-  @Column('uuid', { nullable: true })
+  @Column('varchar', { length: 255, nullable: true })
   staffId?: string;
 
   @Index()
@@ -34,7 +34,7 @@ export class TimeSlotOrmEntity extends BaseOrmEntity {
   })
   status: TimeSlotStatus;
 
-  @Column('uuid', { nullable: true })
+  @Column('varchar', { length: 255, nullable: true })
   bookingId?: string;
 
   @ManyToOne('BookingOrmEntity', { onDelete: 'SET NULL' })

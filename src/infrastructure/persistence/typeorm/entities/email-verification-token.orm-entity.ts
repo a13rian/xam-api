@@ -10,7 +10,7 @@ export class EmailVerificationTokenOrmEntity extends BaseOrmEntity {
   @Index()
   token: string;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'varchar', length: 255 })
   @Index()
   userId: string;
 

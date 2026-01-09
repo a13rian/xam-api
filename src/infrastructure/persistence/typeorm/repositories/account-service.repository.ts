@@ -23,6 +23,17 @@ export class AccountServiceRepository implements IAccountServiceRepository {
     return entity ? this.mapper.toDomain(entity) : null;
   }
 
+  async findByIds(ids: string[]): Promise<AccountService[]> {
+    if (ids.length === 0) {
+      return [];
+    }
+    const entities = await this.repository
+      .createQueryBuilder('accountService')
+      .where('accountService.id IN (:...ids)', { ids })
+      .getMany();
+    return entities.map((e) => this.mapper.toDomain(e));
+  }
+
   async findByAccountId(
     accountId: string,
     activeOnly = true,

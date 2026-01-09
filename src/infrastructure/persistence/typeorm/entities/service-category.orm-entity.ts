@@ -23,7 +23,7 @@ export class ServiceCategoryOrmEntity extends BaseOrmEntity {
   description?: string;
 
   @Index()
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   parentId?: string;
 
   @Column({ type: 'text', nullable: true })

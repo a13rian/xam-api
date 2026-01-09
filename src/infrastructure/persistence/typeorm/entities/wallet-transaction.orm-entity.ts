@@ -8,7 +8,7 @@ import { BaseOrmEntity } from './base.orm-entity';
 export class WalletTransactionOrmEntity extends BaseOrmEntity {
   protected readonly idPrefix = 'wtx';
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'varchar', length: 255 })
   @Index()
   walletId: string;
 
@@ -32,7 +32,7 @@ export class WalletTransactionOrmEntity extends BaseOrmEntity {
   @Index()
   referenceType: string | null;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   @Index()
   referenceId: string | null;
 

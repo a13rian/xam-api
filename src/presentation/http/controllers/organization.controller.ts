@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Param,
-  ParseUUIDPipe,
-  HttpCode,
-} from '@nestjs/common';
+import { Controller, Get, Post, Param, HttpCode } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 import { RequirePermissions } from '../../../shared/decorators/permissions.decorator';
@@ -49,7 +42,7 @@ export class AdminOrganizationController {
   @HttpCode(200)
   @RequirePermissions(PERMISSIONS.PARTNER.APPROVE)
   async approve(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<void> {
     await this.commandBus.execute(new ApproveOrganizationCommand(id, user.id));

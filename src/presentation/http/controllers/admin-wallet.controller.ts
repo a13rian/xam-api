@@ -6,7 +6,6 @@ import {
   Param,
   Query,
   Body,
-  ParseUUIDPipe,
   NotFoundException,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -65,9 +64,7 @@ export class AdminWalletController {
     summary: 'Get wallet by ID',
     description: 'Get wallet details by wallet ID',
   })
-  async getWalletById(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<WalletResponseDto> {
+  async getWalletById(@Param('id') id: string): Promise<WalletResponseDto> {
     const wallet = await this.queryBus.execute<
       GetWalletQuery,
       WalletResponseDto | null
@@ -89,7 +86,7 @@ export class AdminWalletController {
     description: 'Get transaction history for a specific wallet',
   })
   async getWalletTransactions(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Query() query: ListTransactionsQueryDto,
   ): Promise<TransactionListResponseDto> {
     return await this.queryBus.execute<
@@ -106,7 +103,7 @@ export class AdminWalletController {
       'Manually adjust wallet balance (positive for credit, negative for debit)',
   })
   async adjustBalance(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() dto: AdminAdjustBalanceDto,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<AdminAdjustBalanceResponseDto> {

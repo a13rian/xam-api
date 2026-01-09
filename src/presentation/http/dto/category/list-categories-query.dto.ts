@@ -1,6 +1,6 @@
 import {
   IsOptional,
-  IsUUID,
+  IsString,
   IsBoolean,
   IsInt,
   Min,
@@ -15,7 +15,7 @@ export class ListCategoriesQueryDto {
   includeInactive?: boolean = false;
 
   @IsOptional()
-  @IsUUID()
+  @IsString()
   parentId?: string;
 
   @IsOptional()

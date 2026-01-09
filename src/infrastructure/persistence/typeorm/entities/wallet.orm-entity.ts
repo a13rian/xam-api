@@ -16,7 +16,7 @@ import { BaseOrmEntity } from './base.orm-entity';
 export class WalletOrmEntity extends BaseOrmEntity {
   protected readonly idPrefix = 'wlt';
 
-  @Column({ type: 'uuid', unique: true })
+  @Column({ type: 'varchar', length: 255, unique: true })
   @Index()
   userId: string;
 

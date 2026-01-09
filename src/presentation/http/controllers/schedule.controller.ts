@@ -5,7 +5,6 @@ import {
   Body,
   Param,
   Query,
-  ParseUUIDPipe,
   NotFoundException,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -37,7 +36,7 @@ export class ScheduleController {
   @Get('available')
   @Public()
   async getAvailable(
-    @Param('locationId', ParseUUIDPipe) locationId: string,
+    @Param('locationId') locationId: string,
     @Query() query: GetSlotsQueryDto,
   ): Promise<{ items: TimeSlotResponseDto[] }> {
     return await this.queryBus.execute<
@@ -68,7 +67,7 @@ export class PartnerScheduleController {
   @Get()
   async getSlots(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('locationId', ParseUUIDPipe) locationId: string,
+    @Param('locationId') locationId: string,
     @Query() query: GetSlotsByRangeQueryDto,
   ): Promise<{ items: TimeSlotResponseDto[] }> {
     await this.getOrganizationId(user.id); // Verify organization
@@ -85,7 +84,7 @@ export class PartnerScheduleController {
   @Post('generate')
   async generateSlots(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('locationId', ParseUUIDPipe) locationId: string,
+    @Param('locationId') locationId: string,
     @Body() dto: GenerateSlotsDto,
   ): Promise<{ count: number }> {
     const organizationId = await this.getOrganizationId(user.id);
@@ -105,7 +104,7 @@ export class PartnerScheduleController {
   @Post(':slotId/block')
   async blockSlot(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('slotId', ParseUUIDPipe) slotId: string,
+    @Param('slotId') slotId: string,
   ): Promise<void> {
     const organizationId = await this.getOrganizationId(user.id);
     await this.commandBus.execute(new BlockSlotCommand(slotId, organizationId));
@@ -114,7 +113,7 @@ export class PartnerScheduleController {
   @Post(':slotId/unblock')
   async unblockSlot(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('slotId', ParseUUIDPipe) slotId: string,
+    @Param('slotId') slotId: string,
   ): Promise<void> {
     const organizationId = await this.getOrganizationId(user.id);
     await this.commandBus.execute(

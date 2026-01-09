@@ -6,6 +6,7 @@ export const BOOKING_REPOSITORY = Symbol('BOOKING_REPOSITORY');
 export interface BookingSearchOptions {
   customerId?: string;
   organizationId?: string;
+  accountId?: string; // For Individual provider bookings
   locationId?: string;
   status?: BookingStatusEnum;
   startDate?: Date;

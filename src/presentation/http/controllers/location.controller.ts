@@ -6,7 +6,6 @@ import {
   Delete,
   Body,
   Param,
-  ParseUUIDPipe,
   NotFoundException,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -41,9 +40,7 @@ export class LocationController {
 
   @Get(':id')
   @Public()
-  async getById(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<LocationResponseDto> {
+  async getById(@Param('id') id: string): Promise<LocationResponseDto> {
     return await this.queryBus.execute<GetLocationQuery, LocationResponseDto>(
       new GetLocationQuery(id),
     );
@@ -52,7 +49,7 @@ export class LocationController {
   @Get(':id/hours')
   @Public()
   async getOperatingHours(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
   ): Promise<{ items: OperatingHoursResponseDto[] }> {
     return await this.queryBus.execute<
       GetOperatingHoursQuery,
@@ -123,7 +120,7 @@ export class PartnerLocationController {
   @Put(':id')
   async update(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() dto: UpdateLocationDto,
   ): Promise<LocationResponseDto> {
     const organizationId = await this.getOrganizationId(user.id);
@@ -149,7 +146,7 @@ export class PartnerLocationController {
   @Post(':id/primary')
   async setPrimary(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
   ): Promise<LocationResponseDto> {
     const organizationId = await this.getOrganizationId(user.id);
 
@@ -163,7 +160,7 @@ export class PartnerLocationController {
   @Put(':id/hours')
   async setOperatingHours(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() dto: SetOperatingHoursDto,
   ): Promise<{ items: OperatingHoursResponseDto[] }> {
     const organizationId = await this.getOrganizationId(user.id);
@@ -178,7 +175,7 @@ export class PartnerLocationController {
   @Delete(':id')
   async delete(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
   ): Promise<void> {
     const organizationId = await this.getOrganizationId(user.id);
     await this.commandBus.execute(

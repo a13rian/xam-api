@@ -62,6 +62,13 @@ export class AccountMapper {
       rating: entity.rating ? Number(entity.rating) : null,
       totalReviews: entity.totalReviews ?? 0,
       completedBookings: entity.completedBookings ?? 0,
+      // Address fields
+      street: entity.street,
+      ward: entity.ward,
+      district: entity.district,
+      city: entity.city,
+      latitude: entity.latitude ? Number(entity.latitude) : null,
+      longitude: entity.longitude ? Number(entity.longitude) : null,
     });
   }
 
@@ -109,6 +116,13 @@ export class AccountMapper {
     entity.rating = domain.rating;
     entity.totalReviews = domain.totalReviews;
     entity.completedBookings = domain.completedBookings;
+    // Address fields
+    entity.street = domain.street;
+    entity.ward = domain.ward;
+    entity.district = domain.district;
+    entity.city = domain.city;
+    entity.latitude = domain.latitude;
+    entity.longitude = domain.longitude;
     return entity;
   }
 

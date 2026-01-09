@@ -31,7 +31,7 @@ export class OrganizationOrmEntity extends BaseOrmEntity {
   @Column({ type: 'timestamp', nullable: true })
   approvedAt: Date | null;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   approvedBy: string | null;
 
   // Business fields (merged from PartnerBusiness)

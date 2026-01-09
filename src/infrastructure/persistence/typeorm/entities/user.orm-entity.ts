@@ -71,4 +71,23 @@ export class UserOrmEntity extends BaseOrmEntity {
     marketingEmails: boolean;
     bookingReminders: boolean;
   };
+
+  // Address fields for home service booking
+  @Column({ type: 'text', nullable: true })
+  street: string | null;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  ward: string | null;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  district: string | null;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  city: string | null;
+
+  @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+  latitude: number | null;
+
+  @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+  longitude: number | null;
 }

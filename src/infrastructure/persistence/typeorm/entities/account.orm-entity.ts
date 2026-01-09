@@ -29,7 +29,7 @@ import { BaseOrmEntity } from './base.orm-entity';
 export class AccountOrmEntity extends BaseOrmEntity {
   protected readonly idPrefix = 'acc';
 
-  @Column({ type: 'uuid', unique: true })
+  @Column({ type: 'varchar', length: 255, unique: true })
   @Index()
   userId: string;
 
@@ -37,7 +37,7 @@ export class AccountOrmEntity extends BaseOrmEntity {
   @JoinColumn({ name: 'user_id' })
   user: UserOrmEntity;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   @Index()
   organizationId: string | null;
 
@@ -80,7 +80,7 @@ export class AccountOrmEntity extends BaseOrmEntity {
   invitationStatus: InvitationStatusEnum | null;
 
   @Index({ unique: true, where: '"invitation_token" IS NOT NULL' })
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   invitationToken: string | null;
 
   @Column({ type: 'timestamp', nullable: true })
@@ -95,7 +95,7 @@ export class AccountOrmEntity extends BaseOrmEntity {
   @Column({ type: 'timestamp', nullable: true })
   approvedAt: Date | null;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   approvedBy: string | null;
 
   @Column({ type: 'text', nullable: true })

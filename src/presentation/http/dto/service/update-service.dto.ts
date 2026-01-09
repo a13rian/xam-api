@@ -1,7 +1,6 @@
 import {
   IsString,
   IsOptional,
-  IsUUID,
   IsInt,
   IsNumber,
   Min,
@@ -20,7 +19,7 @@ export class UpdateServiceDto {
   description?: string;
 
   @IsOptional()
-  @IsUUID()
+  @IsString()
   categoryId?: string;
 
   @IsOptional()

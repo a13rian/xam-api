@@ -10,11 +10,11 @@ export class ServiceOrmEntity extends BaseOrmEntity {
   protected readonly idPrefix = 'srv';
 
   @Index()
-  @Column('uuid')
+  @Column('varchar', { length: 255 })
   organizationId: string;
 
   @Index()
-  @Column('uuid')
+  @Column('varchar', { length: 255 })
   categoryId: string;
 
   @Column({ length: 200 })

@@ -65,6 +65,13 @@ export interface AccountProps {
   rating?: number | null;
   totalReviews: number;
   completedBookings: number;
+  // Address fields
+  street?: string | null;
+  ward?: string | null;
+  district?: string | null;
+  city?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 export interface CreateIndividualAccountProps {
@@ -131,6 +138,13 @@ export class Account extends AggregateRoot {
   private _rating: number | null;
   private _totalReviews: number;
   private _completedBookings: number;
+  // Address fields
+  private _street: string | null;
+  private _ward: string | null;
+  private _district: string | null;
+  private _city: string | null;
+  private _latitude: number | null;
+  private _longitude: number | null;
 
   private constructor(props: AccountProps) {
     super();
@@ -176,6 +190,13 @@ export class Account extends AggregateRoot {
     this._rating = props.rating ?? null;
     this._totalReviews = props.totalReviews ?? 0;
     this._completedBookings = props.completedBookings ?? 0;
+    // Address fields
+    this._street = props.street ?? null;
+    this._ward = props.ward ?? null;
+    this._district = props.district ?? null;
+    this._city = props.city ?? null;
+    this._latitude = props.latitude ?? null;
+    this._longitude = props.longitude ?? null;
   }
 
   static createIndividual(props: CreateIndividualAccountProps): Account {
@@ -791,6 +812,40 @@ export class Account extends AggregateRoot {
 
   get completedBookings(): number {
     return this._completedBookings;
+  }
+
+  // Address getters
+  get street(): string | null {
+    return this._street;
+  }
+
+  get ward(): string | null {
+    return this._ward;
+  }
+
+  get district(): string | null {
+    return this._district;
+  }
+
+  get city(): string | null {
+    return this._city;
+  }
+
+  get latitude(): number | null {
+    return this._latitude;
+  }
+
+  get longitude(): number | null {
+    return this._longitude;
+  }
+
+  get fullAddress(): string | null {
+    if (!this._street && !this._ward && !this._district && !this._city) {
+      return null;
+    }
+    return [this._street, this._ward, this._district, this._city]
+      .filter(Boolean)
+      .join(', ');
   }
 
   toObject(): Record<string, unknown> {

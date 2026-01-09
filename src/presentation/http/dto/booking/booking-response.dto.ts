@@ -2,7 +2,8 @@ import { BookingStatusEnum } from '../../../../core/domain/booking/value-objects
 
 export class BookingServiceResponseDto {
   id: string;
-  serviceId: string;
+  serviceId?: string; // For Organization services
+  accountServiceId?: string; // For Individual account services
   serviceName: string;
   price: number;
   currency: string;
@@ -12,8 +13,9 @@ export class BookingServiceResponseDto {
 export class BookingResponseDto {
   id: string;
   customerId: string;
-  organizationId: string;
-  locationId: string;
+  organizationId?: string; // For Business providers
+  accountId?: string; // For Individual providers
+  locationId?: string;
   staffId?: string;
   status: BookingStatusEnum;
   scheduledDate: Date;

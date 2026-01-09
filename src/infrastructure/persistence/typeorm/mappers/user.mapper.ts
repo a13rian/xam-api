@@ -29,6 +29,13 @@ export class UserMapper {
       notificationSettings: NotificationSettings.fromJSON(
         entity.notificationSettings,
       ),
+      // Address fields
+      street: entity.street,
+      ward: entity.ward,
+      district: entity.district,
+      city: entity.city,
+      latitude: entity.latitude ? Number(entity.latitude) : null,
+      longitude: entity.longitude ? Number(entity.longitude) : null,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     });
@@ -51,6 +58,13 @@ export class UserMapper {
     entity.lockedUntil = domain.lockedUntil;
     entity.lastLoginAt = domain.lastLoginAt;
     entity.notificationSettings = domain.notificationSettings.toJSON();
+    // Address fields
+    entity.street = domain.street;
+    entity.ward = domain.ward;
+    entity.district = domain.district;
+    entity.city = domain.city;
+    entity.latitude = domain.latitude;
+    entity.longitude = domain.longitude;
     entity.createdAt = domain.createdAt;
     entity.updatedAt = domain.updatedAt;
     return entity;

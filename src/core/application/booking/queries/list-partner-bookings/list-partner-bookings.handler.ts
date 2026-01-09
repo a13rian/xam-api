@@ -19,6 +19,7 @@ export class ListPartnerBookingsHandler implements IQueryHandler<ListPartnerBook
   ): Promise<BookingsListResponseDto> {
     const result = await this.bookingRepository.search({
       organizationId: query.organizationId,
+      accountId: query.accountId,
       status: query.status,
       startDate: query.startDate,
       endDate: query.endDate,
@@ -33,6 +34,7 @@ export class ListPartnerBookingsHandler implements IQueryHandler<ListPartnerBook
           id: props.id,
           customerId: props.customerId,
           organizationId: props.organizationId,
+          accountId: props.accountId,
           locationId: props.locationId,
           staffId: props.staffId,
           status: props.status,
@@ -57,6 +59,7 @@ export class ListPartnerBookingsHandler implements IQueryHandler<ListPartnerBook
           services: props.services.map((s) => ({
             id: s.id,
             serviceId: s.serviceId,
+            accountServiceId: s.accountServiceId,
             serviceName: s.serviceName,
             price: s.price,
             currency: s.currency,

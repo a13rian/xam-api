@@ -5,7 +5,7 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
+import { createId } from '@paralleldrive/cuid2';
 import { CreateServiceCommand } from './create-service.command';
 import { Service } from '../../../../domain/service/entities/service.entity';
 import {
@@ -62,7 +62,7 @@ export class CreateServiceHandler implements ICommandHandler<CreateServiceComman
     }
 
     const service = Service.create({
-      id: uuidv4(),
+      id: `srv_${createId()}`,
       organizationId: command.organizationId,
       categoryId: command.categoryId,
       name: command.name,

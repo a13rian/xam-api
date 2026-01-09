@@ -1,6 +1,5 @@
 import {
   IsOptional,
-  IsUUID,
   IsBoolean,
   IsString,
   IsInt,
@@ -11,11 +10,11 @@ import { Transform, Type } from 'class-transformer';
 
 export class ListServicesQueryDto {
   @IsOptional()
-  @IsUUID()
+  @IsString()
   organizationId?: string;
 
   @IsOptional()
-  @IsUUID()
+  @IsString()
   categoryId?: string;
 
   @IsOptional()

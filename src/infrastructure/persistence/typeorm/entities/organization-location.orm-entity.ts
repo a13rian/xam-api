@@ -7,7 +7,7 @@ export class OrganizationLocationOrmEntity extends BaseOrmEntity {
   protected readonly idPrefix = 'loc';
 
   @Index()
-  @Column('uuid')
+  @Column('varchar', { length: 255 })
   organizationId: string;
 
   @Column({ length: 200 })

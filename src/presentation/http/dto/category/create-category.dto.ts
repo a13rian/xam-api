@@ -1,7 +1,6 @@
 import {
   IsString,
   IsOptional,
-  IsUUID,
   IsInt,
   Min,
   MaxLength,
@@ -26,7 +25,7 @@ export class CreateCategoryDto {
   description?: string;
 
   @IsOptional()
-  @IsUUID()
+  @IsString()
   parentId?: string;
 
   @IsOptional()

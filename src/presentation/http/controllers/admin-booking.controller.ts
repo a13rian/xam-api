@@ -6,7 +6,6 @@ import {
   Param,
   Query,
   Body,
-  ParseUUIDPipe,
   NotFoundException,
   HttpCode,
 } from '@nestjs/common';
@@ -79,9 +78,7 @@ export class AdminBookingController {
     description: 'Get booking details by ID (admin only)',
   })
   @ApiParam({ name: 'id', description: 'Booking ID' })
-  async getBooking(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<BookingResponseDto> {
+  async getBooking(@Param('id') id: string): Promise<BookingResponseDto> {
     const booking = await this.queryBus.execute<
       GetBookingQuery,
       BookingResponseDto | null
@@ -103,7 +100,7 @@ export class AdminBookingController {
   })
   @ApiParam({ name: 'id', description: 'Booking ID' })
   async updateBookingStatus(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() dto: AdminUpdateBookingStatusDto,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<BookingResponseDto> {
@@ -121,7 +118,7 @@ export class AdminBookingController {
   })
   @ApiParam({ name: 'id', description: 'Booking ID' })
   async cancelBooking(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() dto: AdminCancelBookingDto,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<BookingResponseDto> {

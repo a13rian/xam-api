@@ -1,7 +1,6 @@
 import {
   IsString,
   IsOptional,
-  IsUUID,
   IsInt,
   IsNumber,
   IsEnum,
@@ -11,7 +10,7 @@ import {
 import { BookingTypeEnum } from '../../../../core/domain/service/value-objects/booking-type.vo';
 
 export class CreateServiceDto {
-  @IsUUID()
+  @IsString()
   categoryId: string;
 
   @IsString()
