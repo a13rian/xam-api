@@ -72,7 +72,7 @@ export class ExportUsersHandler implements IQueryHandler<ExportUsersQuery> {
     // Build CSV content
     const csvContent = [
       headers.map((h) => this.escapeCSV(h)).join(','),
-      ...rows.map((row) => row.map((v) => this.escapeCSV(v)).join(',')),
+      ...rows.map((row) => row.map((v) => this.escapeCSV(String(v))).join(',')),
     ].join('\n');
 
     const timestamp = new Date().toISOString().split('T')[0];
