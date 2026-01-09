@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class Migration1765901376465 implements MigrationInterface {
-  name = 'Migration1765901376465';
+export class Migration1767963785749 implements MigrationInterface {
+  name = 'Migration1767963785749';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS postgis`);
@@ -22,7 +22,7 @@ export class Migration1765901376465 implements MigrationInterface {
                 "home_service_radius_km" numeric(5, 2),
                 "rejection_reason" text,
                 "approved_at" TIMESTAMP,
-                "approved_by" uuid,
+                "approved_by" character varying(255),
                 "business_name" character varying(200) NOT NULL,
                 "tax_id" character varying(50),
                 "business_license" character varying(100),
@@ -42,7 +42,7 @@ export class Migration1765901376465 implements MigrationInterface {
                 "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "deleted_at" TIMESTAMP WITH TIME ZONE,
-                "organization_id" character varying NOT NULL,
+                "organization_id" character varying(255) NOT NULL,
                 "name" character varying(200) NOT NULL,
                 "street" text NOT NULL,
                 "ward" character varying(100),
@@ -93,7 +93,7 @@ export class Migration1765901376465 implements MigrationInterface {
                 "name" character varying NOT NULL,
                 "description" text,
                 "is_system" boolean NOT NULL DEFAULT false,
-                "organization_id" uuid,
+                "organization_id" character varying(255),
                 CONSTRAINT "pk_roles_id" PRIMARY KEY ("id")
             )
         `);
@@ -121,6 +121,14 @@ export class Migration1765901376465 implements MigrationInterface {
                 "email_verified_at" TIMESTAMP,
                 "failed_login_attempts" integer NOT NULL DEFAULT '0',
                 "locked_until" TIMESTAMP,
+                "last_login_at" TIMESTAMP WITH TIME ZONE,
+                "notification_settings" jsonb NOT NULL DEFAULT '{"emailNotifications":true,"pushNotifications":true,"marketingEmails":false,"bookingReminders":true}',
+                "street" text,
+                "ward" character varying(100),
+                "district" character varying(100),
+                "city" character varying(100),
+                "latitude" numeric(10, 7),
+                "longitude" numeric(10, 7),
                 CONSTRAINT "uq_users_email" UNIQUE ("email"),
                 CONSTRAINT "pk_users_id" PRIMARY KEY ("id")
             )
@@ -143,10 +151,11 @@ export class Migration1765901376465 implements MigrationInterface {
                 "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "deleted_at" TIMESTAMP WITH TIME ZONE,
-                "customer_id" character varying NOT NULL,
-                "organization_id" character varying NOT NULL,
-                "location_id" character varying NOT NULL,
-                "staff_id" uuid,
+                "customer_id" character varying(255) NOT NULL,
+                "organization_id" character varying(255),
+                "account_id" character varying(255),
+                "location_id" character varying(255),
+                "staff_id" character varying(255),
                 "status" "public"."bookings_status_enum" NOT NULL DEFAULT 'pending',
                 "scheduled_date" date NOT NULL,
                 "start_time" TIME NOT NULL,
@@ -160,7 +169,7 @@ export class Migration1765901376465 implements MigrationInterface {
                 "customer_name" character varying(200) NOT NULL,
                 "notes" text,
                 "cancellation_reason" text,
-                "cancelled_by" uuid,
+                "cancelled_by" character varying(255),
                 "confirmed_at" TIMESTAMP,
                 "started_at" TIMESTAMP,
                 "completed_at" TIMESTAMP,
@@ -173,6 +182,9 @@ export class Migration1765901376465 implements MigrationInterface {
         `);
     await queryRunner.query(`
             CREATE INDEX "idx_bookings_organization_id" ON "bookings" ("organization_id")
+        `);
+    await queryRunner.query(`
+            CREATE INDEX "idx_bookings_account_id" ON "bookings" ("account_id")
         `);
     await queryRunner.query(`
             CREATE INDEX "idx_bookings_location_id" ON "bookings" ("location_id")
@@ -192,8 +204,9 @@ export class Migration1765901376465 implements MigrationInterface {
                 "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "deleted_at" TIMESTAMP WITH TIME ZONE,
-                "booking_id" character varying NOT NULL,
-                "service_id" uuid NOT NULL,
+                "booking_id" character varying(255) NOT NULL,
+                "service_id" character varying(255),
+                "account_service_id" character varying(255),
                 "service_name" character varying(200) NOT NULL,
                 "price" numeric(15, 2) NOT NULL,
                 "currency" character varying(3) NOT NULL DEFAULT 'VND',
@@ -211,7 +224,7 @@ export class Migration1765901376465 implements MigrationInterface {
                 "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "deleted_at" TIMESTAMP WITH TIME ZONE,
                 "token" character varying NOT NULL,
-                "user_id" character varying NOT NULL,
+                "user_id" character varying(255) NOT NULL,
                 "expires_at" TIMESTAMP NOT NULL,
                 "is_used" boolean NOT NULL DEFAULT false,
                 CONSTRAINT "pk_email_verification_tokens_id" PRIMARY KEY ("id")
@@ -229,7 +242,7 @@ export class Migration1765901376465 implements MigrationInterface {
                 "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "deleted_at" TIMESTAMP WITH TIME ZONE,
-                "location_id" character varying NOT NULL,
+                "location_id" character varying(255) NOT NULL,
                 "day_of_week" smallint NOT NULL,
                 "open_time" TIME NOT NULL,
                 "close_time" TIME NOT NULL,
@@ -248,7 +261,7 @@ export class Migration1765901376465 implements MigrationInterface {
                 "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "deleted_at" TIMESTAMP WITH TIME ZONE,
                 "token" character varying NOT NULL,
-                "user_id" character varying NOT NULL,
+                "user_id" character varying(255) NOT NULL,
                 "expires_at" TIMESTAMP NOT NULL,
                 "is_used" boolean NOT NULL DEFAULT false,
                 CONSTRAINT "pk_password_reset_tokens_id" PRIMARY KEY ("id")
@@ -267,7 +280,7 @@ export class Migration1765901376465 implements MigrationInterface {
                 "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "deleted_at" TIMESTAMP WITH TIME ZONE,
                 "token" character varying NOT NULL,
-                "user_id" character varying NOT NULL,
+                "user_id" character varying(255) NOT NULL,
                 "user_agent" character varying,
                 "ip_address" character varying,
                 "expires_at" TIMESTAMP NOT NULL,
@@ -290,7 +303,7 @@ export class Migration1765901376465 implements MigrationInterface {
                 "name" character varying(100) NOT NULL,
                 "slug" character varying(150) NOT NULL,
                 "description" text,
-                "parent_id" character varying,
+                "parent_id" character varying(255),
                 "icon_url" text,
                 "sort_order" integer NOT NULL DEFAULT '0',
                 "is_active" boolean NOT NULL DEFAULT true,
@@ -315,8 +328,8 @@ export class Migration1765901376465 implements MigrationInterface {
                 "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "deleted_at" TIMESTAMP WITH TIME ZONE,
-                "organization_id" character varying NOT NULL,
-                "category_id" character varying NOT NULL,
+                "organization_id" character varying(255) NOT NULL,
+                "category_id" character varying(255) NOT NULL,
                 "name" character varying(200) NOT NULL,
                 "description" text,
                 "price_amount" numeric(15, 2) NOT NULL,
@@ -355,24 +368,22 @@ export class Migration1765901376465 implements MigrationInterface {
                 "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "deleted_at" TIMESTAMP WITH TIME ZONE,
-                "user_id" character varying NOT NULL,
-                "organization_id" character varying,
+                "user_id" character varying(255) NOT NULL,
+                "organization_id" character varying(255),
                 "type" "public"."accounts_type_enum" NOT NULL,
                 "role" "public"."accounts_role_enum",
                 "display_name" character varying(200) NOT NULL,
                 "specialization" character varying(100),
-                "years_experience" smallint,
-                "certifications" jsonb NOT NULL DEFAULT '[]',
                 "portfolio" text,
                 "personal_bio" text,
                 "status" "public"."accounts_status_enum" NOT NULL,
                 "invitation_status" "public"."accounts_invitation_status_enum",
-                "invitation_token" uuid,
+                "invitation_token" character varying(255),
                 "invited_at" TIMESTAMP,
                 "accepted_at" TIMESTAMP,
                 "is_active" boolean NOT NULL DEFAULT true,
                 "approved_at" TIMESTAMP,
-                "approved_by" uuid,
+                "approved_by" character varying(255),
                 "rejection_reason" text,
                 "street" text,
                 "ward" character varying(100),
@@ -437,8 +448,8 @@ export class Migration1765901376465 implements MigrationInterface {
                 "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "deleted_at" TIMESTAMP WITH TIME ZONE,
-                "staff_id" character varying NOT NULL,
-                "service_id" character varying NOT NULL,
+                "staff_id" character varying(255) NOT NULL,
+                "service_id" character varying(255) NOT NULL,
                 CONSTRAINT "uq_staff_services_staff_id_service_id" UNIQUE ("staff_id", "service_id"),
                 CONSTRAINT "pk_staff_services_id" PRIMARY KEY ("id")
             )
@@ -458,13 +469,13 @@ export class Migration1765901376465 implements MigrationInterface {
                 "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "deleted_at" TIMESTAMP WITH TIME ZONE,
-                "location_id" character varying NOT NULL,
-                "staff_id" uuid,
+                "location_id" character varying(255) NOT NULL,
+                "staff_id" character varying(255),
                 "date" date NOT NULL,
                 "start_time" TIME NOT NULL,
                 "end_time" TIME NOT NULL,
                 "status" "public"."time_slots_status_enum" NOT NULL DEFAULT 'available',
-                "booking_id" character varying,
+                "booking_id" character varying(255),
                 CONSTRAINT "uq_time_slots_location_id_staff_id_date_start_time" UNIQUE ("location_id", "staff_id", "date", "start_time"),
                 CONSTRAINT "pk_time_slots_id" PRIMARY KEY ("id")
             )
@@ -482,21 +493,6 @@ export class Migration1765901376465 implements MigrationInterface {
             CREATE INDEX "idx_time_slots_location_id_date_status" ON "time_slots" ("location_id", "date", "status")
         `);
     await queryRunner.query(`
-            CREATE TABLE "user_profiles" (
-                "user_id" character varying NOT NULL,
-                "avatar" text,
-                "bio" text,
-                "phone" character varying(20),
-                "address" text,
-                "date_of_birth" date,
-                "gender" character varying(20),
-                "preferences" jsonb DEFAULT '{}',
-                "created_at" TIMESTAMP NOT NULL DEFAULT now(),
-                "updated_at" TIMESTAMP NOT NULL DEFAULT now(),
-                CONSTRAINT "pk_user_profiles_user_id" PRIMARY KEY ("user_id")
-            )
-        `);
-    await queryRunner.query(`
             CREATE TYPE "public"."wallet_transactions_type_enum" AS ENUM(
                 'deposit',
                 'withdrawal',
@@ -511,13 +507,13 @@ export class Migration1765901376465 implements MigrationInterface {
                 "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "deleted_at" TIMESTAMP WITH TIME ZONE,
-                "wallet_id" character varying NOT NULL,
+                "wallet_id" character varying(255) NOT NULL,
                 "type" "public"."wallet_transactions_type_enum" NOT NULL,
                 "amount" numeric(15, 2) NOT NULL,
                 "balance_after" numeric(15, 2) NOT NULL,
                 "currency" character varying(3) NOT NULL DEFAULT 'VND',
                 "reference_type" character varying(50),
-                "reference_id" uuid,
+                "reference_id" character varying(255),
                 "description" text NOT NULL,
                 CONSTRAINT "pk_wallet_transactions_id" PRIMARY KEY ("id")
             )
@@ -540,7 +536,7 @@ export class Migration1765901376465 implements MigrationInterface {
                 "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
                 "deleted_at" TIMESTAMP WITH TIME ZONE,
-                "user_id" character varying NOT NULL,
+                "user_id" character varying(255) NOT NULL,
                 "balance" numeric(15, 2) NOT NULL DEFAULT '0',
                 "currency" character varying(3) NOT NULL DEFAULT 'VND',
                 CONSTRAINT "uq_wallets_user_id" UNIQUE ("user_id"),
@@ -571,6 +567,37 @@ export class Migration1765901376465 implements MigrationInterface {
         `);
     await queryRunner.query(`
             CREATE INDEX "idx_account_galleries_account_id_sort_order" ON "account_galleries" ("account_id", "sort_order")
+        `);
+    await queryRunner.query(`
+            CREATE TABLE "account_services" (
+                "id" character varying(255) NOT NULL,
+                "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+                "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+                "deleted_at" TIMESTAMP WITH TIME ZONE,
+                "account_id" character varying(255) NOT NULL,
+                "category_id" character varying(255) NOT NULL,
+                "name" character varying(200) NOT NULL,
+                "description" text,
+                "price_amount" numeric(15, 2) NOT NULL,
+                "price_currency" character varying(3) NOT NULL DEFAULT 'VND',
+                "duration_minutes" integer NOT NULL,
+                "is_active" boolean NOT NULL DEFAULT true,
+                "sort_order" integer NOT NULL DEFAULT '0',
+                CONSTRAINT "pk_account_services_id" PRIMARY KEY ("id")
+            )
+        `);
+    await queryRunner.query(`
+            CREATE INDEX "idx_account_services_account_id" ON "account_services" ("account_id")
+        `);
+    await queryRunner.query(`
+            CREATE INDEX "idx_account_services_category_id" ON "account_services" ("category_id")
+        `);
+    await queryRunner.query(`
+            CREATE UNIQUE INDEX "idx_account_services_account_id_name" ON "account_services" ("account_id", "name")
+            WHERE "deleted_at" IS NULL
+        `);
+    await queryRunner.query(`
+            CREATE INDEX "idx_account_services_account_id_is_active" ON "account_services" ("account_id", "is_active")
         `);
     await queryRunner.query(`
             CREATE TABLE "wards" (
@@ -775,10 +802,6 @@ export class Migration1765901376465 implements MigrationInterface {
             ADD CONSTRAINT "fk_time_slots_location_id" FOREIGN KEY ("location_id") REFERENCES "organization_locations"("id") ON DELETE CASCADE ON UPDATE NO ACTION
         `);
     await queryRunner.query(`
-            ALTER TABLE "user_profiles"
-            ADD CONSTRAINT "fk_user_profiles_user_id" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION
-        `);
-    await queryRunner.query(`
             ALTER TABLE "wallet_transactions"
             ADD CONSTRAINT "fk_wallet_transactions_wallet_id" FOREIGN KEY ("wallet_id") REFERENCES "wallets"("id") ON DELETE NO ACTION ON UPDATE NO ACTION
         `);
@@ -789,6 +812,14 @@ export class Migration1765901376465 implements MigrationInterface {
     await queryRunner.query(`
             ALTER TABLE "account_galleries"
             ADD CONSTRAINT "fk_account_galleries_account_id" FOREIGN KEY ("account_id") REFERENCES "accounts"("id") ON DELETE CASCADE ON UPDATE NO ACTION
+        `);
+    await queryRunner.query(`
+            ALTER TABLE "account_services"
+            ADD CONSTRAINT "fk_account_services_account_id" FOREIGN KEY ("account_id") REFERENCES "accounts"("id") ON DELETE CASCADE ON UPDATE NO ACTION
+        `);
+    await queryRunner.query(`
+            ALTER TABLE "account_services"
+            ADD CONSTRAINT "fk_account_services_category_id" FOREIGN KEY ("category_id") REFERENCES "service_categories"("id") ON DELETE RESTRICT ON UPDATE NO ACTION
         `);
     await queryRunner.query(`
             ALTER TABLE "wards"
@@ -836,6 +867,12 @@ export class Migration1765901376465 implements MigrationInterface {
             ALTER TABLE "wards" DROP CONSTRAINT "fk_wards_district_id"
         `);
     await queryRunner.query(`
+            ALTER TABLE "account_services" DROP CONSTRAINT "fk_account_services_category_id"
+        `);
+    await queryRunner.query(`
+            ALTER TABLE "account_services" DROP CONSTRAINT "fk_account_services_account_id"
+        `);
+    await queryRunner.query(`
             ALTER TABLE "account_galleries" DROP CONSTRAINT "fk_account_galleries_account_id"
         `);
     await queryRunner.query(`
@@ -843,9 +880,6 @@ export class Migration1765901376465 implements MigrationInterface {
         `);
     await queryRunner.query(`
             ALTER TABLE "wallet_transactions" DROP CONSTRAINT "fk_wallet_transactions_wallet_id"
-        `);
-    await queryRunner.query(`
-            ALTER TABLE "user_profiles" DROP CONSTRAINT "fk_user_profiles_user_id"
         `);
     await queryRunner.query(`
             ALTER TABLE "time_slots" DROP CONSTRAINT "fk_time_slots_location_id"
@@ -968,6 +1002,21 @@ export class Migration1765901376465 implements MigrationInterface {
             DROP TABLE "wards"
         `);
     await queryRunner.query(`
+            DROP INDEX "public"."idx_account_services_account_id_is_active"
+        `);
+    await queryRunner.query(`
+            DROP INDEX "public"."idx_account_services_account_id_name"
+        `);
+    await queryRunner.query(`
+            DROP INDEX "public"."idx_account_services_category_id"
+        `);
+    await queryRunner.query(`
+            DROP INDEX "public"."idx_account_services_account_id"
+        `);
+    await queryRunner.query(`
+            DROP TABLE "account_services"
+        `);
+    await queryRunner.query(`
             DROP INDEX "public"."idx_account_galleries_account_id_sort_order"
         `);
     await queryRunner.query(`
@@ -999,9 +1048,6 @@ export class Migration1765901376465 implements MigrationInterface {
         `);
     await queryRunner.query(`
             DROP TYPE "public"."wallet_transactions_type_enum"
-        `);
-    await queryRunner.query(`
-            DROP TABLE "user_profiles"
         `);
     await queryRunner.query(`
             DROP INDEX "public"."idx_time_slots_location_id_date_status"
@@ -1146,6 +1192,9 @@ export class Migration1765901376465 implements MigrationInterface {
         `);
     await queryRunner.query(`
             DROP INDEX "public"."idx_bookings_location_id"
+        `);
+    await queryRunner.query(`
+            DROP INDEX "public"."idx_bookings_account_id"
         `);
     await queryRunner.query(`
             DROP INDEX "public"."idx_bookings_organization_id"
